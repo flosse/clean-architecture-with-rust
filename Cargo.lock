@@ -12,6 +12,7 @@ name = "application"
 version = "0.0.0"
 dependencies = [
  "domain",
+ "entity",
 ]
 
 [[package]]
