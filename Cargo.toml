@@ -1,0 +1,25 @@
+[package]
+name = "clean-architecture-with-rust"
+version = "0.0.0"
+authors = ["Markus Kohlhase <markus.kohlhase@slowtec.de>"]
+edition = "2018"
+publish = false
+
+[workspace]
+members = [
+  "adapter",
+  "application",
+  "domain",
+  "entity",
+  "infrastructure"
+]
+
+[dependencies]
+infrastructure = "0.0.0"
+
+[patch.crates-io]
+adapter = { path = "adapter" }
+application = { path = "application" }
+domain = { path = "domain" }
+entity = { path = "entity" }
+infrastructure = { path = "infrastructure" }
