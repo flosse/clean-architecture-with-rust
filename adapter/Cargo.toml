@@ -6,3 +6,4 @@ publish = false
 
 [dependencies]
 application = "0.0.0"
+domain = "0.0.0"

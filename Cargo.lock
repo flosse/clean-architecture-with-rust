@@ -5,6 +5,7 @@ name = "adapter"
 version = "0.0.0"
 dependencies = [
  "application",
+ "domain",
 ]
 
 [[package]]
