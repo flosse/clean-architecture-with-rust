@@ -5,7 +5,12 @@ edition = "2018"
 publish = false
 
 [dependencies]
+
+# Workspace dependencies
 adapter = "*"
 application = "*"
 domain = "*"
 entity = "*"
+
+# External dependencies
+structopt = { version = "0.3", default-features = false }
