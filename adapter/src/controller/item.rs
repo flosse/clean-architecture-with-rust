@@ -2,6 +2,7 @@ use crate::presenter::item::Presenter;
 use application::{gateway::repository::item::ItemRepo, interactor::item::Interactor};
 use domain::usecase::item::create::{CreateItem, Request};
 use std::{error, fmt};
+use thiserror::Error;
 
 pub struct ItemController<R, P> {
     repository: R,
@@ -11,8 +12,9 @@ pub struct ItemController<R, P> {
 type RepoError<R> = <R as ItemRepo>::Err;
 type Id<R> = <R as ItemRepo>::Id;
 
-#[derive(Debug)]
+#[derive(Debug, Error)]
 pub enum Error {
+    #[error(transparent)]
     Repo(Box<dyn error::Error>),
 }
 

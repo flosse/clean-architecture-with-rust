@@ -5,4 +5,7 @@ edition = "2018"
 publish = false
 
 [dependencies]
-adapter = "*" 
+adapter = "*"
+application = "*"
+domain = "*"
+entity = "*"
