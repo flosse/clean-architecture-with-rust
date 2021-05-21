@@ -24,3 +24,11 @@ that means
 
 > Nothing in an inner circle can know anything at all about
 > something in an outer circle
+
+## Example Szenario
+
+The main purpose of this example is to discuss the architecture
+not the application szenario itself.
+So let's implement a simple application that manages some `Item`s
+which hold some data. For simplicity the data itself is just
+a `title` and nothing else.
