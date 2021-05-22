@@ -1,9 +1,9 @@
-use db::in_memory::InMemory;
+use db::json_file::JsonFile;
 
 pub mod cli;
 pub mod db;
 
 pub fn run() {
-    let db = InMemory::default();
+    let db = JsonFile::try_new().expect("JSON file store");
     cli::run(db);
 }

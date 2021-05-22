@@ -13,4 +13,6 @@ domain = "*"
 entity = "*"
 
 # External dependencies
+jfs = "*"
+serde = { version = "1", features = ["derive"] }
 structopt = { version = "0.3", default-features = false }
