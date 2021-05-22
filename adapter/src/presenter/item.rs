@@ -1,4 +1,4 @@
-use domain::usecase::item::create::Response;
+use application::usecase::item::create::Response;
 use std::fmt::Display;
 
 pub trait Presenter<Id> {

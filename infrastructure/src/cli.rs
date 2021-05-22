@@ -14,7 +14,7 @@ enum Cmd {
 
 pub fn run<D>(db: D)
 where
-    D: ItemRepo,
+    D: ItemRepo + 'static,
     Id<D>: Display,
     RepoErr<D>: Error + 'static,
 {

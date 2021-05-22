@@ -1,6 +1,8 @@
 use crate::presenter::item::Presenter;
-use application::{gateway::repository::item::ItemRepo, interactor::item::Interactor};
-use domain::usecase::item::create::{CreateItem, Request};
+use application::{
+    gateway::repository::item::ItemRepo,
+    usecase::item::create::{CreateItem, Request},
+};
 use std::{error, fmt};
 use thiserror::Error;
 
@@ -20,7 +22,7 @@ pub enum Error {
 
 impl<R, P> ItemController<R, P>
 where
-    R: ItemRepo,
+    R: ItemRepo + 'static,
     P: Presenter<Id<R>>,
 {
     pub fn new(repository: R, presenter: P) -> Self {
@@ -34,7 +36,7 @@ where
     where
         RepoError<R>: error::Error + fmt::Debug + 'static,
     {
-        let interactor = Interactor::new(&self.repository);
+        let interactor = CreateItem::new(&self.repository);
         let req = Request {
             title: title.into(),
         };

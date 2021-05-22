@@ -5,5 +5,9 @@ edition = "2018"
 publish = false
 
 [dependencies]
+# Workspace dependencies
 domain = "0.0.0"
 entity = "0.0.0"
+
+# External dependencies
+thiserror = "1"
