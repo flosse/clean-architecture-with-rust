@@ -1,10 +1,9 @@
-use adapter::{controller::item::ItemController, presenter::item::CliPresenter};
+use adapter::{controller::item::ItemController, id::item::ItemId, presenter::item::CliPresenter};
 use application::gateway::repository::item::ItemRepo;
-use std::{error::Error, fmt::Display};
+use std::error::Error;
 use structopt::StructOpt;
 
 type RepoErr<D> = <D as ItemRepo>::Err;
-type Id<D> = <D as ItemRepo>::Id;
 
 #[derive(StructOpt)]
 enum Cmd {
@@ -14,8 +13,7 @@ enum Cmd {
 
 pub fn run<D>(db: D)
 where
-    D: ItemRepo + 'static,
-    Id<D>: Display,
+    D: ItemRepo<Id = ItemId> + 'static,
     RepoErr<D>: Error + 'static,
 {
     let cmd = Cmd::from_args();

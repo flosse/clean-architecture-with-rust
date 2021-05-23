@@ -15,6 +15,9 @@ impl Title {
     pub const fn new(title: String) -> Self {
         Self(title)
     }
+    pub fn into_string(self) -> String {
+        self.0
+    }
 }
 
 impl AsRef<str> for Title {

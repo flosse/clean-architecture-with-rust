@@ -1,4 +1,4 @@
-use crate::presenter::item::Presenter;
+use crate::{id::item::ItemId, presenter::item::Presenter};
 use application::{
     gateway::repository::item::ItemRepo,
     usecase::item::create::{CreateItem, Request},
@@ -12,7 +12,6 @@ pub struct ItemController<R, P> {
 }
 
 type RepoError<R> = <R as ItemRepo>::Err;
-type Id<R> = <R as ItemRepo>::Id;
 
 #[derive(Debug, Error)]
 pub enum Error {
@@ -22,8 +21,8 @@ pub enum Error {
 
 impl<R, P> ItemController<R, P>
 where
-    R: ItemRepo + 'static,
-    P: Presenter<Id<R>>,
+    R: ItemRepo<Id = ItemId> + 'static,
+    P: Presenter,
 {
     pub fn new(repository: R, presenter: P) -> Self {
         Self {

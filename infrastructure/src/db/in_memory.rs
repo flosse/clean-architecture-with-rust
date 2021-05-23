@@ -1,27 +1,35 @@
+use adapter::id::{item::ItemId, NewId};
 use application::gateway::repository::item::ItemRepo;
 use entity::item::Item;
-use std::{cell::RefCell, collections::HashMap, convert::Infallible};
+use std::{collections::HashMap, convert::Infallible, sync::Mutex};
 
 #[derive(Default)]
 pub struct InMemory {
-    items: RefCell<HashMap<Id, Item>>,
+    items: Mutex<HashMap<ItemId, Item>>,
 }
-
-type Id = u32;
 
 impl ItemRepo for InMemory {
     type Err = Infallible;
-    type Id = Id;
+    type Id = ItemId;
     fn save(&self, item: Item) -> Result<Self::Id, Self::Err> {
-        let id = self
-            .items
-            .borrow()
-            .iter()
-            .map(|(id, _)| id)
-            .max()
-            .unwrap_or(&0)
-            + 1;
-        self.items.borrow_mut().insert(id, item);
+        let id = self.new_id()?;
+        self.items.lock().unwrap().insert(id, item);
         Ok(id)
+    }
+}
+
+impl NewId<ItemId> for InMemory {
+    type Err = Infallible;
+    fn new_id(&self) -> Result<ItemId, Self::Err> {
+        let next = self
+            .items
+            .lock()
+            .unwrap()
+            .iter()
+            .map(|(id, _)| u32::from(*id))
+            .max()
+            .unwrap_or(0)
+            + 1;
+        Ok(ItemId::from(next))
     }
 }
