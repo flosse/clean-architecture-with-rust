@@ -68,6 +68,7 @@ name = "domain"
 version = "0.0.0"
 dependencies = [
  "entity",
+ "thiserror",
 ]
 
 [[package]]

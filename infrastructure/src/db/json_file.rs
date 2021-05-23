@@ -42,14 +42,18 @@ mod models {
     impl From<e::Item> for Item {
         fn from(from: e::Item) -> Self {
             let e::Item { title } = from;
-            Self { title }
+            Self {
+                title: title.as_ref().to_string(),
+            }
         }
     }
 
     impl From<Item> for e::Item {
         fn from(from: Item) -> Self {
             let Item { title } = from;
-            Self { title }
+            Self {
+                title: e::Title::new(title),
+            }
         }
     }
 }

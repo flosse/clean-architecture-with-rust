@@ -1,5 +1,6 @@
 use crate::gateway::repository::item::ItemRepo;
-use entity::item::Item;
+use domain::validate::item::{validate_item, ItemInvalidity};
+use entity::item::{Item, Title};
 use std::{error, fmt};
 use thiserror::Error;
 
@@ -35,6 +36,8 @@ where
 {
     #[error(transparent)]
     Repo(RepoError<R>),
+    #[error(transparent)]
+    Invalidity(ItemInvalidity),
 }
 
 impl<R> fmt::Debug for Error<R>
@@ -44,7 +47,8 @@ where
 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            Error::Repo(e) => e.fmt(f),
+            Self::Repo(e) => e.fmt(f),
+            Self::Invalidity(i) => i.fmt(f),
         }
     }
 }
@@ -56,7 +60,10 @@ where
 {
     /// Create a new item with the given title.
     pub fn exec(&self, req: Request) -> Result<Response<Id<R>>, Error<R>> {
-        let item = Item { title: req.title };
+        let item = Item {
+            title: Title(req.title),
+        };
+        validate_item(&item).map_err(Error::Invalidity)?;
         let id = self.repo.save(item).map_err(Error::Repo)?;
         Ok(Response { id })
     }
@@ -93,7 +100,16 @@ mod tests {
             title: "foo".into(),
         };
         let res = usecase.exec(req).unwrap();
-        assert_eq!(repo.item.borrow().as_ref().unwrap().title, "foo");
+        assert_eq!(repo.item.borrow().as_ref().unwrap().title.0, "foo");
         assert_eq!(res.id, 42);
+    }
+
+    #[test]
+    fn create_with_empty_title() {
+        let repo = MockRepo::default();
+        let usecase = CreateItem::new(&repo);
+        let req = Request { title: "".into() };
+        let err = usecase.exec(req).err().unwrap();
+        assert!(matches!(err, Error::Invalidity(_)));
     }
 }

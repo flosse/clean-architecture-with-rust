@@ -28,7 +28,7 @@ where
                     println!("Created a new item (ID = {})", res);
                 }
                 Err(err) => {
-                    println!("Undable to create a new item: {})", err);
+                    println!("Undable to create a new item: {}", err);
                 }
             }
         }
