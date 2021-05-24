@@ -7,8 +7,8 @@ pub struct Presenter;
 
 #[derive(Debug, Serialize)]
 pub struct Item {
-    pub title: String,
     pub id: String,
+    pub title: String,
 }
 
 #[derive(Debug, Serialize)]
