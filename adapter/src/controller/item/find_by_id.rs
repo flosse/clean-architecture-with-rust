@@ -1,10 +1,10 @@
 use crate::{
     id::item::{ItemId, ParseItemIdError},
-    presenter::item::find_by_id::Presenter,
+    presenter::Presenter,
 };
 use application::{
     gateway::repository::item::ItemRepo,
-    usecase::item::find_by_id::{self, FindById, Request},
+    usecase::item::find_by_id::{self, FindById, Request, Response},
 };
 use std::{error, fmt, sync::Arc};
 use thiserror::Error;
@@ -44,7 +44,7 @@ where
 impl<R, P> Controller<R, P>
 where
     R: ItemRepo<Id = ItemId> + 'static,
-    P: Presenter,
+    P: Presenter<Response<ItemId>>,
 {
     pub fn new(repository: Arc<R>, presenter: P) -> Self {
         Self {
@@ -52,7 +52,7 @@ where
             presenter,
         }
     }
-    pub fn find_item(&self, id: &str) -> Result<P::Out, Error<R>>
+    pub fn find_item(&self, id: &str) -> Result<P::ViewModel, Error<R>>
     where
         RepoError<R>: error::Error + fmt::Debug + 'static,
     {

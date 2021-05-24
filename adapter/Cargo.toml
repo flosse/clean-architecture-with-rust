@@ -10,4 +10,5 @@ application = "0.0.0"
 domain = "0.0.0"
 
 # External dependencies
+serde = { version = "1", features = ["derive"] }
 thiserror = "1"

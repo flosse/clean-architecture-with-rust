@@ -26,7 +26,7 @@ impl ItemRepo for InMemory {
             .unwrap()
             .get(&id)
             .cloned()
-            .ok_or_else(|| Error::NotFound)
+            .ok_or(Error::NotFound)
     }
 }
 

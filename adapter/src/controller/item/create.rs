@@ -1,7 +1,7 @@
-use crate::{id::item::ItemId, presenter::item::create::Presenter};
+use crate::{id::item::ItemId, presenter::Presenter};
 use application::{
     gateway::repository::item::ItemRepo,
-    usecase::item::create::{self, CreateItem, Request},
+    usecase::item::create::{self, CreateItem, Request, Response},
 };
 use std::{error, fmt, sync::Arc};
 use thiserror::Error;
@@ -38,7 +38,7 @@ where
 impl<R, P> Controller<R, P>
 where
     R: ItemRepo<Id = ItemId> + 'static,
-    P: Presenter,
+    P: Presenter<Response<ItemId>>,
 {
     pub fn new(repository: Arc<R>, presenter: P) -> Self {
         Self {
@@ -47,7 +47,7 @@ where
         }
     }
 
-    pub fn create_item(&self, title: impl Into<String>) -> Result<P::Out, Error<R>>
+    pub fn create_item(&self, title: impl Into<String>) -> Result<P::ViewModel, Error<R>>
     where
         RepoError<R>: error::Error + fmt::Debug + 'static,
     {

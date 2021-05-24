@@ -3,9 +3,7 @@ use adapter::{
         create::Controller as CreateController, find_by_id::Controller as FindController,
     },
     id::item::ItemId,
-    presenter::item::{
-        create::CliPresenter as CreatePresenter, find_by_id::CliPresenter as FindPresenter,
-    },
+    presenter::cli::Presenter,
 };
 use application::gateway::repository::item::ItemRepo;
 use std::{error::Error, sync::Arc};
@@ -28,10 +26,10 @@ where
 {
     let cmd = Cmd::from_args();
     let repo = Arc::new(repo);
+    let presenter = Presenter::default();
 
     match cmd {
         Cmd::Create { title } => {
-            let presenter = CreatePresenter::default();
             let controller = CreateController::new(repo, presenter);
             match controller.create_item(title) {
                 Ok(res) => {
@@ -43,7 +41,6 @@ where
             }
         }
         Cmd::Read { id } => {
-            let presenter = FindPresenter::default();
             let controller = FindController::new(repo, presenter);
             match controller.find_item(&id) {
                 Ok(item) => {
