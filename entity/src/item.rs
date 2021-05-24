@@ -3,12 +3,12 @@
 // Further readings:
 // - https://enterprisecraftsmanship.com/posts/dont-use-ids-domain-entities/
 // - https://enterprisecraftsmanship.com/posts/link-to-an-aggregate-reference-or-id/
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Item {
     pub title: Title,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Title(pub String);
 
 impl Title {

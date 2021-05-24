@@ -1,6 +1,6 @@
 use adapter::id::{item::ItemId, NewId};
 use application::gateway::repository::item::ItemRepo;
-use entity::item::Item;
+use entity::item::{Item, Title};
 use jfs::{Config, Store};
 use std::{collections::HashMap, io};
 
@@ -34,6 +34,19 @@ impl JsonFile {
         map.insert(item_id.to_string(), storage_id);
         self.ids.save_with_id(&map, MAP_ITEM_ID_KEY)?;
         Ok(())
+    }
+    fn storage_id(&self, item_id: ItemId) -> Result<StorageId, io::Error> {
+        let id = item_id.to_string();
+        self.ids
+            .get::<HashMap<String, String>>(MAP_ITEM_ID_KEY)?
+            .get(&id)
+            .cloned()
+            .ok_or_else(|| {
+                io::Error::new(
+                    io::ErrorKind::NotFound,
+                    format!("No item with ID = {} found", id),
+                )
+            })
     }
 }
 
@@ -69,6 +82,14 @@ impl ItemRepo for JsonFile {
         let storage_id = self.items.save(&model)?;
         self.save_item_id(storage_id, item_id)?;
         Ok(item_id)
+    }
+    fn get(&self, id: Self::Id) -> Result<Item, Self::Err> {
+        let sid = self.storage_id(id)?;
+        let model = self.items.get::<models::Item>(&sid)?;
+        debug_assert_eq!(id.to_string(), model.item_id);
+        Ok(Item {
+            title: Title::new(model.title),
+        })
     }
 }
 
