@@ -6,10 +6,8 @@ use adapter::{
     presenter::cli::Presenter,
 };
 use application::gateway::repository::item::ItemRepo;
-use std::{error::Error, sync::Arc};
+use std::sync::Arc;
 use structopt::StructOpt;
-
-type RepoErr<R> = <R as ItemRepo>::Err;
 
 #[derive(StructOpt)]
 enum Cmd {
@@ -22,7 +20,6 @@ enum Cmd {
 pub fn run<R>(repo: R)
 where
     R: ItemRepo<Id = ItemId> + 'static,
-    RepoErr<R>: Error + 'static,
 {
     let cmd = Cmd::from_args();
     let repo = Arc::new(repo);

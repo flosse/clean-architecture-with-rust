@@ -3,7 +3,7 @@ use application::{
     gateway::repository::item::ItemRepo,
     usecase::item::create::{self, CreateItem, Request, Response},
 };
-use std::{error, fmt, sync::Arc};
+use std::sync::Arc;
 use thiserror::Error;
 
 pub struct Controller<R, P> {
@@ -11,28 +11,10 @@ pub struct Controller<R, P> {
     presenter: P,
 }
 
-type RepoError<R> = <R as ItemRepo>::Err;
-
-#[derive(Error)]
-pub enum Error<R>
-where
-    R: ItemRepo + 'static,
-    RepoError<R>: error::Error + 'static,
-{
+#[derive(Debug, Error)]
+pub enum Error {
     #[error(transparent)]
-    Usecase(create::Error<R>),
-}
-
-impl<R> fmt::Debug for Error<R>
-where
-    R: ItemRepo,
-    RepoError<R>: error::Error,
-{
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            Self::Usecase(e) => e.fmt(f),
-        }
-    }
+    Usecase(#[from] create::Error),
 }
 
 impl<R, P> Controller<R, P>
@@ -47,15 +29,12 @@ where
         }
     }
 
-    pub fn create_item(&self, title: impl Into<String>) -> Result<P::ViewModel, Error<R>>
-    where
-        RepoError<R>: error::Error + fmt::Debug + 'static,
-    {
+    pub fn create_item(&self, title: impl Into<String>) -> Result<P::ViewModel, Error> {
         let interactor = CreateItem::new(&*self.repository);
         let req = Request {
             title: title.into(),
         };
-        let res = interactor.exec(req).map_err(Error::Usecase)?;
+        let res = interactor.exec(req)?;
         Ok(self.presenter.present(res))
     }
 }

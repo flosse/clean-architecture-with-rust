@@ -1,5 +1,4 @@
-use crate::gateway::repository::item::ItemRepo;
-use std::{error, fmt};
+use crate::gateway::repository::item::{Error as RepoError, ItemRepo};
 use thiserror::Error;
 
 pub struct Request<Id> {
@@ -11,7 +10,6 @@ pub struct Response<Id> {
     pub title: String,
 }
 
-type RepoError<R> = <R as ItemRepo>::Err;
 type Id<R> = <R as ItemRepo>::Id;
 
 /// Find item by ID usecase interactor
@@ -25,36 +23,19 @@ impl<'r, R> FindById<'r, R> {
     }
 }
 
-#[derive(Error)]
-pub enum Error<R>
-where
-    R: ItemRepo,
-    RepoError<R>: error::Error + 'static,
-{
+#[derive(Debug, Error)]
+pub enum Error {
     #[error(transparent)]
-    Repo(RepoError<R>),
-}
-
-impl<R> fmt::Debug for Error<R>
-where
-    R: ItemRepo,
-    RepoError<R>: error::Error,
-{
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            Self::Repo(e) => e.fmt(f),
-        }
-    }
+    Repo(#[from] RepoError),
 }
 
 impl<'r, R> FindById<'r, R>
 where
     R: ItemRepo,
-    RepoError<R>: error::Error,
     Id<R>: Clone,
 {
-    pub fn exec(&self, req: Request<Id<R>>) -> Result<Response<Id<R>>, Error<R>> {
-        let item = self.repo.get(req.id.clone()).map_err(Error::Repo)?;
+    pub fn exec(&self, req: Request<Id<R>>) -> Result<Response<Id<R>>, Error> {
+        let item = self.repo.get(req.id.clone())?;
         Ok(Response {
             id: req.id,
             title: item.title.into_string(),

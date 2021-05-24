@@ -1,28 +1,23 @@
 use adapter::id::{item::ItemId, NewId};
-use application::gateway::repository::item::ItemRepo;
+use application::gateway::repository::item::{Error, ItemRepo, Result};
 use entity::item::Item;
-use std::{collections::HashMap, sync::Mutex};
+use std::{collections::HashMap, sync::RwLock};
 
 #[derive(Default)]
 pub struct InMemory {
-    items: Mutex<HashMap<ItemId, Item>>,
-}
-
-pub enum Error {
-    NotFound,
+    items: RwLock<HashMap<ItemId, Item>>,
 }
 
 impl ItemRepo for InMemory {
-    type Err = Error;
     type Id = ItemId;
-    fn save(&self, item: Item) -> Result<Self::Id, Self::Err> {
+    fn save(&self, item: Item) -> Result<Self::Id> {
         let id = self.new_id()?;
-        self.items.lock().unwrap().insert(id, item);
+        self.items.write().unwrap().insert(id, item);
         Ok(id)
     }
-    fn get(&self, id: Self::Id) -> Result<Item, Self::Err> {
+    fn get(&self, id: Self::Id) -> Result<Item> {
         self.items
-            .lock()
+            .read()
             .unwrap()
             .get(&id)
             .cloned()
@@ -32,10 +27,10 @@ impl ItemRepo for InMemory {
 
 impl NewId<ItemId> for InMemory {
     type Err = Error;
-    fn new_id(&self) -> Result<ItemId, Self::Err> {
+    fn new_id(&self) -> Result<ItemId> {
         let next = self
             .items
-            .lock()
+            .read()
             .unwrap()
             .iter()
             .map(|(id, _)| u32::from(*id))

@@ -1,5 +1,5 @@
 use adapter::id::{item::ItemId, NewId};
-use application::gateway::repository::item::ItemRepo;
+use application::gateway::repository::item::{Error, ItemRepo, Result};
 use entity::item::{Item, Title};
 use jfs::{Config, Store};
 use std::{collections::HashMap, io};
@@ -13,7 +13,7 @@ const LAST_ITEM_ID_KEY: &str = "last-item-id";
 const MAP_ITEM_ID_KEY: &str = "map-item-id";
 
 impl JsonFile {
-    pub fn try_new() -> Result<Self, io::Error> {
+    pub fn try_new() -> Result<Self> {
         let cfg = Config {
             single: true,
             pretty: true,
@@ -23,7 +23,7 @@ impl JsonFile {
         let ids = Store::new_with_cfg("ids", cfg)?;
         Ok(Self { items, ids })
     }
-    fn save_item_id(&self, storage_id: StorageId, item_id: ItemId) -> Result<(), io::Error> {
+    fn save_item_id(&self, storage_id: StorageId, item_id: ItemId) -> Result<()> {
         let mut map = match self.ids.get::<HashMap<String, String>>(MAP_ITEM_ID_KEY) {
             Ok(map) => Ok(map),
             Err(err) => match err.kind() {
@@ -35,24 +35,19 @@ impl JsonFile {
         self.ids.save_with_id(&map, MAP_ITEM_ID_KEY)?;
         Ok(())
     }
-    fn storage_id(&self, item_id: ItemId) -> Result<StorageId, io::Error> {
+    fn storage_id(&self, item_id: ItemId) -> Result<StorageId> {
         let id = item_id.to_string();
         self.ids
             .get::<HashMap<String, String>>(MAP_ITEM_ID_KEY)?
             .get(&id)
             .cloned()
-            .ok_or_else(|| {
-                io::Error::new(
-                    io::ErrorKind::NotFound,
-                    format!("No item with ID = {} found", id),
-                )
-            })
+            .ok_or(Error::NotFound)
     }
 }
 
 impl NewId<ItemId> for JsonFile {
-    type Err = io::Error;
-    fn new_id(&self) -> Result<ItemId, Self::Err> {
+    type Err = Error;
+    fn new_id(&self) -> Result<ItemId> {
         let id = match self.ids.get::<u32>(LAST_ITEM_ID_KEY) {
             Ok(id) => Ok(id),
             Err(err) => match err.kind() {
@@ -69,10 +64,9 @@ impl NewId<ItemId> for JsonFile {
 type StorageId = String;
 
 impl ItemRepo for JsonFile {
-    type Err = io::Error;
     type Id = ItemId;
 
-    fn save(&self, item: Item) -> Result<Self::Id, Self::Err> {
+    fn save(&self, item: Item) -> Result<Self::Id> {
         let item_id = self.new_id()?;
         let Item { title } = item;
         let model = models::Item {
@@ -83,7 +77,7 @@ impl ItemRepo for JsonFile {
         self.save_item_id(storage_id, item_id)?;
         Ok(item_id)
     }
-    fn get(&self, id: Self::Id) -> Result<Item, Self::Err> {
+    fn get(&self, id: Self::Id) -> Result<Item> {
         let sid = self.storage_id(id)?;
         let model = self.items.get::<models::Item>(&sid)?;
         debug_assert_eq!(id.to_string(), model.item_id);
