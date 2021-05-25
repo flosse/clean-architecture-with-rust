@@ -1,22 +1,22 @@
-use adapter::id::{item::ItemId, NewId};
-use application::gateway::repository::item::{Error, ItemRepo, Result};
-use entity::item::Item;
+use adapter::id::{thought::Id, NewId};
+use application::gateway::repository::thought::{Error, Repo, Result};
+use entity::thought::Thought;
 use std::{collections::HashMap, sync::RwLock};
 
 #[derive(Default)]
 pub struct InMemory {
-    items: RwLock<HashMap<ItemId, Item>>,
+    thoughts: RwLock<HashMap<Id, Thought>>,
 }
 
-impl ItemRepo for InMemory {
-    type Id = ItemId;
-    fn save(&self, item: Item) -> Result<Self::Id> {
+impl Repo for InMemory {
+    type Id = Id;
+    fn save(&self, thought: Thought) -> Result<Self::Id> {
         let id = self.new_id()?;
-        self.items.write().unwrap().insert(id, item);
+        self.thoughts.write().unwrap().insert(id, thought);
         Ok(id)
     }
-    fn get(&self, id: Self::Id) -> Result<Item> {
-        self.items
+    fn get(&self, id: Self::Id) -> Result<Thought> {
+        self.thoughts
             .read()
             .unwrap()
             .get(&id)
@@ -25,11 +25,11 @@ impl ItemRepo for InMemory {
     }
 }
 
-impl NewId<ItemId> for InMemory {
+impl NewId<Id> for InMemory {
     type Err = Error;
-    fn new_id(&self) -> Result<ItemId> {
+    fn new_id(&self) -> Result<Id> {
         let next = self
-            .items
+            .thoughts
             .read()
             .unwrap()
             .iter()
@@ -37,6 +37,6 @@ impl NewId<ItemId> for InMemory {
             .max()
             .unwrap_or(0)
             + 1;
-        Ok(ItemId::from(next))
+        Ok(Id::from(next))
     }
 }

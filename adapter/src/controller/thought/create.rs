@@ -1,7 +1,7 @@
-use crate::{id::item::ItemId, presenter::Presenter};
+use crate::{id::thought::Id, presenter::Presenter};
 use application::{
-    gateway::repository::item::ItemRepo,
-    usecase::item::create::{self, CreateItem, Request, Response},
+    gateway::repository::thought::Repo,
+    usecase::thought::create::{self, CreateThought, Request, Response},
 };
 use std::sync::Arc;
 use thiserror::Error;
@@ -19,8 +19,8 @@ pub enum Error {
 
 impl<R, P> Controller<R, P>
 where
-    R: ItemRepo<Id = ItemId> + 'static,
-    P: Presenter<Response<ItemId>>,
+    R: Repo<Id = Id> + 'static,
+    P: Presenter<Response<Id>>,
 {
     pub fn new(repository: Arc<R>, presenter: P) -> Self {
         Self {
@@ -29,8 +29,8 @@ where
         }
     }
 
-    pub fn create_item(&self, title: impl Into<String>) -> Result<P::ViewModel, Error> {
-        let interactor = CreateItem::new(&*self.repository);
+    pub fn create_thought(&self, title: impl Into<String>) -> Result<P::ViewModel, Error> {
+        let interactor = CreateThought::new(&*self.repository);
         let req = Request {
             title: title.into(),
         };

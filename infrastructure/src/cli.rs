@@ -1,25 +1,25 @@
 use adapter::{
-    controller::item::{
+    controller::thought::{
         create::Controller as CreateController, find_by_id::Controller as FindController,
     },
-    id::item::ItemId,
+    id::thought::Id,
     presenter::cli::Presenter,
 };
-use application::gateway::repository::item::ItemRepo;
+use application::gateway::repository::thought::Repo;
 use std::sync::Arc;
 use structopt::StructOpt;
 
 #[derive(StructOpt)]
 enum Cmd {
-    #[structopt(about = "Create a new item")]
+    #[structopt(about = "Create a new thought")]
     Create { title: String },
-    #[structopt(about = "Read an item")]
+    #[structopt(about = "Read an specific thought")]
     Read { id: String },
 }
 
 pub fn run<R>(repo: R)
 where
-    R: ItemRepo<Id = ItemId> + 'static,
+    R: Repo<Id = Id> + 'static,
 {
     let cmd = Cmd::from_args();
     let repo = Arc::new(repo);
@@ -28,23 +28,23 @@ where
     match cmd {
         Cmd::Create { title } => {
             let controller = CreateController::new(repo, presenter);
-            match controller.create_item(title) {
+            match controller.create_thought(title) {
                 Ok(res) => {
-                    println!("Created a new item (ID = {})", res);
+                    println!("Created a new thought (ID = {})", res);
                 }
                 Err(err) => {
-                    println!("Undable to create a new item: {}", err);
+                    println!("Undable to create a new thought: {}", err);
                 }
             }
         }
         Cmd::Read { id } => {
             let controller = FindController::new(repo, presenter);
-            match controller.find_item(&id) {
-                Ok(item) => {
-                    println!("{}", item);
+            match controller.find_thought(&id) {
+                Ok(thought) => {
+                    println!("{}", thought);
                 }
                 Err(err) => {
-                    println!("Undable find item: {}", err);
+                    println!("Undable find thought: {}", err);
                 }
             }
         }

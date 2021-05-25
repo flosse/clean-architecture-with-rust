@@ -1,4 +1,4 @@
-# Clean Architecture with Rust
+# Full-Stack Clean Architecture with Rust
 
 This repository contains an example implementation of a
 [Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
@@ -27,8 +27,13 @@ that means
 
 ## Example Szenario
 
-The main purpose of this example is to discuss the architecture
+The main purpose of this example is to discuss the architecture,
 not the application szenario itself.
-So let's implement a simple application that manages some `Item`s
-which hold some data. For simplicity the data itself is just
-a `title` and nothing else.
+Nevertheless, the code represents a real-world application
+that helps self-employed people organize their lives.
+
+### User Stories
+
+> *As a* self-employed person,
+> *I want to* be able to write down spontaneous thoughts,
+> *so that* I can find them again at a central point

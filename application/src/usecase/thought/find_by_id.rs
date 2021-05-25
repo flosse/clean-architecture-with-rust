@@ -1,4 +1,4 @@
-use crate::gateway::repository::item::{Error as RepoError, ItemRepo};
+use crate::gateway::repository::thought::{Error as RepoError, Repo};
 use thiserror::Error;
 
 pub struct Request<Id> {
@@ -10,9 +10,9 @@ pub struct Response<Id> {
     pub title: String,
 }
 
-type Id<R> = <R as ItemRepo>::Id;
+type Id<R> = <R as Repo>::Id;
 
-/// Find item by ID usecase interactor
+/// Find thought by ID usecase interactor
 pub struct FindById<'r, R> {
     repo: &'r R,
 }
@@ -31,14 +31,14 @@ pub enum Error {
 
 impl<'r, R> FindById<'r, R>
 where
-    R: ItemRepo,
+    R: Repo,
     Id<R>: Clone,
 {
     pub fn exec(&self, req: Request<Id<R>>) -> Result<Response<Id<R>>, Error> {
-        let item = self.repo.get(req.id.clone())?;
+        let thought = self.repo.get(req.id.clone())?;
         Ok(Response {
             id: req.id,
-            title: item.title.into_string(),
+            title: thought.title.into_string(),
         })
     }
 }

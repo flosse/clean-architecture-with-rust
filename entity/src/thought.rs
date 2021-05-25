@@ -4,12 +4,19 @@
 // - https://enterprisecraftsmanship.com/posts/dont-use-ids-domain-entities/
 // - https://enterprisecraftsmanship.com/posts/link-to-an-aggregate-reference-or-id/
 #[derive(Debug, Clone)]
-pub struct Item {
+pub struct Thought {
     pub title: Title,
 }
 
+impl Thought {
+    pub const fn new(title: String) -> Self {
+        let title = Title::new(title);
+        Self { title }
+    }
+}
+
 #[derive(Debug, Clone)]
-pub struct Title(pub String);
+pub struct Title(String);
 
 impl Title {
     pub const fn new(title: String) -> Self {
@@ -23,5 +30,16 @@ impl Title {
 impl AsRef<str> for Title {
     fn as_ref(&self) -> &str {
         &self.0
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn create_a_new_thought() {
+        let thought = Thought::new("foo".to_string());
+        assert_eq!(thought.title.as_ref(), "foo");
     }
 }

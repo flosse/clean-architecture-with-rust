@@ -48,7 +48,7 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: test
-          args: --all
+          args: --workspace --all-features
 
       - name: Check code coverage
         uses: actions-rs/tarpaulin@v0.1

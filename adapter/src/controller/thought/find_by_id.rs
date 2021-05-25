@@ -1,10 +1,10 @@
 use crate::{
-    id::item::{ItemId, ParseItemIdError},
+    id::thought::{Id, ParseError},
     presenter::Presenter,
 };
 use application::{
-    gateway::repository::item::ItemRepo,
-    usecase::item::find_by_id::{self, FindById, Request, Response},
+    gateway::repository::thought::Repo,
+    usecase::thought::find_by_id::{self, FindById, Request, Response},
 };
 use std::sync::Arc;
 use thiserror::Error;
@@ -17,15 +17,15 @@ pub struct Controller<R, P> {
 #[derive(Debug, Error)]
 pub enum Error {
     #[error(transparent)]
-    Parameter(#[from] ParseItemIdError),
+    Parameter(#[from] ParseError),
     #[error(transparent)]
     Usecase(#[from] find_by_id::Error),
 }
 
 impl<R, P> Controller<R, P>
 where
-    R: ItemRepo<Id = ItemId> + 'static,
-    P: Presenter<Response<ItemId>>,
+    R: Repo<Id = Id> + 'static,
+    P: Presenter<Response<Id>>,
 {
     pub fn new(repository: Arc<R>, presenter: P) -> Self {
         Self {
@@ -33,7 +33,7 @@ where
             presenter,
         }
     }
-    pub fn find_item(&self, id: &str) -> Result<P::ViewModel, Error> {
+    pub fn find_thought(&self, id: &str) -> Result<P::ViewModel, Error> {
         let interactor = FindById::new(&*self.repository);
         let req = Request { id: id.parse()? };
         let res = interactor.exec(req)?;
