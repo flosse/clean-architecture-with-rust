@@ -49,3 +49,8 @@ jobs:
         with:
           command: test
           args: --all
+
+      - name: Check code coverage
+        uses: actions-rs/tarpaulin@v0.1
+        with:
+          args: --ignore-tests --workspace
