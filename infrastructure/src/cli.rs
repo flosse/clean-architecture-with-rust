@@ -1,3 +1,4 @@
+use crate::web;
 use adapter::{
     controller::thought::{
         create::Controller as CreateController, find_by_id::Controller as FindController,
@@ -8,6 +9,7 @@ use adapter::{
 use application::gateway::repository::thought::Repo;
 use std::sync::Arc;
 use structopt::StructOpt;
+use tokio::runtime::Runtime;
 
 #[derive(StructOpt)]
 enum Cmd {
@@ -15,6 +17,8 @@ enum Cmd {
     Create { title: String },
     #[structopt(about = "Read an specific thought")]
     Read { id: String },
+    #[structopt(about = "Run web service")]
+    Serve {},
 }
 
 pub fn run<R>(repo: R)
@@ -47,6 +51,10 @@ where
                     println!("Undable find thought: {}", err);
                 }
             }
+        }
+        Cmd::Serve {} => {
+            let rt = Runtime::new().expect("tokio runtime");
+            rt.block_on(web::run(repo));
         }
     }
 }
