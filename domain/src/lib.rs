@@ -1,1 +1,1 @@
-pub mod validate;
+pub mod thought;

@@ -8,6 +8,3 @@ publish = false
 
 # Workspace dependencies
 entity = "0.0.0"
-
-# External dependencies
-thiserror = "1"

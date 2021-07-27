@@ -1,4 +1,4 @@
-use entity::thought::Thought;
+use domain::thought::Thought;
 use std::{io, result};
 use thiserror::Error;
 

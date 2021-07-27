@@ -23,7 +23,6 @@ name = "application"
 version = "0.0.0"
 dependencies = [
  "domain",
- "entity",
  "thiserror",
 ]
 
@@ -138,7 +137,6 @@ name = "domain"
 version = "0.0.0"
 dependencies = [
  "entity",
- "thiserror",
 ]
 
 [[package]]

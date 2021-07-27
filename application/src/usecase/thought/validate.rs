@@ -1,8 +1,8 @@
-use entity::thought::{Thought, Title};
+use domain::thought::{Thought, Title, TitleConstraints};
 use thiserror::Error;
 
-const MAX_TITLE_LEN: usize = 80;
-const MIN_TITLE_LEN: usize = 3;
+pub type Request = Thought;
+pub type Response = Result<(), ThoughtInvalidity>;
 
 #[derive(Debug, Error)]
 pub enum ThoughtInvalidity {
@@ -18,24 +18,21 @@ pub enum TitleInvalidity {
     MaxLength { max: usize, actual: usize },
 }
 
-pub fn validate_thought(thought: &Thought) -> Result<(), ThoughtInvalidity> {
+pub fn validate_thought(thought: &Request) -> Response {
     validate_title(&thought.title).map_err(ThoughtInvalidity::Title)?;
     Ok(())
 }
 
 fn validate_title(title: &Title) -> Result<(), TitleInvalidity> {
     let actual = title.as_ref().len();
-    if actual < MIN_TITLE_LEN {
-        return Err(TitleInvalidity::MinLength {
-            min: MIN_TITLE_LEN,
-            actual,
-        });
+    let min = TitleConstraints::min_len();
+
+    if actual < min {
+        return Err(TitleInvalidity::MinLength { min, actual });
     }
-    if actual > MAX_TITLE_LEN {
-        return Err(TitleInvalidity::MaxLength {
-            max: MAX_TITLE_LEN,
-            actual,
-        });
+    let max = TitleConstraints::max_len();
+    if actual > max {
+        return Err(TitleInvalidity::MaxLength { max, actual });
     }
     Ok(())
 }

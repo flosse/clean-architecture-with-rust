@@ -1,6 +1,8 @@
-use crate::gateway::repository::thought::{Error as RepoError, Repo};
-use domain::validate::thought::{validate_thought, ThoughtInvalidity};
-use entity::thought::Thought;
+use crate::{
+    gateway::repository::thought::{Error as RepoError, Repo},
+    usecase::thought::validate::{validate_thought, ThoughtInvalidity},
+};
+use domain::thought::Thought;
 use thiserror::Error;
 
 pub struct Request {
