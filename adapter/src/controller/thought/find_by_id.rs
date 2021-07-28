@@ -34,6 +34,7 @@ where
         }
     }
     pub fn find_thought(&self, id: &str) -> Result<P::ViewModel, Error> {
+        log::debug!("Find thought {}", id);
         let interactor = FindById::new(&*self.repository);
         let req = Request { id: id.parse()? };
         let res = interactor.exec(req)?;

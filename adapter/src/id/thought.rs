@@ -2,7 +2,7 @@ use std::str::FromStr;
 use thiserror::Error;
 
 /// This is the public ID of a thought.
-#[derive(Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Id(u32);
 
 impl From<u32> for Id {

@@ -5,11 +5,13 @@ use crate::{
 use domain::thought::Thought;
 use thiserror::Error;
 
+#[derive(Debug)]
 pub struct Request {
     /// The title of new thought.
     pub title: String,
 }
 
+#[derive(Debug)]
 pub struct Response<Id> {
     /// The ID of the newly created thought.
     pub id: Id,
@@ -42,6 +44,7 @@ where
 {
     /// Create a new thought with the given title.
     pub fn exec(&self, req: Request) -> Result<Response<Id<R>>, Error> {
+        log::debug!("Create new thought: {:?}", req);
         let thought = Thought::new(req.title);
         validate_thought(&thought)?;
         let id = self.repo.save(thought)?;

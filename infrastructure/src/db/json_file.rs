@@ -67,6 +67,7 @@ impl Repo for JsonFile {
     type Id = Id;
 
     fn save(&self, thought: Thought) -> Result<Self::Id> {
+        log::debug!("Save thought {:?} to JSON file", thought);
         let id = self.new_id()?;
         let Thought { title } = thought;
         let model = models::Thought {
@@ -78,6 +79,7 @@ impl Repo for JsonFile {
         Ok(id)
     }
     fn get(&self, id: Self::Id) -> Result<Thought> {
+        log::debug!("Get thought {:?} from JSON file", id);
         let sid = self.storage_id(id)?;
         let model = self.thoughts.get::<models::Thought>(&sid)?;
         debug_assert_eq!(id.to_string(), model.thought_id);

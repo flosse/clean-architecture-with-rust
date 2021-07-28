@@ -9,4 +9,5 @@ publish = false
 domain = "0.0.0"
 
 # External dependencies
+log = "*"
 thiserror = "1"

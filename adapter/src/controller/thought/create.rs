@@ -30,10 +30,10 @@ where
     }
 
     pub fn create_thought(&self, title: impl Into<String>) -> Result<P::ViewModel, Error> {
+        let title = title.into();
+        log::debug!("Create thought '{}'", title);
+        let req = Request { title };
         let interactor = CreateThought::new(&*self.repository);
-        let req = Request {
-            title: title.into(),
-        };
         let res = interactor.exec(req)?;
         Ok(self.presenter.present(res))
     }
