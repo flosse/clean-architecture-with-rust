@@ -3,7 +3,7 @@ use adapter::{
     controller::thought::{
         create::Controller as CreateController, find_by_id::Controller as FindController,
     },
-    id::thought::Id,
+    model::app::thought::Id,
     presenter::cli::Presenter,
 };
 use application::gateway::repository::thought::Repo;
@@ -32,25 +32,13 @@ where
     match cmd {
         Cmd::Create { title } => {
             let controller = CreateController::new(repo, presenter);
-            match controller.create_thought(title) {
-                Ok(res) => {
-                    println!("Created a new thought (ID = {})", res);
-                }
-                Err(err) => {
-                    println!("Undable to create a new thought: {}", err);
-                }
-            }
+            let res = controller.create_thought(title);
+            println!("{}", res);
         }
         Cmd::Read { id } => {
             let controller = FindController::new(repo, presenter);
-            match controller.find_thought(&id) {
-                Ok(thought) => {
-                    println!("{}", thought);
-                }
-                Err(err) => {
-                    println!("Undable find thought: {}", err);
-                }
-            }
+            let res = controller.find_thought(&id);
+            println!("{}", res);
         }
         Cmd::Serve {} => {
             let rt = Runtime::new().expect("tokio runtime");

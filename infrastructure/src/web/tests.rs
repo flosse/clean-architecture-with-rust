@@ -6,7 +6,7 @@ use serde::Deserialize;
 use std::{io, sync::Arc};
 use warp::reply::Response;
 
-use adapter::id::{thought::Id, NewId};
+use adapter::model::app::{thought::Id, NewId};
 
 pub fn blank_db() -> Arc<InMemory> {
     Arc::new(InMemory::default())

@@ -1,7 +1,7 @@
 pub mod cli;
-pub mod json;
+pub mod http_json_api;
 
-pub trait Presenter<D> {
+pub trait Present<D> {
     /// View model
     type ViewModel;
     /// Present the given data `D`

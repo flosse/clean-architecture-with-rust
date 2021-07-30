@@ -1,6 +1,5 @@
-use crate::gateway::repository::thought::{Error as RepoError, Repo};
+use crate::gateway::repository::thought::{self as repo, Repo};
 use std::fmt::Debug;
-use thiserror::Error;
 
 #[derive(Debug)]
 pub struct Request<Id> {
@@ -26,11 +25,7 @@ impl<'r, R> FindById<'r, R> {
     }
 }
 
-#[derive(Debug, Error)]
-pub enum Error {
-    #[error(transparent)]
-    Repo(#[from] RepoError),
-}
+pub type Error = repo::Error;
 
 impl<'r, R> FindById<'r, R>
 where

@@ -1,4 +1,4 @@
-use adapter::id::{thought::Id, NewId};
+use adapter::model::app::{thought::Id, NewId};
 use application::gateway::repository::thought::{Error, Repo, Result};
 use entity::thought::{Thought, Title};
 use jfs::{Config, Store};

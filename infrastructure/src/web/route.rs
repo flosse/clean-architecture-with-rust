@@ -1,5 +1,5 @@
 use crate::web::handler;
-use adapter::id::thought::Id;
+use adapter::model::app::thought::Id;
 use application::gateway::repository::thought::Repo;
 use std::{convert::Infallible, sync::Arc};
 use warp::{body, path, Filter, Rejection, Reply};

@@ -8,6 +8,8 @@ version = "0.0.0"
 dependencies = [
  "application",
  "domain",
+ "http",
+ "http-serde",
  "log",
  "serde",
  "thiserror",
@@ -393,6 +395,16 @@ dependencies = [
  "bytes",
  "http",
  "pin-project-lite",
+]
+
+[[package]]
+name = "http-serde"
+version = "1.0.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "25698ac7002625796d5a7df8f0602400571da944c2edc1d5c268a6947dd4f692"
+dependencies = [
+ "http",
+ "serde",
 ]
 
 [[package]]

@@ -10,6 +10,8 @@ application = "0.0.0"
 domain = "0.0.0"
 
 # External dependencies
+http = "*"
+http-serde = "*"
 log = "*"
 serde = { version = "1", features = ["derive"] }
 thiserror = "1"

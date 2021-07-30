@@ -1,10 +1,11 @@
 use crate::web::handler::{reply_error, Result};
 use adapter::{
-    controller::thought::find_by_id::Controller, id::thought::Id, presenter::json::Presenter,
+    controller::thought::find_by_id::Controller, model::app::thought::Id,
+    presenter::http_json_api::Presenter,
 };
 use application::gateway::repository::thought::Repo;
 use std::sync::Arc;
-use warp::{http::StatusCode, reply, Reply};
+use warp::{reply, Reply};
 
 pub type Request = String;
 
@@ -14,19 +15,18 @@ where
 {
     let presenter = Presenter::default();
     let controller = Controller::new(repo, presenter);
-    match controller.find_thought(&req) {
-        Ok(res) => Ok(reply::with_status(reply::json(&res), StatusCode::OK)),
-        Err(err) => Ok(reply_error(err.into())),
+    let res = controller.find_thought(&req);
+    match res {
+        Ok(res) => Ok(reply::with_status(reply::json(&res.data), res.status)),
+        Err(err) => Ok(reply_error(err)),
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::handle;
-    use crate::web::{
-        handler::JsonError,
-        tests::{add_thought_to_db, blank_db, corrupt_db, response_json_body},
-    };
+    use crate::web::tests::{add_thought_to_db, blank_db, corrupt_db, response_json_body};
+    use adapter::model::view::json::Error;
     use serde_json::Value;
     use warp::{http::StatusCode, Reply};
 
@@ -57,10 +57,10 @@ mod tests {
 
         assert_eq!(res.status(), StatusCode::NOT_FOUND);
 
-        let err: JsonError = response_json_body(res).await.unwrap();
+        let err: Error = response_json_body(res).await.unwrap();
 
-        assert_eq!(err.msg, "Could not find thought");
-        assert_eq!(err.status_code, 404);
+        assert_eq!(err.msg.unwrap(), "Could not find thought");
+        assert_eq!(err.status, StatusCode::NOT_FOUND);
     }
 
     #[tokio::test]
@@ -72,9 +72,9 @@ mod tests {
 
         assert_eq!(res.status(), StatusCode::BAD_REQUEST);
 
-        let err: JsonError = response_json_body(res).await.unwrap();
-        assert_eq!(err.msg, "Unable to parse thought ID");
-        assert_eq!(err.status_code, 400);
+        let err: Error = response_json_body(res).await.unwrap();
+        assert_eq!(err.msg.unwrap(), "Unable to parse thought ID");
+        assert_eq!(err.status, StatusCode::BAD_REQUEST);
     }
 
     #[tokio::test]
@@ -86,9 +86,9 @@ mod tests {
 
         assert_eq!(res.status(), StatusCode::INTERNAL_SERVER_ERROR);
 
-        let err: JsonError = response_json_body(res).await.unwrap();
+        let err: Error = response_json_body(res).await.unwrap();
 
-        assert_eq!(err.msg, "A database error occured");
-        assert_eq!(err.status_code, 500);
+        assert_eq!(err.msg, None);
+        assert_eq!(err.status, StatusCode::INTERNAL_SERVER_ERROR);
     }
 }

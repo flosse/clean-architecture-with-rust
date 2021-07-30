@@ -1,26 +1,19 @@
-use crate::{id::thought::Id, presenter::Presenter};
-use application::{
-    gateway::repository::thought::Repo,
-    usecase::thought::create::{self, CreateThought, Request, Response},
+use crate::{
+    model::app::thought::{create as app, Id},
+    presenter::Present,
 };
+use application::{gateway::repository::thought::Repo, usecase::thought::create as uc};
 use std::sync::Arc;
-use thiserror::Error;
 
 pub struct Controller<R, P> {
     repository: Arc<R>,
     presenter: P,
 }
 
-#[derive(Debug, Error)]
-pub enum Error {
-    #[error(transparent)]
-    Usecase(#[from] create::Error),
-}
-
 impl<R, P> Controller<R, P>
 where
     R: Repo<Id = Id> + 'static,
-    P: Presenter<Response<Id>>,
+    P: Present<app::Result>,
 {
     pub fn new(repository: Arc<R>, presenter: P) -> Self {
         Self {
@@ -29,12 +22,12 @@ where
         }
     }
 
-    pub fn create_thought(&self, title: impl Into<String>) -> Result<P::ViewModel, Error> {
+    pub fn create_thought(&self, title: impl Into<String>) -> P::ViewModel {
         let title = title.into();
         log::debug!("Create thought '{}'", title);
-        let req = Request { title };
-        let interactor = CreateThought::new(&*self.repository);
-        let res = interactor.exec(req)?;
-        Ok(self.presenter.present(res))
+        let req = app::Request { title };
+        let interactor = uc::CreateThought::new(&*self.repository);
+        let res = interactor.exec(req);
+        self.presenter.present(res)
     }
 }

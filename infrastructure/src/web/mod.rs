@@ -1,4 +1,4 @@
-use adapter::id::thought::Id;
+use adapter::model::app::thought::Id;
 use application::gateway::repository::thought::Repo;
 use std::{net::SocketAddr, sync::Arc};
 

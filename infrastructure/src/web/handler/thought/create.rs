@@ -1,10 +1,12 @@
 use crate::web::handler::{reply_error, Result};
-use adapter::controller::thought::create::Controller;
-use adapter::{id::thought::Id, presenter::json::Presenter};
+use adapter::{
+    controller::thought::create::Controller, model::app::thought::Id,
+    presenter::http_json_api::Presenter,
+};
 use application::gateway::repository::thought::Repo;
 use serde::Deserialize;
 use std::sync::Arc;
-use warp::{http::StatusCode, reply, Reply};
+use warp::{reply, Reply};
 
 #[derive(Deserialize)]
 pub struct Request {
@@ -18,18 +20,16 @@ where
     let presenter = Presenter::default();
     let controller = Controller::new(repo, presenter);
     match controller.create_thought(req.title) {
-        Ok(res) => Ok(reply::with_status(reply::json(&res), StatusCode::CREATED)),
-        Err(err) => Ok(reply_error(err.into())),
+        Ok(res) => Ok(reply::with_status(reply::json(&res.data), res.status)),
+        Err(err) => Ok(reply_error(err)),
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::{handle, Request};
-    use crate::web::{
-        handler::JsonError,
-        tests::{blank_db, response_json_body},
-    };
+    use crate::web::tests::{blank_db, response_json_body};
+    use adapter::model::view::json::Error;
     use application::gateway::repository::thought::Repo;
     use serde_json::Value;
     use warp::{http::StatusCode, Reply};
@@ -61,10 +61,13 @@ mod tests {
 
         assert_eq!(res.status(), StatusCode::BAD_REQUEST);
 
-        let err: JsonError = response_json_body(res).await.unwrap();
+        let err: Error = response_json_body(res).await.unwrap();
 
-        assert_eq!(err.msg, "The title must have at least 3 but has 1 chars");
-        assert_eq!(err.status_code, 400);
+        assert_eq!(
+            err.msg.unwrap(),
+            "The title must have at least 3 but has 1 chars"
+        );
+        assert_eq!(err.status, StatusCode::BAD_REQUEST);
     }
 
     #[tokio::test]
@@ -77,9 +80,12 @@ mod tests {
 
         assert_eq!(res.status(), StatusCode::BAD_REQUEST);
 
-        let err: JsonError = response_json_body(res).await.unwrap();
+        let err: Error = response_json_body(res).await.unwrap();
 
-        assert_eq!(err.msg, "The title must have at most 80 but has 100 chars");
-        assert_eq!(err.status_code, 400);
+        assert_eq!(
+            err.msg.unwrap(),
+            "The title must have at most 80 but has 100 chars"
+        );
+        assert_eq!(err.status, StatusCode::BAD_REQUEST);
     }
 }
