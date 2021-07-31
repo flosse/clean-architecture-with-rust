@@ -26,7 +26,7 @@ where
 mod tests {
     use super::handle;
     use crate::web::tests::{add_thought_to_db, blank_db, corrupt_db, response_json_body};
-    use adapter::model::view::json::Error;
+    use adapter::model::view::json::{thought::find_by_id as uc, Error};
     use serde_json::Value;
     use warp::{http::StatusCode, Reply};
 
@@ -57,10 +57,11 @@ mod tests {
 
         assert_eq!(res.status(), StatusCode::NOT_FOUND);
 
-        let err: Error = response_json_body(res).await.unwrap();
+        let err: Error<uc::Error> = response_json_body(res).await.unwrap();
 
         assert_eq!(err.msg.unwrap(), "Could not find thought");
         assert_eq!(err.status, StatusCode::NOT_FOUND);
+        assert!(matches!(err.details.unwrap(), uc::Error::NotFound));
     }
 
     #[tokio::test]
@@ -72,9 +73,10 @@ mod tests {
 
         assert_eq!(res.status(), StatusCode::BAD_REQUEST);
 
-        let err: Error = response_json_body(res).await.unwrap();
+        let err: Error<uc::Error> = response_json_body(res).await.unwrap();
         assert_eq!(err.msg.unwrap(), "Unable to parse thought ID");
         assert_eq!(err.status, StatusCode::BAD_REQUEST);
+        assert!(matches!(err.details.unwrap(), uc::Error::Id));
     }
 
     #[tokio::test]
@@ -86,9 +88,10 @@ mod tests {
 
         assert_eq!(res.status(), StatusCode::INTERNAL_SERVER_ERROR);
 
-        let err: Error = response_json_body(res).await.unwrap();
+        let err: Error<uc::Error> = response_json_body(res).await.unwrap();
 
         assert_eq!(err.msg, None);
         assert_eq!(err.status, StatusCode::INTERNAL_SERVER_ERROR);
+        assert!(matches!(err.details, None));
     }
 }

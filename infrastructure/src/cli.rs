@@ -7,7 +7,10 @@ use adapter::{
     presenter::cli::Presenter,
 };
 use application::gateway::repository::thought::Repo;
-use std::sync::Arc;
+use std::{
+    net::{IpAddr, SocketAddr},
+    sync::Arc,
+};
 use structopt::StructOpt;
 use tokio::runtime::Runtime;
 
@@ -18,7 +21,12 @@ enum Cmd {
     #[structopt(about = "Read an specific thought")]
     Read { id: String },
     #[structopt(about = "Run web service")]
-    Serve {},
+    Serve {
+        #[structopt(default_value = "127.0.0.1", help = "IP address", long)]
+        bind: IpAddr,
+        #[structopt(default_value = "3030", help = "TCP port", long)]
+        port: u16,
+    },
 }
 
 pub fn run<R>(repo: R)
@@ -40,9 +48,10 @@ where
             let res = controller.find_thought(&id);
             println!("{}", res);
         }
-        Cmd::Serve {} => {
+        Cmd::Serve { bind, port } => {
             let rt = Runtime::new().expect("tokio runtime");
-            rt.block_on(web::run(repo));
+            let addr = SocketAddr::from((bind, port));
+            rt.block_on(web::run(repo, addr));
         }
     }
 }

@@ -13,9 +13,11 @@ domain = "0.0.0"
 entity = "0.0.0"
 
 # External dependencies
-pretty_env_logger = "*"
 log = "*"
 jfs = "*"
+mime_guess = "*"
+pretty_env_logger = "*"
+rust-embed = "*"
 serde = { version = "1", features = ["derive"] }
 structopt = { version = "0.3", default-features = false }
 tokio = { version = "1", features = ["full"] }

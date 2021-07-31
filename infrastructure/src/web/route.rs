@@ -8,21 +8,21 @@ pub fn api<D>(db: Arc<D>) -> impl Filter<Extract = impl Reply, Error = Rejection
 where
     D: Repo<Id = Id> + 'static,
 {
-    let base_path = path("thought");
+    let base_path = path("api").and(path("thought"));
 
-    // POST /thought
+    // POST /api/thought
     let post_thought = warp::post()
         .and(path::end())
         .and(body::json())
         .and(with_db(db.clone()))
         .and_then(handler::thought::create::handle);
 
-    // GET /thought/<ID>
+    // GET /api/thought/<ID>
     let get_thought = warp::get()
         .and(path!(String))
         .and(path::end())
         .and(with_db(db))
-        .and_then(handler::thought::read::handle);
+        .and_then(handler::thought::find_by_id::handle);
 
     base_path.and(post_thought.or(get_thought))
 }

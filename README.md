@@ -6,14 +6,16 @@ written in [Rust](https://rust-lang.org).
 
 ## Circles
 
-Each circle (a.k.a layer) is organized in a separate create.
+Each circle (a.k.a layer) is organized in a separate crate.
 Currently there are these circles:
 
 - `entity`
 - `domain`
 - `application`
 - `adapter`
+  - `json-boundary`
 - `infrastructure`
+- `webapp`
 
 Depending on your system the amount and the name of circles could
 be different but the main **dependency rule** must be ensured:
@@ -24,6 +26,16 @@ that means
 
 > Nothing in an inner circle can know anything at all about
 > something in an outer circle
+
+## Build & run
+
+```
+cd webapp/
+trunk build
+cd ..
+cargo build
+./target/debug/clean-architecture-with-rust serve
+```
 
 ## Example Szenario
 

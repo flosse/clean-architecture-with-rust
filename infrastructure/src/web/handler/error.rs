@@ -4,7 +4,10 @@ use warp::{reply, Rejection};
 
 pub type Result<T> = result::Result<T, Rejection>;
 
-pub fn reply_error(err: Error) -> reply::WithStatus<reply::Json> {
+pub fn reply_error<T>(err: Error<T>) -> reply::WithStatus<reply::Json>
+where
+    T: serde::Serialize,
+{
     let status = err.status;
     let reply = reply::json(&err);
     reply::with_status(reply, status)

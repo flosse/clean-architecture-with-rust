@@ -1,19 +1,14 @@
 use crate::web::handler::{reply_error, Result};
 use adapter::{
-    controller::thought::create::Controller, model::app::thought::Id,
+    controller::thought::create::Controller,
+    model::{app::thought::Id, view::json::thought::create as view},
     presenter::http_json_api::Presenter,
 };
 use application::gateway::repository::thought::Repo;
-use serde::Deserialize;
 use std::sync::Arc;
 use warp::{reply, Reply};
 
-#[derive(Deserialize)]
-pub struct Request {
-    title: String,
-}
-
-pub async fn handle<R>(req: Request, repo: Arc<R>) -> Result<impl Reply>
+pub async fn handle<R>(req: view::Request, repo: Arc<R>) -> Result<impl Reply>
 where
     R: Repo<Id = Id> + 'static,
 {
@@ -29,7 +24,7 @@ where
 mod tests {
     use super::{handle, Request};
     use crate::web::tests::{blank_db, response_json_body};
-    use adapter::model::view::json::Error;
+    use adapter::model::view::json::{thought::create as uc, Error};
     use application::gateway::repository::thought::Repo;
     use serde_json::Value;
     use warp::{http::StatusCode, Reply};
@@ -61,13 +56,17 @@ mod tests {
 
         assert_eq!(res.status(), StatusCode::BAD_REQUEST);
 
-        let err: Error = response_json_body(res).await.unwrap();
+        let err: Error<uc::Error> = response_json_body(res).await.unwrap();
 
         assert_eq!(
             err.msg.unwrap(),
             "The title must have at least 3 but has 1 chars"
         );
         assert_eq!(err.status, StatusCode::BAD_REQUEST);
+        assert!(matches!(
+            err.details.unwrap(),
+            uc::Error::TitleMinLength { actual: 1, min: 3 }
+        ));
     }
 
     #[tokio::test]
@@ -80,12 +79,19 @@ mod tests {
 
         assert_eq!(res.status(), StatusCode::BAD_REQUEST);
 
-        let err: Error = response_json_body(res).await.unwrap();
+        let err: Error<uc::Error> = response_json_body(res).await.unwrap();
 
         assert_eq!(
             err.msg.unwrap(),
             "The title must have at most 80 but has 100 chars"
         );
         assert_eq!(err.status, StatusCode::BAD_REQUEST);
+        assert!(matches!(
+            err.details.unwrap(),
+            uc::Error::TitleMaxLength {
+                actual: 100,
+                max: 80
+            }
+        ));
     }
 }

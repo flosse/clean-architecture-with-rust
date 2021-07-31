@@ -8,11 +8,13 @@ publish = false
 [workspace]
 members = [
   "adapter",
+  "adapter/json-boundary",
   "application",
   "domain",
   "entity",
   "infrastructure"
 ]
+exclude = [ "webapp" ]
 
 [dependencies]
 infrastructure = "0.0.0"
@@ -23,3 +25,4 @@ application = { path = "application" }
 domain = { path = "domain" }
 entity = { path = "entity" }
 infrastructure = { path = "infrastructure" }
+json-boundary = { path = "adapter/json-boundary" }

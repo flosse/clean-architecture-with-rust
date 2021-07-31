@@ -1,0 +1,17 @@
+[package]
+name = "json-boundary"
+version = "0.0.0"
+edition = "2018"
+publish = false
+
+[dependencies]
+application = { version = "0.0.0", optional = true }
+domain = { version = "0.0.0", optional = true }
+serde = { version = "1", features =  ["derive"] }
+serde_json = "1"
+http = "*"
+http-serde = "*"
+
+[features]
+default = []
+conversions = ["application", "domain"]
