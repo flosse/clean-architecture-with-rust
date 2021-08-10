@@ -26,6 +26,17 @@ jobs:
           toolchain: stable
           components: rustfmt, clippy
 
+      - name: Install trunk
+        run: |
+          wget -qO- https://github.com/thedodd/trunk/releases/download/v0.13.1/trunk-x86_64-unknown-linux-gnu.tar.gz | tar -C ~/.cargo/bin -xzf-
+
+      - name: Build webapp
+        run: |
+          cd webapp/
+          rustup target add wasm32-unknown-unknown
+          trunk -V
+          trunk build
+
       - name: Check code formatting
         uses: actions-rs/cargo@v1
         with:
