@@ -48,7 +48,7 @@ pub mod create {
 
 pub mod find_by_id {
     use super::{Id, ParseIdError};
-    use application::{gateway::repository::thought as repo, usecase::thought::find_by_id as uc};
+    use application::usecase::thought::find_by_id as uc;
     use std::result;
     use thiserror::Error;
 
@@ -58,9 +58,11 @@ pub mod find_by_id {
 
     #[derive(Debug, Error)]
     pub enum Error {
-        #[error(transparent)]
-        Id(#[from] ParseIdError),
-        #[error(transparent)]
-        Repo(#[from] repo::Error),
+        #[error("{}", ParseIdError)]
+        Id,
+        #[error("{}", uc::Error::NotFound)]
+        NotFound,
+        #[error("{}", uc::Error::Repo)]
+        Repo,
     }
 }

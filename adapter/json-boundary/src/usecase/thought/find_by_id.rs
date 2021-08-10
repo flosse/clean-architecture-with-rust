@@ -29,7 +29,7 @@ mod conv {
         fn try_from(from: uc::Error) -> Result<Self, Self::Error> {
             match from {
                 uc::Error::NotFound => Ok(Self::NotFound),
-                uc::Error::Io(_) => Err(()),
+                uc::Error::Repo => Err(()),
             }
         }
     }

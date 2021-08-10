@@ -5,7 +5,6 @@ use crate::{
     },
     presenter::Present,
 };
-use application::gateway::repository::thought as repo;
 use http::StatusCode;
 use std::convert::TryFrom;
 
@@ -28,7 +27,7 @@ impl Present<app::create::Result> for Presenter {
                     status: StatusCode::BAD_REQUEST,
                     details: view::create::Error::try_from(err).ok(),
                 },
-                app::create::Error::Repo(_) => Error::internal(),
+                app::create::Error::Repo => Error::internal(),
             })
     }
 }
@@ -44,19 +43,17 @@ impl Present<app::find_by_id::Result> for Presenter {
                 status: StatusCode::OK,
             })
             .map_err(|err| match err {
-                app::find_by_id::Error::Id(err) => Error {
+                app::find_by_id::Error::Id => Error {
                     msg: Some(err.to_string()),
                     status: StatusCode::BAD_REQUEST,
                     details: Some(view::find_by_id::Error::Id),
                 },
-                app::find_by_id::Error::Repo(err) => match err {
-                    repo::Error::NotFound => Error {
-                        msg: Some("Could not find thought".to_string()),
-                        status: StatusCode::NOT_FOUND,
-                        details: view::find_by_id::Error::try_from(err).ok(),
-                    },
-                    repo::Error::Io(_) => Error::internal(),
+                app::find_by_id::Error::NotFound => Error {
+                    msg: Some("Could not find thought".to_string()),
+                    status: StatusCode::NOT_FOUND,
+                    details: Some(view::find_by_id::Error::NotFound),
                 },
+                app::find_by_id::Error::Repo => Error::internal(),
             })
     }
 }

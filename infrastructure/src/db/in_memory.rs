@@ -1,5 +1,5 @@
 use adapter::model::app::{thought::Id, NewId};
-use application::gateway::repository::thought::{Error, Repo, Result};
+use application::gateway::repository::thought::{GetError, Repo, SaveError};
 use entity::thought::Thought;
 use std::{collections::HashMap, sync::RwLock};
 
@@ -10,24 +10,24 @@ pub struct InMemory {
 
 impl Repo for InMemory {
     type Id = Id;
-    fn save(&self, thought: Thought) -> Result<Self::Id> {
+    fn save(&self, thought: Thought) -> Result<Self::Id, SaveError> {
         let id = self.new_id()?;
         self.thoughts.write().unwrap().insert(id, thought);
         Ok(id)
     }
-    fn get(&self, id: Self::Id) -> Result<Thought> {
+    fn get(&self, id: Self::Id) -> Result<Thought, GetError> {
         self.thoughts
             .read()
             .unwrap()
             .get(&id)
             .cloned()
-            .ok_or(Error::NotFound)
+            .ok_or(GetError::NotFound)
     }
 }
 
 impl NewId<Id> for InMemory {
-    type Err = Error;
-    fn new_id(&self) -> Result<Id> {
+    type Err = SaveError;
+    fn new_id(&self) -> Result<Id, Self::Err> {
         let next = self
             .thoughts
             .read()

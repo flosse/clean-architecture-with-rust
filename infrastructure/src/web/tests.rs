@@ -1,12 +1,11 @@
 use crate::db::in_memory::InMemory;
+use adapter::model::app::{thought::Id, NewId};
 use anyhow::Result;
 use application::gateway::repository::thought::{self as repo, Repo};
 use entity::thought::Thought;
 use serde::Deserialize;
-use std::{io, sync::Arc};
+use std::sync::Arc;
 use warp::reply::Response;
-
-use adapter::model::app::{thought::Id, NewId};
 
 pub fn blank_db() -> Arc<InMemory> {
     Arc::new(InMemory::default())
@@ -19,27 +18,20 @@ pub fn corrupt_db() -> Arc<CorruptTestDb> {
 #[derive(Default)]
 pub struct CorruptTestDb;
 
-fn io_err<T>() -> repo::Result<T> {
-    Err(repo::Error::Io(io::Error::new(
-        io::ErrorKind::Other,
-        "no connection",
-    )))
-}
-
 impl Repo for CorruptTestDb {
     type Id = Id;
-    fn save(&self, _: Thought) -> repo::Result<Self::Id> {
-        io_err()
+    fn save(&self, _: Thought) -> Result<Self::Id, repo::SaveError> {
+        Err(repo::SaveError::Connection)
     }
-    fn get(&self, _: Self::Id) -> repo::Result<Thought> {
-        io_err()
+    fn get(&self, _: Self::Id) -> Result<Thought, repo::GetError> {
+        Err(repo::GetError::Connection)
     }
 }
 
 impl NewId<Id> for CorruptTestDb {
-    type Err = repo::Error;
-    fn new_id(&self) -> repo::Result<Id> {
-        io_err()
+    type Err = repo::SaveError;
+    fn new_id(&self) -> Result<Id, Self::Err> {
+        Err(repo::SaveError::Connection)
     }
 }
 

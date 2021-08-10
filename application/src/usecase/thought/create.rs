@@ -1,5 +1,5 @@
 use crate::{
-    gateway::repository::thought::{Error as RepoError, Repo},
+    gateway::repository::thought::{Repo, SaveError},
     usecase::thought::validate::{validate_thought, ThoughtInvalidity},
 };
 use domain::thought::Thought;
@@ -32,10 +32,18 @@ type Id<R> = <R as Repo>::Id;
 
 #[derive(Debug, Error)]
 pub enum Error {
-    #[error(transparent)]
-    Repo(#[from] RepoError),
+    #[error("{}", SaveError::Connection)]
+    Repo,
     #[error(transparent)]
     Invalidity(#[from] ThoughtInvalidity),
+}
+
+impl From<SaveError> for Error {
+    fn from(e: SaveError) -> Self {
+        match e {
+            SaveError::Connection => Self::Repo,
+        }
+    }
 }
 
 impl<'r, R> CreateThought<'r, R>
@@ -55,6 +63,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::gateway::repository::thought::GetError;
     use std::sync::RwLock;
 
     #[derive(Default)]
@@ -65,11 +74,11 @@ mod tests {
     impl Repo for MockRepo {
         type Id = u32;
 
-        fn save(&self, thought: Thought) -> Result<Self::Id, RepoError> {
+        fn save(&self, thought: Thought) -> Result<Self::Id, SaveError> {
             *self.thought.write().unwrap() = Some(thought);
             Ok(42)
         }
-        fn get(&self, _: Self::Id) -> Result<Thought, RepoError> {
+        fn get(&self, _: Self::Id) -> Result<Thought, GetError> {
             todo!()
         }
     }

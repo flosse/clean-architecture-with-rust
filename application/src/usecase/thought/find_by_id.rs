@@ -1,5 +1,6 @@
-use crate::gateway::repository::thought::{self as repo, Repo};
+use crate::gateway::repository::thought::{GetError, Repo};
 use std::fmt::Debug;
+use thiserror::Error;
 
 #[derive(Debug)]
 pub struct Request<Id> {
@@ -25,7 +26,22 @@ impl<'r, R> FindById<'r, R> {
     }
 }
 
-pub type Error = repo::Error;
+#[derive(Debug, Error)]
+pub enum Error {
+    #[error("{}", GetError::NotFound)]
+    NotFound,
+    #[error("{}", GetError::Connection)]
+    Repo,
+}
+
+impl From<GetError> for Error {
+    fn from(e: GetError) -> Self {
+        match e {
+            GetError::NotFound => Self::NotFound,
+            GetError::Connection => Self::Repo,
+        }
+    }
+}
 
 impl<'r, R> FindById<'r, R>
 where

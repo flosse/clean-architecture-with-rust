@@ -22,7 +22,7 @@ where
 
 #[cfg(test)]
 mod tests {
-    use super::{handle, Request};
+    use super::{handle, view::Request};
     use crate::web::tests::{blank_db, response_json_body};
     use adapter::model::view::json::{thought::create as uc, Error};
     use application::gateway::repository::thought::Repo;

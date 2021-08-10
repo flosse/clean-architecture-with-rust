@@ -1,19 +1,22 @@
 use domain::thought::Thought;
-use std::{io, result};
 use thiserror::Error;
 
 #[derive(Debug, Error)]
-pub enum Error {
-    #[error("Though not found")]
+pub enum GetError {
+    #[error("Thought not found")]
     NotFound,
-    #[error(transparent)]
-    Io(#[from] io::Error),
+    #[error("Thought repository connection problem")]
+    Connection,
 }
 
-pub type Result<T> = result::Result<T, Error>;
+#[derive(Debug, Error)]
+pub enum SaveError {
+    #[error("Thought repository connection problem")]
+    Connection,
+}
 
 pub trait Repo: Send + Sync {
     type Id;
-    fn save(&self, thought: Thought) -> Result<Self::Id>;
-    fn get(&self, id: Self::Id) -> Result<Thought>;
+    fn save(&self, thought: Thought) -> Result<Self::Id, SaveError>;
+    fn get(&self, id: Self::Id) -> Result<Thought, GetError>;
 }

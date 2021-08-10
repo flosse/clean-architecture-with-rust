@@ -25,11 +25,17 @@ where
         log::debug!("Find thought {}", id);
         let res = id
             .parse::<Id>()
-            .map_err(app::Error::Id)
+            .map_err(|_| app::Error::Id)
             .map(|id| app::Request { id })
             .and_then(|req| {
                 let interactor = uc::FindById::new(&*self.repository);
-                interactor.exec(req).map_err(app::Error::Repo)
+                interactor.exec(req).map_err(|e| {
+                    // TODO: impl From<uc::Error> for app::Error
+                    match e {
+                        uc::Error::Repo => app::Error::Repo,
+                        uc::Error::NotFound => app::Error::NotFound,
+                    }
+                })
             });
         self.presenter.present(res)
     }
