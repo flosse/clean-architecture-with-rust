@@ -57,3 +57,19 @@ impl Present<app::find_by_id::Result> for Presenter {
             })
     }
 }
+
+// -- Read all -- //
+
+impl Present<app::read_all::Result> for Presenter {
+    type ViewModel = Result<Vec<view::Thought>, view::read_all::Error>;
+    fn present(&self, res: app::read_all::Result) -> Self::ViewModel {
+        res.map(|resp| resp.thoughts.into_iter().map(view::Thought::from).collect())
+            .map(|data| Response {
+                data,
+                status: StatusCode::OK,
+            })
+            .map_err(|err| match err {
+                app::read_all::Error::Repo => Error::internal(),
+            })
+    }
+}

@@ -17,6 +17,12 @@ where
         .and(with_db(db.clone()))
         .and_then(handler::thought::create::handle);
 
+    // GET /api/thought
+    let get_thoughts = warp::get()
+        .and(path::end())
+        .and(with_db(db.clone()))
+        .and_then(handler::thought::read_all::handle);
+
     // GET /api/thought/<ID>
     let get_thought = warp::get()
         .and(path!(String))
@@ -24,7 +30,7 @@ where
         .and(with_db(db))
         .and_then(handler::thought::find_by_id::handle);
 
-    base_path.and(post_thought.or(get_thought))
+    base_path.and(post_thought.or(get_thoughts).or(get_thought))
 }
 
 fn with_db<D>(db: Arc<D>) -> impl Filter<Extract = (Arc<D>,), Error = Infallible> + Clone

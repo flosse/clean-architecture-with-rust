@@ -1,5 +1,5 @@
 use adapter::model::app::{thought::Id, NewId};
-use application::gateway::repository::thought::{GetError, Repo, SaveError};
+use application::gateway::repository::thought::{GetAllError, GetError, Repo, SaveError};
 use entity::thought::{Thought, Title};
 use jfs::{Config, Store};
 use std::{collections::HashMap, io};
@@ -114,6 +114,28 @@ impl Repo for JsonFile {
         Ok(Thought {
             title: Title::new(model.title),
         })
+    }
+    fn get_all(&self) -> Result<Vec<(Self::Id, Thought)>, GetAllError> {
+        log::debug!("Get all thoughts from JSON file");
+        let thoughts = self
+            .thoughts
+            .all::<models::Thought>()
+            .map_err(|err| {
+                log::warn!("Unable to load all thoughts: {}", err);
+                GetAllError::Connection
+            })?
+            .into_iter()
+            .filter_map(|(_, model)| model.thought_id.parse().ok().map(|id| (id, model.title)))
+            .map(|(id, title)| {
+                (
+                    id,
+                    Thought {
+                        title: Title::new(title),
+                    },
+                )
+            })
+            .collect();
+        Ok(thoughts)
     }
 }
 

@@ -66,3 +66,14 @@ pub mod find_by_id {
         Repo,
     }
 }
+
+pub mod read_all {
+    use super::Id;
+    use application::usecase::thought::read_all as uc;
+    use std::result;
+
+    pub type Request = uc::Request;
+    pub type Response = uc::Response<Id>;
+    pub type Result = result::Result<Response, Error>;
+    pub type Error = uc::Error;
+}

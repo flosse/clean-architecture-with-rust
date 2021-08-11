@@ -24,6 +24,7 @@ pub enum Msg {
     Page(page::Msg),
     CreateThoughtResult(Result<ThoughtId>),
     FindThoughtResult(Result<Thought>),
+    FetchAllThoughtsResult(Result<Vec<Thought>>),
 }
 
 // ------ ------
@@ -52,6 +53,9 @@ pub fn update(msg: Msg, mdl: &mut Mdl) -> Option<Cmd> {
         Msg::Page(msg) => msg,
         Msg::CreateThoughtResult(res) => page::Msg::Home(page::home::Msg::CreateThoughtResult(res)),
         Msg::FindThoughtResult(res) => page::Msg::Home(page::home::Msg::FindThoughtResult(res)),
+        Msg::FetchAllThoughtsResult(res) => {
+            page::Msg::Home(page::home::Msg::FetchAllThoughtsResult(res))
+        }
     };
     page::update(page_msg, &mut mdl.page).map(Cmd::from)
 }

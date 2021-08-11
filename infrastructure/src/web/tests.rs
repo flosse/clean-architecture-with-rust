@@ -26,6 +26,9 @@ impl Repo for CorruptTestDb {
     fn get(&self, _: Self::Id) -> Result<Thought, repo::GetError> {
         Err(repo::GetError::Connection)
     }
+    fn get_all(&self) -> Result<Vec<(Id, Thought)>, repo::GetAllError> {
+        Err(repo::GetAllError::Connection)
+    }
 }
 
 impl NewId<Id> for CorruptTestDb {

@@ -27,6 +27,7 @@ type Result<T> = std::result::Result<T, Error>;
 pub enum Msg {
     View(view::Msg),
     CreateThoughtResult(Result<ThoughtId>),
+    FetchAllThoughtsResult(Result<Vec<Thought>>),
     FindThoughtResult(Result<Thought>),
 }
 
@@ -56,6 +57,10 @@ fn update(msg: Msg, mdl: &mut Mdl, orders: &mut impl Orders<Msg>) {
             let msg = view::Msg::FindThoughtResult(res);
             view::update(msg, &mut mdl.view);
         }
+        Msg::FetchAllThoughtsResult(res) => {
+            let msg = view::Msg::FetchAllThoughtsResult(res);
+            view::update(msg, &mut mdl.view);
+        }
     }
 }
 
@@ -64,6 +69,11 @@ fn update(msg: Msg, mdl: &mut Mdl, orders: &mut impl Orders<Msg>) {
 async fn create_thought(title: String) -> Msg {
     let res = usecase::thought::create(title).await;
     Msg::CreateThoughtResult(res)
+}
+
+async fn fetch_all_thoughts() -> Msg {
+    let res = usecase::thought::fetch_all().await;
+    Msg::FetchAllThoughtsResult(res)
 }
 
 async fn find_thought_by_id(id: domain::ThoughtId) -> Msg {
@@ -75,7 +85,8 @@ async fn find_thought_by_id(id: domain::ThoughtId) -> Msg {
 //     Init
 // ------ ------
 
-fn init(_: Url, _: &mut impl Orders<Msg>) -> Mdl {
+fn init(_: Url, orders: &mut impl Orders<Msg>) -> Mdl {
+    orders.perform_cmd(fetch_all_thoughts());
     Mdl::default()
 }
 

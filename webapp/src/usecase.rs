@@ -23,6 +23,13 @@ pub mod thought {
             .map_err(|e| presenter.present(e))
     }
 
+    pub async fn fetch_all() -> Result<Vec<Thought>, String> {
+        let presenter = ErrorPresenter::default();
+        api::fetch_all_thoughts()
+            .await
+            .map_err(|e| presenter.present(e))
+    }
+
     // ------ ------
     //   Presenter
     // ------ ------

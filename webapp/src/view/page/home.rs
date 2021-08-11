@@ -27,6 +27,7 @@ pub enum Msg {
     CreateRequest,
     CreateThoughtResult(Result<ThoughtId, String>),
     FindThoughtResult(Result<Thought, String>),
+    FetchAllThoughtsResult(Result<Vec<Thought>, String>),
 }
 
 // ------ ------
@@ -66,6 +67,7 @@ pub fn update(msg: Msg, mdl: &mut Mdl) -> Option<Cmd> {
             match res {
                 Ok(_) => {
                     mdl.input.clear();
+                    mdl.error = None;
                 }
                 Err(err) => {
                     mdl.input_error = Some(err.clone());
@@ -73,6 +75,14 @@ pub fn update(msg: Msg, mdl: &mut Mdl) -> Option<Cmd> {
                 }
             }
         }
+        Msg::FetchAllThoughtsResult(res) => match res {
+            Ok(thoughts) => {
+                mdl.thoughts = thoughts;
+            }
+            Err(err) => {
+                mdl.error = Some(err);
+            }
+        },
     }
     None
 }
