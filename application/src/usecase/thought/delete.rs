@@ -47,7 +47,7 @@ where
 {
     pub fn exec(&self, req: Request<Id<R>>) -> Result<Response, Error> {
         log::debug!("Delete thought by ID: {:?}", req);
-        self.repo.delete(req.id.clone())?;
+        self.repo.delete(req.id)?;
         Ok(Response {})
     }
 }
