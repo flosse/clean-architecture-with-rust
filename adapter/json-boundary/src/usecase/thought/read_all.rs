@@ -16,7 +16,7 @@ mod conv {
     {
         fn from(from: uc::Thought<Id>) -> Self {
             let uc::Thought { id, title } = from;
-            let id = id.to_string();
+            let id = id.to_string().into();
             Self { id, title }
         }
     }

@@ -14,6 +14,7 @@ pub struct Mdl {
     input: String,
     input_error: Option<String>,
     error: Option<String>,
+    wait_for_deletion: Option<ThoughtId>,
     wait: bool,
 }
 
@@ -24,10 +25,12 @@ pub struct Mdl {
 #[derive(Debug)]
 pub enum Msg {
     InputChanged(String),
+    DeleteRequest(ThoughtId),
     CreateRequest,
     CreateThoughtResult(Result<ThoughtId, String>),
     FindThoughtResult(Result<Thought, String>),
     FetchAllThoughtsResult(Result<Vec<Thought>, String>),
+    DeleteThoughtResult(Result<ThoughtId, String>),
 }
 
 // ------ ------
@@ -37,6 +40,7 @@ pub enum Msg {
 #[derive(Debug)]
 pub enum Cmd {
     CreateThought(String),
+    DeleteThought(ThoughtId),
 }
 
 // ------ ------
@@ -55,6 +59,10 @@ pub fn update(msg: Msg, mdl: &mut Mdl) -> Option<Cmd> {
                 mdl.wait = true;
                 return Some(cmd);
             }
+        }
+        Msg::DeleteRequest(id) => {
+            let cmd = Cmd::DeleteThought(id);
+            return Some(cmd);
         }
         Msg::FindThoughtResult(Err(err)) => {
             mdl.error = Some(err);
@@ -78,6 +86,14 @@ pub fn update(msg: Msg, mdl: &mut Mdl) -> Option<Cmd> {
         Msg::FetchAllThoughtsResult(res) => match res {
             Ok(thoughts) => {
                 mdl.thoughts = thoughts;
+            }
+            Err(err) => {
+                mdl.error = Some(err);
+            }
+        },
+        Msg::DeleteThoughtResult(res) => match res {
+            Ok(id) => {
+                mdl.thoughts.retain(|t| t.id != id);
             }
             Err(err) => {
                 mdl.error = Some(err);
@@ -115,7 +131,7 @@ pub fn view(mdl: &Mdl) -> Node<Msg> {
                 C!["container"],
                 header(),
                 new_thought_input(mdl),
-                thoughts_list(&mdl.thoughts)
+                thoughts_list(&mdl.thoughts, &mdl.wait_for_deletion)
             ]
         ]
     ]
@@ -190,14 +206,45 @@ fn new_thought_input(mdl: &Mdl) -> Node<Msg> {
     ]
 }
 
-fn thoughts_list<M>(thoughts: &[Thought]) -> Node<M> {
+fn thoughts_list(thoughts: &[Thought], wait_for_deletion: &Option<ThoughtId>) -> Node<Msg> {
     div![
-        C!["block"],
+        C!["block", "thoughts"],
         h3![C!["title", "is-4"], "Thoughts"],
         if thoughts.is_empty() {
             p!["Currenty there are no thoughts."]
         } else {
-            ul![thoughts.iter().map(|t| li![&t.title])]
+            ul![thoughts.iter().map(|t| {
+                let wait = wait_for_deletion
+                    .as_ref()
+                    .map(|id| id == &t.id)
+                    .unwrap_or(false);
+                li![thought(t, wait)]
+            })]
         }
+    ]
+}
+
+fn thought(t: &Thought, wait_for_deletion: bool) -> Node<Msg> {
+    let id = t.id.clone();
+    div![
+        C!["level"],
+        div![C!["level-left"], div![C!["level-item"], &t.title]],
+        div![
+            C!["level-right"],
+            div![
+                C!["level-item"],
+                button![
+                    ev(Ev::Click, |_| Msg::DeleteRequest(id)),
+                    C!["button", "is-danger"],
+                    if wait_for_deletion {
+                        C!["is-loading"]
+                    } else {
+                        C![]
+                    },
+                    span![C!["icon"], i![C!["fa", "fa-trash-alt"],]],
+                    span!["delete"]
+                ]
+            ]
+        ]
     ]
 }

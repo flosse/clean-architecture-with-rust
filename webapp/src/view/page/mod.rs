@@ -1,3 +1,4 @@
+use crate::domain::*;
 use seed::prelude::*;
 
 pub mod home;
@@ -33,12 +34,15 @@ pub enum Msg {
 #[derive(Debug)]
 pub enum Cmd {
     CreateThought(String),
+    DeleteThought(ThoughtId),
 }
 
 impl From<home::Cmd> for Cmd {
     fn from(cmd: home::Cmd) -> Self {
-        let home::Cmd::CreateThought(title) = cmd;
-        Self::CreateThought(title)
+        match cmd {
+            home::Cmd::CreateThought(title) => Self::CreateThought(title),
+            home::Cmd::DeleteThought(id) => Self::DeleteThought(id),
+        }
     }
 }
 

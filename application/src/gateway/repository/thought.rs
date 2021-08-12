@@ -21,9 +21,17 @@ pub enum GetAllError {
     Connection,
 }
 
+#[derive(Debug, Error)]
+pub enum DeleteError {
+    #[error("Thought not found")]
+    NotFound,
+    #[error("Thought repository connection problem")]
+    Connection,
+}
 pub trait Repo: Send + Sync {
     type Id;
     fn save(&self, thought: Thought) -> Result<Self::Id, SaveError>;
     fn get(&self, id: Self::Id) -> Result<Thought, GetError>;
     fn get_all(&self) -> Result<Vec<(Self::Id, Thought)>, GetAllError>;
+    fn delete(&self, id: Self::Id) -> Result<(), DeleteError>;
 }

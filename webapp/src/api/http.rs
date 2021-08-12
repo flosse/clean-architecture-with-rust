@@ -37,6 +37,17 @@ where
     to_result(res).await
 }
 
+pub async fn delete_json<R, T, E>(url: &str, req: &R) -> Result<T, E>
+where
+    R: Serialize,
+    T: for<'de> Deserialize<'de> + 'static,
+    E: for<'de> Deserialize<'de> + 'static,
+{
+    let req = Request::new(url).method(Method::Delete).json(req)?;
+    let res = fetch(req).await?;
+    to_result(res).await
+}
+
 async fn to_result<T, E>(res: Response) -> Result<T, E>
 where
     T: for<'de> Deserialize<'de> + 'static,

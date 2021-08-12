@@ -1,5 +1,7 @@
 use adapter::model::app::{thought::Id, NewId};
-use application::gateway::repository::thought::{GetAllError, GetError, Repo, SaveError};
+use application::gateway::repository::thought::{
+    DeleteError, GetAllError, GetError, Repo, SaveError,
+};
 use entity::thought::{Thought, Title};
 use jfs::{Config, Store};
 use std::{collections::HashMap, io};
@@ -136,6 +138,26 @@ impl Repo for JsonFile {
             })
             .collect();
         Ok(thoughts)
+    }
+    fn delete(&self, id: Self::Id) -> Result<(), DeleteError> {
+        log::debug!("Delete thought {:?} from JSON file", id);
+        let sid = self.storage_id(id).map_err(|err| {
+            log::warn!("Unable to get thought ID: {}", err);
+            if err.kind() == io::ErrorKind::NotFound {
+                DeleteError::NotFound
+            } else {
+                DeleteError::Connection
+            }
+        })?;
+        self.thoughts.delete(&sid).map_err(|err| {
+            log::warn!("Unable to delete thought: {}", err);
+            if err.kind() == io::ErrorKind::NotFound {
+                DeleteError::NotFound
+            } else {
+                DeleteError::Connection
+            }
+        })?;
+        Ok(())
     }
 }
 

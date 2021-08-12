@@ -63,7 +63,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::gateway::repository::thought::GetError;
+    use crate::gateway::repository::thought::{DeleteError, GetAllError, GetError};
     use std::sync::RwLock;
 
     #[derive(Default)]
@@ -79,6 +79,12 @@ mod tests {
             Ok(42)
         }
         fn get(&self, _: Self::Id) -> Result<Thought, GetError> {
+            todo!()
+        }
+        fn get_all(&self) -> Result<Vec<(Self::Id, Thought)>, GetAllError> {
+            todo!()
+        }
+        fn delete(&self, _: Self::Id) -> Result<(), DeleteError> {
             todo!()
         }
     }

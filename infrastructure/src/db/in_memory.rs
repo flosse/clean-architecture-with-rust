@@ -1,5 +1,7 @@
 use adapter::model::app::{thought::Id, NewId};
-use application::gateway::repository::thought::{GetAllError, GetError, Repo, SaveError};
+use application::gateway::repository::thought::{
+    DeleteError, GetAllError, GetError, Repo, SaveError,
+};
 use entity::thought::Thought;
 use std::{collections::HashMap, sync::RwLock};
 
@@ -25,6 +27,14 @@ impl Repo for InMemory {
     }
     fn get_all(&self) -> Result<Vec<(Self::Id, Thought)>, GetAllError> {
         Ok(self.thoughts.read().unwrap().clone().into_iter().collect())
+    }
+    fn delete(&self, id: Self::Id) -> Result<(), DeleteError> {
+        self.thoughts
+            .write()
+            .unwrap()
+            .remove(&id)
+            .map(|_| ())
+            .ok_or(DeleteError::NotFound)
     }
 }
 

@@ -77,3 +77,24 @@ pub mod read_all {
     pub type Result = result::Result<Response, Error>;
     pub type Error = uc::Error;
 }
+
+pub mod delete {
+    use super::{Id, ParseIdError};
+    use application::usecase::thought::delete as uc;
+    use std::result;
+    use thiserror::Error;
+
+    pub type Request = uc::Request<Id>;
+    pub type Response = uc::Response;
+    pub type Result = result::Result<Response, Error>;
+
+    #[derive(Debug, Error)]
+    pub enum Error {
+        #[error("{}", ParseIdError)]
+        Id,
+        #[error("{}", uc::Error::NotFound)]
+        NotFound,
+        #[error("{}", uc::Error::Repo)]
+        Repo,
+    }
+}

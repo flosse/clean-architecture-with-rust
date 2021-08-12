@@ -29,6 +29,9 @@ impl Repo for CorruptTestDb {
     fn get_all(&self) -> Result<Vec<(Id, Thought)>, repo::GetAllError> {
         Err(repo::GetAllError::Connection)
     }
+    fn delete(&self, _: Self::Id) -> Result<(), repo::DeleteError> {
+        Err(repo::DeleteError::Connection)
+    }
 }
 
 impl NewId<Id> for CorruptTestDb {

@@ -32,7 +32,8 @@ impl<T> Error<T> {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Response<T> {
-    pub data: T,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub data: Option<T>,
     #[serde(with = "http_serde::status_code")]
     pub status: StatusCode,
 }

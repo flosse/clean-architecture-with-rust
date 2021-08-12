@@ -29,6 +29,7 @@ pub enum Msg {
     CreateThoughtResult(Result<ThoughtId>),
     FetchAllThoughtsResult(Result<Vec<Thought>>),
     FindThoughtResult(Result<Thought>),
+    DeleteThoughtResult(Result<ThoughtId>),
 }
 
 // ------ ------
@@ -42,6 +43,9 @@ fn update(msg: Msg, mdl: &mut Mdl, orders: &mut impl Orders<Msg>) {
                 match cmd {
                     view::Cmd::CreateThought(title) => {
                         orders.perform_cmd(create_thought(title));
+                    }
+                    view::Cmd::DeleteThought(id) => {
+                        orders.perform_cmd(delete_thought(id));
                     }
                 }
             }
@@ -61,6 +65,10 @@ fn update(msg: Msg, mdl: &mut Mdl, orders: &mut impl Orders<Msg>) {
             let msg = view::Msg::FetchAllThoughtsResult(res);
             view::update(msg, &mut mdl.view);
         }
+        Msg::DeleteThoughtResult(res) => {
+            let msg = view::Msg::DeleteThoughtResult(res);
+            view::update(msg, &mut mdl.view);
+        }
     }
 }
 
@@ -77,8 +85,13 @@ async fn fetch_all_thoughts() -> Msg {
 }
 
 async fn find_thought_by_id(id: domain::ThoughtId) -> Msg {
-    let res = usecase::thought::find_by_id(id).await;
+    let res = usecase::thought::find_by_id(&id).await;
     Msg::FindThoughtResult(res)
+}
+
+async fn delete_thought(id: domain::ThoughtId) -> Msg {
+    let res = usecase::thought::delete(&id).await;
+    Msg::DeleteThoughtResult(res.map(|_| id))
 }
 
 // ------ ------

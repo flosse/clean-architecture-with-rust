@@ -27,10 +27,22 @@ where
     let get_thought = warp::get()
         .and(path!(String))
         .and(path::end())
-        .and(with_db(db))
+        .and(with_db(db.clone()))
         .and_then(handler::thought::find_by_id::handle);
 
-    base_path.and(post_thought.or(get_thoughts).or(get_thought))
+    // DELETE /api/thought/<ID>
+    let delete_thought = warp::delete()
+        .and(path!(String))
+        .and(path::end())
+        .and(with_db(db))
+        .and_then(handler::thought::delete::handle);
+
+    base_path.and(
+        post_thought
+            .or(get_thoughts)
+            .or(get_thought)
+            .or(delete_thought),
+    )
 }
 
 fn with_db<D>(db: Arc<D>) -> impl Filter<Extract = (Arc<D>,), Error = Infallible> + Clone

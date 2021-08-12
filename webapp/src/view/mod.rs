@@ -25,6 +25,7 @@ pub enum Msg {
     CreateThoughtResult(Result<ThoughtId>),
     FindThoughtResult(Result<Thought>),
     FetchAllThoughtsResult(Result<Vec<Thought>>),
+    DeleteThoughtResult(Result<ThoughtId>),
 }
 
 // ------ ------
@@ -34,12 +35,14 @@ pub enum Msg {
 #[derive(Debug)]
 pub enum Cmd {
     CreateThought(String),
+    DeleteThought(ThoughtId),
 }
 
 impl From<page::Cmd> for Cmd {
     fn from(cmd: page::Cmd) -> Self {
         match cmd {
             page::Cmd::CreateThought(title) => Self::CreateThought(title),
+            page::Cmd::DeleteThought(id) => Self::DeleteThought(id),
         }
     }
 }
@@ -53,6 +56,7 @@ pub fn update(msg: Msg, mdl: &mut Mdl) -> Option<Cmd> {
         Msg::Page(msg) => msg,
         Msg::CreateThoughtResult(res) => page::Msg::Home(page::home::Msg::CreateThoughtResult(res)),
         Msg::FindThoughtResult(res) => page::Msg::Home(page::home::Msg::FindThoughtResult(res)),
+        Msg::DeleteThoughtResult(res) => page::Msg::Home(page::home::Msg::DeleteThoughtResult(res)),
         Msg::FetchAllThoughtsResult(res) => {
             page::Msg::Home(page::home::Msg::FetchAllThoughtsResult(res))
         }

@@ -18,7 +18,7 @@ impl Present<app::create::Result> for Presenter {
     fn present(&self, res: app::create::Result) -> Self::ViewModel {
         res.map(view::ThoughtId::from)
             .map(|id| Response {
-                data: id,
+                data: Some(id),
                 status: StatusCode::CREATED,
             })
             .map_err(|err| match &err {
@@ -39,7 +39,7 @@ impl Present<app::find_by_id::Result> for Presenter {
     fn present(&self, res: app::find_by_id::Result) -> Self::ViewModel {
         res.map(view::Thought::from)
             .map(|data| Response {
-                data,
+                data: Some(data),
                 status: StatusCode::OK,
             })
             .map_err(|err| match err {
@@ -65,11 +65,36 @@ impl Present<app::read_all::Result> for Presenter {
     fn present(&self, res: app::read_all::Result) -> Self::ViewModel {
         res.map(|resp| resp.thoughts.into_iter().map(view::Thought::from).collect())
             .map(|data| Response {
-                data,
+                data: Some(data),
                 status: StatusCode::OK,
             })
             .map_err(|err| match err {
                 app::read_all::Error::Repo => Error::internal(),
             })
+    }
+}
+
+// -- Delete by ID -- //
+
+impl Present<app::delete::Result> for Presenter {
+    type ViewModel = Result<(), view::delete::Error>;
+    fn present(&self, res: app::delete::Result) -> Self::ViewModel {
+        res.map(|_| Response {
+            data: None,
+            status: StatusCode::OK,
+        })
+        .map_err(|err| match err {
+            app::delete::Error::Id => Error {
+                msg: Some(err.to_string()),
+                status: StatusCode::BAD_REQUEST,
+                details: Some(view::delete::Error::Id),
+            },
+            app::delete::Error::NotFound => Error {
+                msg: Some("Could not find thought".to_string()),
+                status: StatusCode::NOT_FOUND,
+                details: Some(view::delete::Error::NotFound),
+            },
+            app::delete::Error::Repo => Error::internal(),
+        })
     }
 }
