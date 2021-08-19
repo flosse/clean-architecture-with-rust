@@ -6,7 +6,7 @@ use adapter::{
     model::app::thought::Id,
     presenter::cli::Presenter,
 };
-use application::gateway::repository::thought::Repo;
+use application::gateway::repository::thought::{NewId, Repo};
 use std::{
     net::{IpAddr, SocketAddr},
     sync::Arc,
@@ -31,7 +31,7 @@ enum Cmd {
 
 pub fn run<R>(repo: R)
 where
-    R: Repo<Id = Id> + 'static,
+    R: Repo<Id = Id> + 'static + NewId<Id>,
 {
     let cmd = Cmd::from_args();
     let repo = Arc::new(repo);
@@ -39,7 +39,7 @@ where
 
     match cmd {
         Cmd::Create { title } => {
-            let controller = CreateController::new(repo, presenter);
+            let controller = CreateController::new(Arc::clone(&repo), repo, presenter);
             let res = controller.create_thought(title);
             println!("{}", res);
         }

@@ -1,8 +1,9 @@
 use crate::db::in_memory::InMemory;
-use adapter::model::app::{thought::Id, NewId};
+use adapter::model::app::thought::Id;
 use anyhow::Result;
-use application::gateway::repository::thought::{self as repo, Repo};
-use entity::thought::Thought;
+use application::gateway::repository::thought::{
+    self as repo, NewId, NewIdError, Repo, ThoughtRecord,
+};
 use serde::Deserialize;
 use std::sync::Arc;
 use warp::reply::Response;
@@ -20,13 +21,13 @@ pub struct CorruptTestDb;
 
 impl Repo for CorruptTestDb {
     type Id = Id;
-    fn save(&self, _: Thought) -> Result<Self::Id, repo::SaveError> {
+    fn save(&self, _: ThoughtRecord<Self::Id>) -> Result<(), repo::SaveError> {
         Err(repo::SaveError::Connection)
     }
-    fn get(&self, _: Self::Id) -> Result<Thought, repo::GetError> {
+    fn get(&self, _: Self::Id) -> Result<ThoughtRecord<Self::Id>, repo::GetError> {
         Err(repo::GetError::Connection)
     }
-    fn get_all(&self) -> Result<Vec<(Id, Thought)>, repo::GetAllError> {
+    fn get_all(&self) -> Result<Vec<ThoughtRecord<Self::Id>>, repo::GetAllError> {
         Err(repo::GetAllError::Connection)
     }
     fn delete(&self, _: Self::Id) -> Result<(), repo::DeleteError> {
@@ -35,9 +36,8 @@ impl Repo for CorruptTestDb {
 }
 
 impl NewId<Id> for CorruptTestDb {
-    type Err = repo::SaveError;
-    fn new_id(&self) -> Result<Id, Self::Err> {
-        Err(repo::SaveError::Connection)
+    fn new_id(&self) -> Result<Id, NewIdError> {
+        Err(repo::NewIdError)
     }
 }
 
@@ -53,8 +53,11 @@ where
 
 pub fn add_thought_to_db(db: &Arc<InMemory>, title: &str) {
     use entity::thought::*;
-    let thought = Thought {
-        title: Title::new(title.to_string()),
+    let thought = ThoughtRecord {
+        id: db.new_id().unwrap(),
+        thought: Thought {
+            title: Title::new(title.to_string()),
+        },
     };
     db.as_ref().save(thought).unwrap();
 }

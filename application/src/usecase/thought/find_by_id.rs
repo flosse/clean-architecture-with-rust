@@ -1,4 +1,4 @@
-use crate::gateway::repository::thought::{GetError, Repo};
+use crate::gateway::repository::thought::{GetError, Repo, ThoughtRecord};
 use std::fmt::Debug;
 use thiserror::Error;
 
@@ -11,6 +11,14 @@ pub struct Request<Id> {
 pub struct Response<Id> {
     pub id: Id,
     pub title: String,
+}
+
+impl<Id> From<ThoughtRecord<Id>> for Response<Id> {
+    fn from(r: ThoughtRecord<Id>) -> Self {
+        let ThoughtRecord { id, thought } = r;
+        let title = thought.title.into_string();
+        Self { id, title }
+    }
 }
 
 type Id<R> = <R as Repo>::Id;
@@ -50,10 +58,7 @@ where
 {
     pub fn exec(&self, req: Request<Id<R>>) -> Result<Response<Id<R>>, Error> {
         log::debug!("Find thought by ID: {:?}", req);
-        let thought = self.repo.get(req.id.clone())?;
-        Ok(Response {
-            id: req.id,
-            title: thought.title.into_string(),
-        })
+        let thought_record = self.repo.get(req.id)?;
+        Ok(Response::from(thought_record))
     }
 }

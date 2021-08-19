@@ -1,6 +1,6 @@
-use adapter::model::app::{thought::Id, NewId};
+use adapter::model::app::thought::Id;
 use application::gateway::repository::thought::{
-    DeleteError, GetAllError, GetError, Repo, SaveError,
+    DeleteError, GetAllError, GetError, NewId, NewIdError, Repo, SaveError, ThoughtRecord,
 };
 use entity::thought::{Thought, Title};
 use jfs::{Config, Store};
@@ -48,15 +48,14 @@ impl JsonFile {
 }
 
 impl NewId<Id> for JsonFile {
-    type Err = SaveError;
-    fn new_id(&self) -> Result<Id, Self::Err> {
+    fn new_id(&self) -> Result<Id, NewIdError> {
         let id = match self.ids.get::<u32>(LAST_THOUGHT_ID_KEY) {
             Ok(id) => Ok(id),
             Err(err) => match err.kind() {
                 io::ErrorKind::NotFound => Ok(0),
                 _ => {
                     log::warn!("Unable to fetch last thought ID key: {}", err);
-                    Err(SaveError::Connection)
+                    Err(NewIdError)
                 }
             },
         }?;
@@ -65,7 +64,7 @@ impl NewId<Id> for JsonFile {
             .save_with_id(&new_id, LAST_THOUGHT_ID_KEY)
             .map_err(|err| {
                 log::warn!("Unable to save new ID: {}", err);
-                SaveError::Connection
+                NewIdError
             })?;
         Ok(Id::from(new_id))
     }
@@ -76,9 +75,9 @@ type StorageId = String;
 impl Repo for JsonFile {
     type Id = Id;
 
-    fn save(&self, thought: Thought) -> Result<Self::Id, SaveError> {
-        log::debug!("Save thought {:?} to JSON file", thought);
-        let id = self.new_id()?;
+    fn save(&self, record: ThoughtRecord<Self::Id>) -> Result<(), SaveError> {
+        log::debug!("Save thought {:?} to JSON file", record);
+        let ThoughtRecord { thought, id } = record;
         let Thought { title } = thought;
         let model = models::Thought {
             thought_id: id.to_string(),
@@ -92,9 +91,9 @@ impl Repo for JsonFile {
             log::warn!("Unable to save thought ID: {}", err);
             SaveError::Connection
         })?;
-        Ok(id)
+        Ok(())
     }
-    fn get(&self, id: Self::Id) -> Result<Thought, GetError> {
+    fn get(&self, id: Self::Id) -> Result<ThoughtRecord<Self::Id>, GetError> {
         log::debug!("Get thought {:?} from JSON file", id);
         let sid = self.storage_id(id).map_err(|err| {
             log::warn!("Unable to get thought ID: {}", err);
@@ -113,11 +112,14 @@ impl Repo for JsonFile {
             }
         })?;
         debug_assert_eq!(id.to_string(), model.thought_id);
-        Ok(Thought {
-            title: Title::new(model.title),
+        Ok(ThoughtRecord {
+            id,
+            thought: Thought {
+                title: Title::new(model.title),
+            },
         })
     }
-    fn get_all(&self) -> Result<Vec<(Self::Id, Thought)>, GetAllError> {
+    fn get_all(&self) -> Result<Vec<ThoughtRecord<Self::Id>>, GetAllError> {
         log::debug!("Get all thoughts from JSON file");
         let thoughts = self
             .thoughts
@@ -128,13 +130,11 @@ impl Repo for JsonFile {
             })?
             .into_iter()
             .filter_map(|(_, model)| model.thought_id.parse().ok().map(|id| (id, model.title)))
-            .map(|(id, title)| {
-                (
-                    id,
-                    Thought {
-                        title: Title::new(title),
-                    },
-                )
+            .map(|(id, title)| ThoughtRecord {
+                id,
+                thought: Thought {
+                    title: Title::new(title),
+                },
             })
             .collect();
         Ok(thoughts)

@@ -1,5 +1,5 @@
 use crate::{
-    gateway::repository::thought::{Repo, SaveError},
+    gateway::repository::thought::{NewId, NewIdError, Repo, SaveError, ThoughtRecord},
     usecase::thought::validate::{validate_thought, ThoughtInvalidity},
 };
 use domain::thought::Thought;
@@ -18,13 +18,14 @@ pub struct Response<Id> {
 }
 
 /// Create thought usecase interactor
-pub struct CreateThought<'r, R> {
+pub struct CreateThought<'r, 'g, R, G> {
     repo: &'r R,
+    id_gen: &'g G,
 }
 
-impl<'r, R> CreateThought<'r, R> {
-    pub fn new(repo: &'r R) -> Self {
-        Self { repo }
+impl<'r, 'g, R, G> CreateThought<'r, 'g, R, G> {
+    pub fn new(repo: &'r R, id_gen: &'g G) -> Self {
+        Self { repo, id_gen }
     }
 }
 
@@ -34,6 +35,8 @@ type Id<R> = <R as Repo>::Id;
 pub enum Error {
     #[error("{}", SaveError::Connection)]
     Repo,
+    #[error("{}", NewIdError)]
+    NewId,
     #[error(transparent)]
     Invalidity(#[from] ThoughtInvalidity),
 }
@@ -46,16 +49,23 @@ impl From<SaveError> for Error {
     }
 }
 
-impl<'r, R> CreateThought<'r, R>
+impl<'r, 'g, R, G> CreateThought<'r, 'g, R, G>
 where
     R: Repo,
+    G: NewId<Id<R>>,
+    Id<R>: Clone + Copy,
 {
     /// Create a new thought with the given title.
     pub fn exec(&self, req: Request) -> Result<Response<Id<R>>, Error> {
         log::debug!("Create new thought: {:?}", req);
         let thought = Thought::new(req.title);
         validate_thought(&thought)?;
-        let id = self.repo.save(thought)?;
+        let id = self.id_gen.new_id().map_err(|err| {
+            log::warn!("{}", err);
+            Error::NewId
+        })?;
+        let record = ThoughtRecord { id, thought };
+        self.repo.save(record)?;
         Ok(Response { id })
     }
 }
@@ -68,20 +78,20 @@ mod tests {
 
     #[derive(Default)]
     struct MockRepo {
-        thought: RwLock<Option<Thought>>,
+        thought: RwLock<Option<ThoughtRecord<u32>>>,
     }
 
     impl Repo for MockRepo {
         type Id = u32;
 
-        fn save(&self, thought: Thought) -> Result<Self::Id, SaveError> {
-            *self.thought.write().unwrap() = Some(thought);
-            Ok(42)
+        fn save(&self, record: ThoughtRecord<Self::Id>) -> Result<(), SaveError> {
+            *self.thought.write().unwrap() = Some(record);
+            Ok(())
         }
-        fn get(&self, _: Self::Id) -> Result<Thought, GetError> {
+        fn get(&self, _: Self::Id) -> Result<ThoughtRecord<Self::Id>, GetError> {
             todo!()
         }
-        fn get_all(&self) -> Result<Vec<(Self::Id, Thought)>, GetAllError> {
+        fn get_all(&self) -> Result<Vec<ThoughtRecord<Self::Id>>, GetAllError> {
             todo!()
         }
         fn delete(&self, _: Self::Id) -> Result<(), DeleteError> {
@@ -89,10 +99,19 @@ mod tests {
         }
     }
 
+    struct IdGen;
+
+    impl NewId<u32> for IdGen {
+        fn new_id(&self) -> Result<u32, NewIdError> {
+            Ok(42)
+        }
+    }
+
     #[test]
     fn create_new_thought() {
         let repo = MockRepo::default();
-        let usecase = CreateThought::new(&repo);
+        let gen = IdGen {};
+        let usecase = CreateThought::new(&repo, &gen);
         let req = Request {
             title: "foo".into(),
         };
@@ -103,6 +122,7 @@ mod tests {
                 .unwrap()
                 .as_ref()
                 .unwrap()
+                .thought
                 .title
                 .as_ref(),
             "foo"
@@ -113,7 +133,8 @@ mod tests {
     #[test]
     fn create_with_empty_title() {
         let repo = MockRepo::default();
-        let usecase = CreateThought::new(&repo);
+        let gen = IdGen {};
+        let usecase = CreateThought::new(&repo, &gen);
         let req = Request { title: "".into() };
         let err = usecase.exec(req).err().unwrap();
         assert!(matches!(err, Error::Invalidity(_)));

@@ -4,16 +4,16 @@ use adapter::{
     model::{app::thought::Id, view::json::thought::create as view},
     presenter::http_json_api::Presenter,
 };
-use application::gateway::repository::thought::Repo;
+use application::gateway::repository::thought::{NewId, Repo};
 use std::sync::Arc;
 use warp::{reply, Reply};
 
 pub async fn handle<R>(req: view::Request, repo: Arc<R>) -> Result<impl Reply>
 where
-    R: Repo<Id = Id> + 'static,
+    R: Repo<Id = Id> + 'static + NewId<Id>,
 {
     let presenter = Presenter::default();
-    let controller = Controller::new(repo, presenter);
+    let controller = Controller::new(Arc::clone(&repo), repo, presenter);
     match controller.create_thought(req.title) {
         Ok(res) => Ok(reply::with_status(reply::json(&res.data), res.status)),
         Err(err) => Ok(reply_error(err)),
@@ -41,9 +41,9 @@ mod tests {
 
         let body: Value = response_json_body(res).await.unwrap();
         let id = body.as_str().unwrap().parse().unwrap();
-        let thought = db.as_ref().get(id).unwrap();
+        let record = db.as_ref().get(id).unwrap();
 
-        assert_eq!(thought.title.as_ref(), "test 1");
+        assert_eq!(record.thought.title.as_ref(), "test 1");
     }
 
     #[tokio::test]

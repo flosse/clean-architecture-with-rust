@@ -21,13 +21,16 @@ impl Present<app::create::Result> for Presenter {
                 data: Some(id),
                 status: StatusCode::CREATED,
             })
-            .map_err(|err| match &err {
-                app::create::Error::Invalidity(invalidity) => Error {
-                    msg: Some(invalidity.to_string()),
-                    status: StatusCode::BAD_REQUEST,
-                    details: view::create::Error::try_from(err).ok(),
-                },
-                app::create::Error::Repo => Error::internal(),
+            .map_err(|err| {
+                use app::create::Error as E;
+                match &err {
+                    E::Invalidity(invalidity) => Error {
+                        msg: Some(invalidity.to_string()),
+                        status: StatusCode::BAD_REQUEST,
+                        details: view::create::Error::try_from(err).ok(),
+                    },
+                    E::Repo | E::NewId => Error::internal(),
+                }
             })
     }
 }

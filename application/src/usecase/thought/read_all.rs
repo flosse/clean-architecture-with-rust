@@ -1,4 +1,4 @@
-use crate::gateway::repository::thought::{GetAllError, Repo};
+use crate::gateway::repository::thought::{GetAllError, Repo, ThoughtRecord};
 use std::fmt::Debug;
 use thiserror::Error;
 
@@ -14,6 +14,14 @@ pub struct Response<Id> {
 pub struct Thought<Id> {
     pub id: Id,
     pub title: String,
+}
+
+impl<Id> From<ThoughtRecord<Id>> for Thought<Id> {
+    fn from(r: ThoughtRecord<Id>) -> Self {
+        let ThoughtRecord { id, thought } = r;
+        let title = thought.title.into_string();
+        Self { id, title }
+    }
 }
 
 type Id<R> = <R as Repo>::Id;
@@ -54,10 +62,7 @@ where
             .repo
             .get_all()?
             .into_iter()
-            .map(|(id, thought)| Thought {
-                id,
-                title: thought.title.into_string(),
-            })
+            .map(Thought::from)
             .collect();
         Ok(Response { thoughts })
     }

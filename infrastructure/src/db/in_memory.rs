@@ -1,23 +1,21 @@
-use adapter::model::app::{thought::Id, NewId};
+use adapter::model::app::thought::Id;
 use application::gateway::repository::thought::{
-    DeleteError, GetAllError, GetError, Repo, SaveError,
+    DeleteError, GetAllError, GetError, NewId, NewIdError, Repo, SaveError, ThoughtRecord,
 };
-use entity::thought::Thought;
 use std::{collections::HashMap, sync::RwLock};
 
 #[derive(Default)]
 pub struct InMemory {
-    thoughts: RwLock<HashMap<Id, Thought>>,
+    thoughts: RwLock<HashMap<Id, ThoughtRecord<Id>>>,
 }
 
 impl Repo for InMemory {
     type Id = Id;
-    fn save(&self, thought: Thought) -> Result<Self::Id, SaveError> {
-        let id = self.new_id()?;
-        self.thoughts.write().unwrap().insert(id, thought);
-        Ok(id)
+    fn save(&self, record: ThoughtRecord<Self::Id>) -> Result<(), SaveError> {
+        self.thoughts.write().unwrap().insert(record.id, record);
+        Ok(())
     }
-    fn get(&self, id: Self::Id) -> Result<Thought, GetError> {
+    fn get(&self, id: Self::Id) -> Result<ThoughtRecord<Self::Id>, GetError> {
         self.thoughts
             .read()
             .unwrap()
@@ -25,8 +23,15 @@ impl Repo for InMemory {
             .cloned()
             .ok_or(GetError::NotFound)
     }
-    fn get_all(&self) -> Result<Vec<(Self::Id, Thought)>, GetAllError> {
-        Ok(self.thoughts.read().unwrap().clone().into_iter().collect())
+    fn get_all(&self) -> Result<Vec<ThoughtRecord<Self::Id>>, GetAllError> {
+        Ok(self
+            .thoughts
+            .read()
+            .unwrap()
+            .iter()
+            .map(|(_, r)| r)
+            .cloned()
+            .collect())
     }
     fn delete(&self, id: Self::Id) -> Result<(), DeleteError> {
         self.thoughts
@@ -39,8 +44,7 @@ impl Repo for InMemory {
 }
 
 impl NewId<Id> for InMemory {
-    type Err = SaveError;
-    fn new_id(&self) -> Result<Id, Self::Err> {
+    fn new_id(&self) -> Result<Id, NewIdError> {
         let next = self
             .thoughts
             .read()

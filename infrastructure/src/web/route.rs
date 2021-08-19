@@ -1,12 +1,12 @@
 use crate::web::handler;
 use adapter::model::app::thought::Id;
-use application::gateway::repository::thought::Repo;
+use application::gateway::repository::thought::{NewId, Repo};
 use std::{convert::Infallible, sync::Arc};
 use warp::{body, path, Filter, Rejection, Reply};
 
 pub fn api<D>(db: Arc<D>) -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone
 where
-    D: Repo<Id = Id> + 'static,
+    D: Repo<Id = Id> + 'static + NewId<Id>,
 {
     let base_path = path("api").and(path("thought"));
 

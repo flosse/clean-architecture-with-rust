@@ -32,7 +32,7 @@ mod conv {
         fn try_from(from: uc::Error) -> Result<Self, Self::Error> {
             use uc::Error as E;
             match from {
-                E::Repo => Err(()),
+                E::Repo | E::NewId => Err(()),
                 E::Invalidity(e) => {
                     let validate::ThoughtInvalidity::Title(e) = e;
                     use validate::TitleInvalidity as T;
