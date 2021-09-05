@@ -1,5 +1,5 @@
 use adapter::model::app::thought::Id;
-use application::gateway::repository::thought::{NewId, Repo};
+use application::{gateway::repository::thought::Repo, identifier::NewId};
 use std::{net::SocketAddr, sync::Arc};
 use warp::Filter;
 

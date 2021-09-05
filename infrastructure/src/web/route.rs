@@ -1,6 +1,6 @@
 use crate::web::handler;
 use adapter::model::app::thought::Id;
-use application::gateway::repository::thought::{NewId, Repo};
+use application::{gateway::repository::thought::Repo, identifier::NewId};
 use std::{convert::Infallible, sync::Arc};
 use warp::{body, path, Filter, Rejection, Reply};
 

@@ -10,8 +10,6 @@ pub struct Request<Id> {
 #[derive(Debug)]
 pub struct Response;
 
-type Id<R> = <R as Repo>::Id;
-
 /// Delete thought by ID usecase interactor
 pub struct Delete<'r, R> {
     repo: &'r R,
@@ -40,12 +38,12 @@ impl From<DeleteError> for Error {
     }
 }
 
-impl<'r, R> Delete<'r, R>
+impl<'r, Id, R> Delete<'r, R>
 where
-    R: Repo,
-    Id<R>: Clone + Debug,
+    R: Repo<Id = Id>,
+    Id: Clone + Debug,
 {
-    pub fn exec(&self, req: Request<Id<R>>) -> Result<Response, Error> {
+    pub fn exec(&self, req: Request<Id>) -> Result<Response, Error> {
         log::debug!("Delete thought by ID: {:?}", req);
         self.repo.delete(req.id)?;
         Ok(Response {})

@@ -4,7 +4,7 @@ use adapter::{
     model::{app::thought::Id, view::json::thought::create as view},
     presenter::http_json_api::Presenter,
 };
-use application::gateway::repository::thought::{NewId, Repo};
+use application::{gateway::repository::thought::Repo, identifier::NewId};
 use std::sync::Arc;
 use warp::{reply, Reply};
 

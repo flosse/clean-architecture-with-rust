@@ -3,8 +3,7 @@ use crate::{
     presenter::Present,
 };
 use application::{
-    gateway::repository::thought::{NewId, Repo},
-    usecase::thought::create as uc,
+    gateway::repository::thought::Repo, identifier::NewId, usecase::thought::create as uc,
 };
 use std::sync::Arc;
 

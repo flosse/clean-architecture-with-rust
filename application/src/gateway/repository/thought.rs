@@ -42,16 +42,3 @@ pub trait Repo: Send + Sync {
     fn get_all(&self) -> Result<Vec<ThoughtRecord<Self::Id>>, GetAllError>;
     fn delete(&self, id: Self::Id) -> Result<(), DeleteError>;
 }
-
-/// A service that generates a new thought ID.
-// The creation of the ID should be done **before** we save a record.
-// To do that we delegate the generation of a new ID to a separate
-// service that can be injected e.g. into a specific usecase.
-// See: https://matthiasnoback.nl/2018/05/when-and-where-to-determine-the-id-of-an-entity/
-pub trait NewId<Id> {
-    fn new_id(&self) -> Result<Id, NewIdError>;
-}
-
-#[derive(Debug, Error)]
-#[error("Unable to generade a new thought ID")]
-pub struct NewIdError;

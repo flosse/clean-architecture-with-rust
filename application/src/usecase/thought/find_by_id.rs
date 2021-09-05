@@ -21,8 +21,6 @@ impl<Id> From<ThoughtRecord<Id>> for Response<Id> {
     }
 }
 
-type Id<R> = <R as Repo>::Id;
-
 /// Find thought by ID usecase interactor
 pub struct FindById<'r, R> {
     repo: &'r R,
@@ -51,12 +49,12 @@ impl From<GetError> for Error {
     }
 }
 
-impl<'r, R> FindById<'r, R>
+impl<'r, Id, R> FindById<'r, R>
 where
-    R: Repo,
-    Id<R>: Clone + Debug,
+    R: Repo<Id = Id>,
+    Id: Clone + Debug,
 {
-    pub fn exec(&self, req: Request<Id<R>>) -> Result<Response<Id<R>>, Error> {
+    pub fn exec(&self, req: Request<Id>) -> Result<Response<Id>, Error> {
         log::debug!("Find thought by ID: {:?}", req);
         let thought_record = self.repo.get(req.id)?;
         Ok(Response::from(thought_record))

@@ -6,7 +6,7 @@ use adapter::{
     model::app::thought::Id,
     presenter::cli::Presenter,
 };
-use application::gateway::repository::thought::{NewId, Repo};
+use application::{gateway::repository::thought::Repo, identifier::NewId};
 use std::{
     net::{IpAddr, SocketAddr},
     sync::Arc,

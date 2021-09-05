@@ -24,8 +24,6 @@ impl<Id> From<ThoughtRecord<Id>> for Thought<Id> {
     }
 }
 
-type Id<R> = <R as Repo>::Id;
-
 /// Read all thoughts usecase interactor
 pub struct ReadAll<'r, R> {
     repo: &'r R,
@@ -51,12 +49,12 @@ impl From<GetAllError> for Error {
     }
 }
 
-impl<'r, R> ReadAll<'r, R>
+impl<'r, Id, R> ReadAll<'r, R>
 where
-    R: Repo,
-    Id<R>: Clone + Debug,
+    R: Repo<Id = Id>,
+    Id: Clone + Debug,
 {
-    pub fn exec(&self, _: Request) -> Result<Response<Id<R>>, Error> {
+    pub fn exec(&self, _: Request) -> Result<Response<Id>, Error> {
         log::debug!("Read all thoughts");
         let thoughts = self
             .repo

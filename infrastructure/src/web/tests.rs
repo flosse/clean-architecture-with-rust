@@ -1,8 +1,9 @@
 use crate::db::in_memory::InMemory;
 use adapter::model::app::thought::Id;
 use anyhow::Result;
-use application::gateway::repository::thought::{
-    self as repo, NewId, NewIdError, Repo, ThoughtRecord,
+use application::{
+    gateway::repository::thought::{self as repo, Repo, ThoughtRecord},
+    identifier::{NewId, NewIdError},
 };
 use serde::Deserialize;
 use std::sync::Arc;
@@ -37,7 +38,7 @@ impl Repo for CorruptTestDb {
 
 impl NewId<Id> for CorruptTestDb {
     fn new_id(&self) -> Result<Id, NewIdError> {
-        Err(repo::NewIdError)
+        Err(NewIdError)
     }
 }
 

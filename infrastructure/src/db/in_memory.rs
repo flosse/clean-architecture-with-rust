@@ -1,6 +1,9 @@
 use adapter::model::app::thought::Id;
-use application::gateway::repository::thought::{
-    DeleteError, GetAllError, GetError, NewId, NewIdError, Repo, SaveError, ThoughtRecord,
+use application::{
+    gateway::repository::thought::{
+        DeleteError, GetAllError, GetError, Repo, SaveError, ThoughtRecord,
+    },
+    identifier::{NewId, NewIdError},
 };
 use std::{collections::HashMap, sync::RwLock};
 

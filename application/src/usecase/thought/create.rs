@@ -1,5 +1,6 @@
 use crate::{
-    gateway::repository::thought::{NewId, NewIdError, Repo, SaveError, ThoughtRecord},
+    gateway::repository::thought::{Repo, SaveError, ThoughtRecord},
+    identifier::{NewId, NewIdError},
     usecase::thought::validate::{validate_thought, ThoughtInvalidity},
 };
 use domain::thought::Thought;
@@ -29,8 +30,6 @@ impl<'r, 'g, R, G> CreateThought<'r, 'g, R, G> {
     }
 }
 
-type Id<R> = <R as Repo>::Id;
-
 #[derive(Debug, Error)]
 pub enum Error {
     #[error("{}", SaveError::Connection)]
@@ -49,14 +48,14 @@ impl From<SaveError> for Error {
     }
 }
 
-impl<'r, 'g, R, G> CreateThought<'r, 'g, R, G>
+impl<'r, 'g, Id, R, G> CreateThought<'r, 'g, R, G>
 where
-    R: Repo,
-    G: NewId<Id<R>>,
-    Id<R>: Clone + Copy,
+    R: Repo<Id = Id>,
+    G: NewId<Id>,
+    Id: Clone + Copy,
 {
     /// Create a new thought with the given title.
-    pub fn exec(&self, req: Request) -> Result<Response<Id<R>>, Error> {
+    pub fn exec(&self, req: Request) -> Result<Response<Id>, Error> {
         log::debug!("Create new thought: {:?}", req);
         let thought = Thought::new(req.title);
         validate_thought(&thought)?;
