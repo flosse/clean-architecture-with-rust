@@ -5,7 +5,7 @@ use application::{
     },
     identifier::{NewId, NewIdError},
 };
-use entity::thought::{Thought, Title};
+use domain::thought::{Thought, Title};
 use jfs::{Config, Store};
 use std::{collections::HashMap, io};
 
@@ -84,7 +84,7 @@ impl Repo for JsonFile {
         let Thought { title } = thought;
         let model = models::Thought {
             thought_id: id.to_string(),
-            title: title.into_string(),
+            title: String::from(title),
         };
         let storage_id = self.thoughts.save(&model).map_err(|err| {
             log::warn!("Unable to save thought: {}", err);

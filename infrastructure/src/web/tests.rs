@@ -53,7 +53,7 @@ where
 }
 
 pub fn add_thought_to_db(db: &Arc<InMemory>, title: &str) {
-    use entity::thought::*;
+    use domain::thought::*;
     let thought = ThoughtRecord {
         id: db.new_id().unwrap(),
         thought: Thought {

@@ -160,13 +160,6 @@ dependencies = [
 [[package]]
 name = "domain"
 version = "0.0.0"
-dependencies = [
- "entity",
-]
-
-[[package]]
-name = "entity"
-version = "0.0.0"
 
 [[package]]
 name = "env_logger"
@@ -482,7 +475,6 @@ dependencies = [
  "anyhow",
  "application",
  "domain",
- "entity",
  "hyper",
  "jfs",
  "log",

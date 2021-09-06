@@ -9,7 +9,6 @@ written in [Rust](https://rust-lang.org).
 Each circle (a.k.a layer) is organized in a separate crate.
 Currently there are these circles:
 
-- `entity`
 - `domain`
 - `application`
 - `adapter`

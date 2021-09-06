@@ -19,7 +19,7 @@ pub struct Thought<Id> {
 impl<Id> From<ThoughtRecord<Id>> for Thought<Id> {
     fn from(r: ThoughtRecord<Id>) -> Self {
         let ThoughtRecord { id, thought } = r;
-        let title = thought.title.into_string();
+        let title = String::from(thought.title);
         Self { id, title }
     }
 }

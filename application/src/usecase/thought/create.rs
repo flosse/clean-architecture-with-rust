@@ -3,7 +3,7 @@ use crate::{
     identifier::{NewId, NewIdError},
     usecase::thought::validate::{validate_thought, ThoughtInvalidity},
 };
-use domain::thought::Thought;
+use domain::thought::{Thought, Title};
 use thiserror::Error;
 
 #[derive(Debug)]
@@ -57,7 +57,8 @@ where
     /// Create a new thought with the given title.
     pub fn exec(&self, req: Request) -> Result<Response<Id>, Error> {
         log::debug!("Create new thought: {:?}", req);
-        let thought = Thought::new(req.title);
+        let title = Title::new(req.title);
+        let thought = Thought { title };
         validate_thought(&thought)?;
         let id = self.id_gen.new_id().map_err(|err| {
             log::warn!("{}", err);
