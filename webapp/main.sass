@@ -1,8 +1,90 @@
 @import "assets/bulma.min"
 
+$header-height: 64px
+$sidebar-width: 250px
+
 #app
   min-width: 100vw
   height: 100vh
 
   .thoughts ul li
     margin-bottom: 0.3em
+
+  #main-navbar
+    position: fixed
+    top: 0
+    left: 0
+    width: 100%
+    height: $header-height
+    box-shadow: 0 0 5px rgba(0,0,0,0.3)
+    .title, .subtitle
+      margin: 0
+    .subtitle
+      margin-left: 1.25em
+
+  #main
+    padding: 70px 1em 2em ($sidebar-width + 5px);
+    min-height: calc(-#{$header-height} + 100vh)
+
+    .error-message
+      border-radius: 0.3em
+      margin: 0.3em
+      color: #f14668
+      background-color: #fee
+      padding: 0.5em
+      font-size: 0.875rem;
+
+  #main-sidebar
+    padding: 2em 0.5em 0px
+    position: fixed
+    top: $header-height
+    left: 0
+    width: $sidebar-width
+    height: calc(-#{$header-height} + 100vh)
+    overflow: hidden
+    border-right: 1px solid #ddd
+
+    .menu-label
+      .button
+        color: #aaa
+        float: right
+        margin-top: -0.75em
+        border-color: transparent
+
+        &:hover
+          color: #000
+          border-color: #b5b5b5
+
+    .menu-list.aol
+      margin-top: 1em
+      margin-left: 1em
+
+      li
+        font-size: 0.9em
+        margin-bottom: 1.25em
+        cursor: pointer
+        color: #777
+
+        &:hover
+          color: #000
+
+        .button
+          color: #ddd
+          float: right
+          margin-top: -0.5em
+          margin-right: 0.4em
+          font-size: 0.9em
+          border-color: transparent
+
+          &:hover
+            color: #000
+            border-color: #b5b5b5
+
+          .icon
+            width: 1em
+            height: 1em
+            margin-left: calc(-0.3em - 1px)
+            margin-right: calc(-0.3em - 1px)
+
+  #main-sidebar, #main
+    transition: all 0.2s ease-out 0s

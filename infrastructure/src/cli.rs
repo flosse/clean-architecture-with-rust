@@ -1,12 +1,7 @@
 use crate::web;
 use adapter::{
-    controller::thought::{
-        create::Controller as CreateController, find_by_id::Controller as FindController,
-    },
-    model::app::thought::Id,
-    presenter::cli::Presenter,
+    controller::thought::Controller as ThoughtController, db::Db, presenter::cli::Presenter,
 };
-use application::{gateway::repository::thought::Repo, identifier::NewId};
 use std::{
     net::{IpAddr, SocketAddr},
     sync::Arc,
@@ -29,29 +24,29 @@ enum Cmd {
     },
 }
 
-pub fn run<R>(repo: R)
+pub fn run<D>(db: D)
 where
-    R: Repo<Id = Id> + 'static + NewId<Id>,
+    D: Db,
 {
     let cmd = Cmd::from_args();
-    let repo = Arc::new(repo);
+    let db = Arc::new(db);
     let presenter = Presenter::default();
 
     match cmd {
         Cmd::Create { title } => {
-            let controller = CreateController::new(Arc::clone(&repo), repo, presenter);
+            let controller = ThoughtController::new(db, presenter);
             let res = controller.create_thought(title);
             println!("{}", res);
         }
         Cmd::Read { id } => {
-            let controller = FindController::new(repo, presenter);
+            let controller = ThoughtController::new(db, presenter);
             let res = controller.find_thought(&id);
             println!("{}", res);
         }
         Cmd::Serve { bind, port } => {
             let rt = Runtime::new().expect("tokio runtime");
             let addr = SocketAddr::from((bind, port));
-            rt.block_on(web::run(repo, addr));
+            rt.block_on(web::run(db, addr));
         }
     }
 }

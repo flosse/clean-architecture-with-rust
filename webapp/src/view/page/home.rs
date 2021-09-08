@@ -1,4 +1,4 @@
-use crate::domain::*;
+use crate::{domain::*, view::new_area_of_life_dialog as new_aol_dialog};
 use seed::{prelude::*, *};
 
 const CLEAN_ARCH_BLOG_URL: &str =
@@ -11,11 +11,13 @@ const CLEAN_ARCH_BLOG_URL: &str =
 #[derive(Debug, Default)]
 pub struct Mdl {
     thoughts: Vec<Thought>,
+    areas_of_life: Vec<AreaOfLife>,
     input: String,
     input_error: Option<String>,
     error: Option<String>,
     wait_for_deletion: Option<ThoughtId>,
     wait: bool,
+    new_aol_dialog: new_aol_dialog::Mdl,
 }
 
 // ------ ------
@@ -26,11 +28,17 @@ pub struct Mdl {
 pub enum Msg {
     InputChanged(String),
     DeleteRequest(ThoughtId),
+    DeleteAreaOfLife(AreaOfLifeId),
     CreateRequest,
     CreateThoughtResult(Result<ThoughtId, String>),
+    CreateAreaOfLifeResult(Result<AreaOfLifeId, String>),
     FindThoughtResult(Result<Thought, String>),
     FetchAllThoughtsResult(Result<Vec<Thought>, String>),
+    FetchAllAreasOfLifeResult(Result<Vec<AreaOfLife>, String>),
     DeleteThoughtResult(Result<ThoughtId, String>),
+    DeleteAreaOfLifeResult(Result<AreaOfLifeId, String>),
+    ShowNewAreaOfLifeDialog,
+    NewAOLDialog(new_aol_dialog::Msg),
 }
 
 // ------ ------
@@ -40,7 +48,9 @@ pub enum Msg {
 #[derive(Debug)]
 pub enum Cmd {
     CreateThought(String),
+    CreateAreaOfLife(String),
     DeleteThought(ThoughtId),
+    DeleteAreaOfLife(AreaOfLifeId),
 }
 
 // ------ ------
@@ -64,6 +74,10 @@ pub fn update(msg: Msg, mdl: &mut Mdl) -> Option<Cmd> {
             let cmd = Cmd::DeleteThought(id);
             return Some(cmd);
         }
+        Msg::DeleteAreaOfLife(id) => {
+            let cmd = Cmd::DeleteAreaOfLife(id);
+            return Some(cmd);
+        }
         Msg::FindThoughtResult(Err(err)) => {
             mdl.error = Some(err);
         }
@@ -83,9 +97,28 @@ pub fn update(msg: Msg, mdl: &mut Mdl) -> Option<Cmd> {
                 }
             }
         }
+        Msg::CreateAreaOfLifeResult(res) => {
+            mdl.new_aol_dialog.wait = false;
+            match res {
+                Ok(_) => {
+                    new_aol_dialog::update(new_aol_dialog::Msg::Cancel, &mut mdl.new_aol_dialog);
+                }
+                Err(err) => {
+                    mdl.new_aol_dialog.error = Some(err);
+                }
+            }
+        }
         Msg::FetchAllThoughtsResult(res) => match res {
             Ok(thoughts) => {
                 mdl.thoughts = thoughts;
+            }
+            Err(err) => {
+                mdl.error = Some(err);
+            }
+        },
+        Msg::FetchAllAreasOfLifeResult(res) => match res {
+            Ok(areas_of_life) => {
+                mdl.areas_of_life = areas_of_life;
             }
             Err(err) => {
                 mdl.error = Some(err);
@@ -99,6 +132,26 @@ pub fn update(msg: Msg, mdl: &mut Mdl) -> Option<Cmd> {
                 mdl.error = Some(err);
             }
         },
+        Msg::DeleteAreaOfLifeResult(res) => match res {
+            Ok(id) => {
+                mdl.areas_of_life.retain(|a| a.id != id);
+            }
+            Err(err) => {
+                mdl.error = Some(err);
+            }
+        },
+        Msg::ShowNewAreaOfLifeDialog => {
+            mdl.new_aol_dialog.active = true;
+        }
+        Msg::NewAOLDialog(msg) => {
+            if let Some(cmd) = new_aol_dialog::update(msg, &mut mdl.new_aol_dialog) {
+                match cmd {
+                    new_aol_dialog::Cmd::Add(name) => {
+                        return Some(Cmd::CreateAreaOfLife(name));
+                    }
+                }
+            }
+        }
     }
     None
 }
@@ -109,22 +162,19 @@ pub fn update(msg: Msg, mdl: &mut Mdl) -> Option<Cmd> {
 
 pub fn view(mdl: &Mdl) -> Node<Msg> {
     div![
-        if let Some(err) = &mdl.error {
-            div![
-                style! {
-                  St::AlignItems => "center";
-                  St::Display => "flex";
-                  St::JustifyContent => "center";
-                  St::Padding =>  em(0.5);
-                  St::FontSize =>  rem(0.875);
-                  St::Color => "#f14668";
-                  St::BackgroundColor => "#fee";
-                },
-                p![err]
-            ]
-        } else {
-            empty![]
-        },
+        header(),
+        div![
+            main_sidebar(mdl),
+            main(mdl),
+            new_aol_dialog::view(&mdl.new_aol_dialog).map_msg(Msg::NewAOLDialog)
+        ]
+    ]
+}
+
+fn main(mdl: &Mdl) -> Node<Msg> {
+    main![
+        id!["main"],
+        error_message(mdl),
         section![
             C!["section"],
             div![
@@ -133,25 +183,96 @@ pub fn view(mdl: &Mdl) -> Node<Msg> {
                 new_thought_input(mdl),
                 thoughts_list(&mdl.thoughts, &mdl.wait_for_deletion)
             ]
+        ],
+    ]
+}
+
+fn error_message<M>(mdl: &Mdl) -> Node<M> {
+    if let Some(err) = &mdl.error {
+        div![
+            C!["error-message"],
+            style! {
+              St::AlignItems => "center";
+              St::Display => "flex";
+              St::JustifyContent => "center";
+            },
+            p![err]
         ]
+    } else {
+        empty![]
+    }
+}
+
+fn main_sidebar(mdl: &Mdl) -> Node<Msg> {
+    aside![
+        id!["main-sidebar"],
+        nav![
+            C!["menu"],
+            p![
+                C!["menu-label"],
+                "Areas of Life",
+                button![
+                    ev(Ev::Click, |_| Msg::ShowNewAreaOfLifeDialog),
+                    C!["button"],
+                    span![
+                        C!["icon", "is-right", "is-small"],
+                        i![C!["fas", "fa-plus-circle"]]
+                    ]
+                ]
+            ],
+            if mdl.areas_of_life.is_empty() {
+                p![
+                    style! {St::Color => "#bbb"; St::FontSize => em(0.75);},
+                    "Currently there are no areas of life"
+                ]
+            } else {
+                ul![
+                    C!["menu-list", "aol"],
+                    mdl.areas_of_life.iter().map(|aol| {
+                        let id = aol.id.clone();
+                        li![
+                            &aol.name,
+                            button![
+                                ev(Ev::Click, |_| Msg::DeleteAreaOfLife(id)),
+                                C!["button"],
+                                span![
+                                    C!["icon", "is-right", "is-small"],
+                                    i![C!["fas", "fa-minus-circle"]]
+                                ]
+                            ]
+                        ]
+                    }),
+                ]
+            }
+        ],
     ]
 }
 
 fn header<M>() -> Node<M> {
-    div![
-        C!["block"],
-        h1![C!["title"], "Full-Stack Clean Architecture with Rust"],
-        p![
-            C!["subtitle"],
-            "An example implementation of a ",
-            a![
-                attrs! { At::Href => CLEAN_ARCH_BLOG_URL; },
-                "Clean Architecture"
-            ],
-            " written in ",
-            a![attrs! { At::Href => "https://rust-lang.org"; }, "Rust"],
-            "."
-        ],
+    nav![
+        id!["main-navbar"],
+        C!["navbar"],
+        div![
+            C!["navbar-start"],
+            div![
+                C!["navbar-item"],
+                h1![
+                    C!["title", "is-5"],
+                    "Full-Stack Clean Architecture with Rust"
+                ],
+                p![
+                    C!["subtitle", "is-6"],
+                    "An example implementation of a ",
+                    a![
+                        attrs! { At::Href => CLEAN_ARCH_BLOG_URL; },
+                        "Clean Architecture"
+                    ],
+                    " written in ",
+                    a![attrs! { At::Href => "https://rust-lang.org"; }, "Rust"],
+                    "."
+                ],
+            ]
+        ]
     ]
 }
 
@@ -162,17 +283,12 @@ fn new_thought_input(mdl: &Mdl) -> Node<Msg> {
         div![
             C!["field"],
             div![
-                if mdl.input_error.is_some() {
-                    C!["control", "has-icons-right"]
-                } else {
-                    C!["control"]
-                },
+                C![
+                    "control",
+                    IF!(mdl.input_error.is_some() => "has-icons-right")
+                ],
                 input![
-                    if mdl.input_error.is_some() {
-                        C!["input", "is-danger"]
-                    } else {
-                        C!["input"]
-                    },
+                    C!["input", IF!(mdl.input_error.is_some() => "is-danger")],
                     input_ev(Ev::Input, Msg::InputChanged),
                     keyboard_ev(Ev::KeyDown, |ev| {
                         if ev.key() == "Enter" {

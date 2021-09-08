@@ -1,19 +1,18 @@
 use crate::web::handler::{reply_error, Result};
 use adapter::{
-    controller::thought::create::Controller,
-    model::{app::thought::Id, view::json::thought::create as view},
+    controller::thought::Controller, db::Db, model::view::json::thought::create::Request,
     presenter::http_json_api::Presenter,
 };
-use application::{gateway::repository::thought::Repo, identifier::NewId};
 use std::sync::Arc;
 use warp::{reply, Reply};
 
-pub async fn handle<R>(req: view::Request, repo: Arc<R>) -> Result<impl Reply>
+pub async fn handle<D>(
+    req: Request,
+    controller: Arc<Controller<D, Presenter>>,
+) -> Result<impl Reply>
 where
-    R: Repo<Id = Id> + 'static + NewId<Id>,
+    D: Db,
 {
-    let presenter = Presenter::default();
-    let controller = Controller::new(Arc::clone(&repo), repo, presenter);
     match controller.create_thought(req.title) {
         Ok(res) => Ok(reply::with_status(reply::json(&res.data), res.status)),
         Err(err) => Ok(reply_error(err)),
@@ -22,7 +21,7 @@ where
 
 #[cfg(test)]
 mod tests {
-    use super::{handle, view::Request};
+    use super::{handle, Arc, Controller, Presenter, Request};
     use crate::web::tests::{blank_db, response_json_body};
     use adapter::model::view::json::{thought::create as uc, Error};
     use application::gateway::repository::thought::Repo;
@@ -32,10 +31,11 @@ mod tests {
     #[tokio::test]
     async fn create() {
         let db = blank_db();
+        let controller = Arc::new(Controller::new(db.clone(), Presenter::default()));
         let req = Request {
             title: "test 1".to_string(),
         };
-        let res = handle(req, db.clone()).await.unwrap().into_response();
+        let res = handle(req, controller).await.unwrap().into_response();
 
         assert_eq!(res.status(), StatusCode::CREATED);
 
@@ -49,10 +49,11 @@ mod tests {
     #[tokio::test]
     async fn create_with_too_short_title() {
         let db = blank_db();
+        let controller = Arc::new(Controller::new(db, Presenter::default()));
         let req = Request {
             title: "t".to_string(),
         };
-        let res = handle(req, db.clone()).await.unwrap().into_response();
+        let res = handle(req, controller).await.unwrap().into_response();
 
         assert_eq!(res.status(), StatusCode::BAD_REQUEST);
 
@@ -72,10 +73,11 @@ mod tests {
     #[tokio::test]
     async fn create_with_too_long_title() {
         let db = blank_db();
+        let controller = Arc::new(Controller::new(db, Presenter::default()));
         let req = Request {
             title: ["t"; 100].join(""),
         };
-        let res = handle(req, db.clone()).await.unwrap().into_response();
+        let res = handle(req, controller).await.unwrap().into_response();
 
         assert_eq!(res.status(), StatusCode::BAD_REQUEST);
 

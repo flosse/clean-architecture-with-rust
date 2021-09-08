@@ -1,5 +1,4 @@
-use adapter::model::app::thought::Id;
-use application::{gateway::repository::thought::Repo, identifier::NewId};
+use adapter::db::Db;
 use std::{net::SocketAddr, sync::Arc};
 use warp::Filter;
 
@@ -11,7 +10,7 @@ mod webapp;
 
 pub async fn run<D>(db: Arc<D>, addr: SocketAddr)
 where
-    D: Repo<Id = Id> + 'static + NewId<Id>,
+    D: Db,
 {
     let api = route::api(db);
     let routes = api.or(webapp::get_index()).or(webapp::get_assets());

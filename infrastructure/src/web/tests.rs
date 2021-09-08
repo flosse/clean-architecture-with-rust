@@ -1,8 +1,8 @@
 use crate::db::in_memory::InMemory;
-use adapter::model::app::thought::Id;
+use adapter::db::Db;
 use anyhow::Result;
 use application::{
-    gateway::repository::thought::{self as repo, Repo, ThoughtRecord},
+    gateway::repository::{area_of_life::AreaOfLifeRecord, thought::ThoughtRecord},
     identifier::{NewId, NewIdError},
 };
 use serde::Deserialize;
@@ -20,25 +20,61 @@ pub fn corrupt_db() -> Arc<CorruptTestDb> {
 #[derive(Default)]
 pub struct CorruptTestDb;
 
-impl Repo for CorruptTestDb {
-    type Id = Id;
-    fn save(&self, _: ThoughtRecord<Self::Id>) -> Result<(), repo::SaveError> {
-        Err(repo::SaveError::Connection)
+impl Db for CorruptTestDb {}
+
+mod thought {
+    use super::*;
+    use adapter::model::app::thought::Id;
+    use application::gateway::repository::thought::{self as repo, Repo};
+
+    impl Repo for CorruptTestDb {
+        type Id = Id;
+        fn save(&self, _: ThoughtRecord<Self::Id>) -> Result<(), repo::SaveError> {
+            Err(repo::SaveError::Connection)
+        }
+        fn get(&self, _: Self::Id) -> Result<ThoughtRecord<Self::Id>, repo::GetError> {
+            Err(repo::GetError::Connection)
+        }
+        fn get_all(&self) -> Result<Vec<ThoughtRecord<Self::Id>>, repo::GetAllError> {
+            Err(repo::GetAllError::Connection)
+        }
+        fn delete(&self, _: Self::Id) -> Result<(), repo::DeleteError> {
+            Err(repo::DeleteError::Connection)
+        }
     }
-    fn get(&self, _: Self::Id) -> Result<ThoughtRecord<Self::Id>, repo::GetError> {
-        Err(repo::GetError::Connection)
-    }
-    fn get_all(&self) -> Result<Vec<ThoughtRecord<Self::Id>>, repo::GetAllError> {
-        Err(repo::GetAllError::Connection)
-    }
-    fn delete(&self, _: Self::Id) -> Result<(), repo::DeleteError> {
-        Err(repo::DeleteError::Connection)
+
+    impl NewId<Id> for CorruptTestDb {
+        fn new_id(&self) -> Result<Id, NewIdError> {
+            Err(NewIdError)
+        }
     }
 }
 
-impl NewId<Id> for CorruptTestDb {
-    fn new_id(&self) -> Result<Id, NewIdError> {
-        Err(NewIdError)
+mod area_of_life {
+    use super::*;
+    use adapter::model::app::area_of_life::Id;
+    use application::gateway::repository::area_of_life::{self as repo, Repo};
+
+    impl Repo for CorruptTestDb {
+        type Id = Id;
+        fn save(&self, _: AreaOfLifeRecord<Self::Id>) -> Result<(), repo::SaveError> {
+            Err(repo::SaveError::Connection)
+        }
+        fn get(&self, _: Self::Id) -> Result<AreaOfLifeRecord<Self::Id>, repo::GetError> {
+            Err(repo::GetError::Connection)
+        }
+        fn get_all(&self) -> Result<Vec<AreaOfLifeRecord<Self::Id>>, repo::GetAllError> {
+            Err(repo::GetAllError::Connection)
+        }
+        fn delete(&self, _: Self::Id) -> Result<(), repo::DeleteError> {
+            Err(repo::DeleteError::Connection)
+        }
+    }
+
+    impl NewId<Id> for CorruptTestDb {
+        fn new_id(&self) -> Result<Id, NewIdError> {
+            Err(NewIdError)
+        }
     }
 }
 
@@ -53,7 +89,9 @@ where
 }
 
 pub fn add_thought_to_db(db: &Arc<InMemory>, title: &str) {
+    use application::gateway::repository::thought::Repo;
     use domain::thought::*;
+
     let thought = ThoughtRecord {
         id: db.new_id().unwrap(),
         thought: Thought {

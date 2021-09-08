@@ -22,3 +22,28 @@ impl Present<app::find_by_id::Result> for Presenter {
         }
     }
 }
+
+impl Present<app::read_all::Result> for Presenter {
+    type ViewModel = String;
+    fn present(&self, result: app::read_all::Result) -> Self::ViewModel {
+        match result {
+            Ok(resp) => resp
+                .thoughts
+                .into_iter()
+                .map(|t| format!("- {} ({})", t.title, t.id.to_string()))
+                .collect::<Vec<_>>()
+                .join("\n"),
+            Err(err) => format!("Unable read all thoughts: {}", err),
+        }
+    }
+}
+
+impl Present<app::delete::Result> for Presenter {
+    type ViewModel = String;
+    fn present(&self, result: app::delete::Result) -> Self::ViewModel {
+        match result {
+            Ok(_) => "Successfully deleted thought".to_string(),
+            Err(err) => format!("Unable delete thought: {}", err),
+        }
+    }
+}

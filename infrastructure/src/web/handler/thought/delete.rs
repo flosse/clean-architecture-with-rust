@@ -1,22 +1,18 @@
 use crate::web::handler::{reply_error, Result};
-use adapter::{
-    controller::thought::delete::Controller, model::app::thought::Id,
-    presenter::http_json_api::Presenter,
-};
-use application::gateway::repository::thought::Repo;
+use adapter::{controller::thought::Controller, db::Db, presenter::http_json_api::Presenter};
 use std::sync::Arc;
 use warp::{reply, Reply};
 
 pub type Request = String;
 
-pub async fn handle<R>(req: Request, repo: Arc<R>) -> Result<impl Reply>
+pub async fn handle<D>(
+    req: Request,
+    controller: Arc<Controller<D, Presenter>>,
+) -> Result<impl Reply>
 where
-    R: Repo<Id = Id> + 'static,
+    D: Db,
 {
-    let presenter = Presenter::default();
-    let controller = Controller::new(repo, presenter);
-    let res = controller.delete_thought(&req);
-    match res {
+    match controller.delete_thought(&req) {
         Ok(res) => Ok(reply::with_status(reply::json(&res.data), res.status)),
         Err(err) => Ok(reply_error(err)),
     }
@@ -24,8 +20,9 @@ where
 
 #[cfg(test)]
 mod tests {
-    use super::{handle, Repo};
+    use super::{handle, Arc, Controller, Presenter};
     use crate::web::tests::{add_thought_to_db, blank_db};
+    use application::gateway::repository::thought::Repo;
     use warp::{http::StatusCode, Reply};
 
     #[tokio::test]
@@ -38,8 +35,9 @@ mod tests {
 
         assert!(db.get(id).is_ok());
 
+        let controller = Arc::new(Controller::new(db.clone(), Presenter::default()));
         let req = id.to_string();
-        let res = handle(req, db.clone()).await.unwrap().into_response();
+        let res = handle(req, controller).await.unwrap().into_response();
 
         assert_eq!(res.status(), StatusCode::OK);
         assert!(db.get(id).is_err());

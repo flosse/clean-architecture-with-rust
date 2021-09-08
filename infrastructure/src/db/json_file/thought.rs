@@ -1,3 +1,4 @@
+use super::*;
 use adapter::model::app::thought::Id;
 use application::{
     gateway::repository::thought::{
@@ -6,74 +7,14 @@ use application::{
     identifier::{NewId, NewIdError},
 };
 use domain::thought::{Thought, Title};
-use jfs::{Config, Store};
-use std::{collections::HashMap, io};
-
-pub struct JsonFile {
-    thoughts: Store,
-    ids: Store,
-}
-
-const LAST_THOUGHT_ID_KEY: &str = "last-thought-id";
-const MAP_THOUGHT_ID_KEY: &str = "map-thought-id";
-
-impl JsonFile {
-    pub fn try_new() -> Result<Self, io::Error> {
-        let cfg = Config {
-            single: true,
-            pretty: true,
-            ..Default::default()
-        };
-        let thoughts = Store::new_with_cfg("thoughts", cfg)?;
-        let ids = Store::new_with_cfg("ids", cfg)?;
-        Ok(Self { thoughts, ids })
-    }
-    fn save_thought_id(&self, storage_id: StorageId, id: Id) -> Result<(), io::Error> {
-        let mut map = match self.ids.get::<HashMap<String, String>>(MAP_THOUGHT_ID_KEY) {
-            Ok(map) => Ok(map),
-            Err(err) => match err.kind() {
-                io::ErrorKind::NotFound => Ok(HashMap::new()),
-                _ => Err(err),
-            },
-        }?;
-        map.insert(id.to_string(), storage_id);
-        self.ids.save_with_id(&map, MAP_THOUGHT_ID_KEY)?;
-        Ok(())
-    }
-    fn storage_id(&self, id: Id) -> Result<StorageId, io::Error> {
-        let id = id.to_string();
-        self.ids
-            .get::<HashMap<String, String>>(MAP_THOUGHT_ID_KEY)?
-            .get(&id)
-            .cloned()
-            .ok_or_else(|| io::Error::new(io::ErrorKind::NotFound, "Storage ID not found"))
-    }
-}
+use std::io;
 
 impl NewId<Id> for JsonFile {
     fn new_id(&self) -> Result<Id, NewIdError> {
-        let id = match self.ids.get::<u32>(LAST_THOUGHT_ID_KEY) {
-            Ok(id) => Ok(id),
-            Err(err) => match err.kind() {
-                io::ErrorKind::NotFound => Ok(0),
-                _ => {
-                    log::warn!("Unable to fetch last thought ID key: {}", err);
-                    Err(NewIdError)
-                }
-            },
-        }?;
-        let new_id = id + 1;
-        self.ids
-            .save_with_id(&new_id, LAST_THOUGHT_ID_KEY)
-            .map_err(|err| {
-                log::warn!("Unable to save new ID: {}", err);
-                NewIdError
-            })?;
-        Ok(Id::from(new_id))
+        let id = self.new_id(LAST_THOUGHT_ID_KEY)?;
+        Ok(id)
     }
 }
-
-type StorageId = String;
 
 impl Repo for JsonFile {
     type Id = Id;
@@ -90,15 +31,16 @@ impl Repo for JsonFile {
             log::warn!("Unable to save thought: {}", err);
             SaveError::Connection
         })?;
-        self.save_thought_id(storage_id, id).map_err(|err| {
-            log::warn!("Unable to save thought ID: {}", err);
-            SaveError::Connection
-        })?;
+        self.save_id(storage_id, id, MAP_THOUGHT_ID_KEY)
+            .map_err(|err| {
+                log::warn!("Unable to save thought ID: {}", err);
+                SaveError::Connection
+            })?;
         Ok(())
     }
     fn get(&self, id: Self::Id) -> Result<ThoughtRecord<Self::Id>, GetError> {
         log::debug!("Get thought {:?} from JSON file", id);
-        let sid = self.storage_id(id).map_err(|err| {
+        let sid = self.storage_id(id, MAP_THOUGHT_ID_KEY).map_err(|err| {
             log::warn!("Unable to get thought ID: {}", err);
             if err.kind() == io::ErrorKind::NotFound {
                 GetError::NotFound
@@ -144,7 +86,7 @@ impl Repo for JsonFile {
     }
     fn delete(&self, id: Self::Id) -> Result<(), DeleteError> {
         log::debug!("Delete thought {:?} from JSON file", id);
-        let sid = self.storage_id(id).map_err(|err| {
+        let sid = self.storage_id(id, MAP_THOUGHT_ID_KEY).map_err(|err| {
             log::warn!("Unable to get thought ID: {}", err);
             if err.kind() == io::ErrorKind::NotFound {
                 DeleteError::NotFound
@@ -161,15 +103,5 @@ impl Repo for JsonFile {
             }
         })?;
         Ok(())
-    }
-}
-
-mod models {
-    use serde::{Deserialize, Serialize};
-
-    #[derive(Serialize, Deserialize)]
-    pub struct Thought {
-        pub(crate) thought_id: String,
-        pub(crate) title: String,
     }
 }

@@ -1,6 +1,7 @@
 use crate::domain::*;
 use seed::prelude::*;
 
+pub mod new_area_of_life_dialog;
 pub mod page;
 
 // ------ ------
@@ -23,9 +24,12 @@ type Result<T> = std::result::Result<T, Error>;
 pub enum Msg {
     Page(page::Msg),
     CreateThoughtResult(Result<ThoughtId>),
+    CreateAreaOfLifeResult(Result<AreaOfLifeId>),
     FindThoughtResult(Result<Thought>),
     FetchAllThoughtsResult(Result<Vec<Thought>>),
+    FetchAllAreasOfLifeResult(Result<Vec<AreaOfLife>>),
     DeleteThoughtResult(Result<ThoughtId>),
+    DeleteAreaOfLifeResult(Result<AreaOfLifeId>),
 }
 
 // ------ ------
@@ -35,14 +39,18 @@ pub enum Msg {
 #[derive(Debug)]
 pub enum Cmd {
     CreateThought(String),
+    CreateAreaOfLife(String),
     DeleteThought(ThoughtId),
+    DeleteAreaOfLife(AreaOfLifeId),
 }
 
 impl From<page::Cmd> for Cmd {
     fn from(cmd: page::Cmd) -> Self {
         match cmd {
             page::Cmd::CreateThought(title) => Self::CreateThought(title),
+            page::Cmd::CreateAreaOfLife(name) => Self::CreateAreaOfLife(name),
             page::Cmd::DeleteThought(id) => Self::DeleteThought(id),
+            page::Cmd::DeleteAreaOfLife(id) => Self::DeleteAreaOfLife(id),
         }
     }
 }
@@ -55,10 +63,19 @@ pub fn update(msg: Msg, mdl: &mut Mdl) -> Option<Cmd> {
     let page_msg = match msg {
         Msg::Page(msg) => msg,
         Msg::CreateThoughtResult(res) => page::Msg::Home(page::home::Msg::CreateThoughtResult(res)),
+        Msg::CreateAreaOfLifeResult(res) => {
+            page::Msg::Home(page::home::Msg::CreateAreaOfLifeResult(res))
+        }
         Msg::FindThoughtResult(res) => page::Msg::Home(page::home::Msg::FindThoughtResult(res)),
         Msg::DeleteThoughtResult(res) => page::Msg::Home(page::home::Msg::DeleteThoughtResult(res)),
+        Msg::DeleteAreaOfLifeResult(res) => {
+            page::Msg::Home(page::home::Msg::DeleteAreaOfLifeResult(res))
+        }
         Msg::FetchAllThoughtsResult(res) => {
             page::Msg::Home(page::home::Msg::FetchAllThoughtsResult(res))
+        }
+        Msg::FetchAllAreasOfLifeResult(res) => {
+            page::Msg::Home(page::home::Msg::FetchAllAreasOfLifeResult(res))
         }
     };
     page::update(page_msg, &mut mdl.page).map(Cmd::from)

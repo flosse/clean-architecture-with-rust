@@ -47,4 +47,8 @@ that helps self-employed people organize their lives.
 
 > *As a* self-employed person,
 > *I want to* be able to write down spontaneous thoughts,
-> *so that* I can find them again at a central point
+> *so that* I can find them later again at a central point.
+
+> *As a* self-employed person,
+> *I want to* structure my thoughts,
+> *so that* they're connected with my personal life topics.
