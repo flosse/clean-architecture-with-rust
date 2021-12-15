@@ -2,7 +2,7 @@
 name = "clean-architecture-with-rust"
 version = "0.0.0"
 authors = ["Markus Kohlhase <markus.kohlhase@slowtec.de>"]
-edition = "2018"
+edition = "2021"
 publish = false
 
 [workspace]
