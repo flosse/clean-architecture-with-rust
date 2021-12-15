@@ -27,7 +27,7 @@ async fn serve(path: Tail) -> Result<impl Reply, Rejection> {
 fn serve_impl(path: &str) -> Result<impl Reply, Rejection> {
     let asset = Asset::get(path).ok_or_else(warp::reject::not_found)?;
     let mime = mime_guess::from_path(path).first_or_octet_stream();
-    let mut res = warp::reply::Response::new(asset.into());
+    let mut res = warp::reply::Response::new(asset.data.into());
     match HeaderValue::from_str(mime.as_ref()) {
         Ok(mime) => {
             res.headers_mut().insert(CONTENT_TYPE, mime);
