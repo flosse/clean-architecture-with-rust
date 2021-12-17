@@ -62,9 +62,9 @@ impl JsonFile {
     }
     fn new_id<I>(&self, key: &str) -> Result<I, NewIdError>
     where
-        I: From<u32>,
+        I: From<u64>,
     {
-        let id = match self.ids.get::<u32>(key) {
+        let id = match self.ids.get::<u64>(key) {
             Ok(id) => Ok(id),
             Err(err) => match err.kind() {
                 io::ErrorKind::NotFound => Ok(0),

@@ -1,19 +1,20 @@
+use domain::thought;
 use std::str::FromStr;
 use thiserror::Error;
 
 /// This is the public ID of a thought.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub struct Id(u32);
+pub struct Id(u64);
 
-impl From<u32> for Id {
-    fn from(id: u32) -> Self {
-        Self(id)
+impl From<thought::Id> for Id {
+    fn from(id: thought::Id) -> Self {
+        Self(id.to_u64())
     }
 }
 
-impl From<Id> for u32 {
+impl From<Id> for thought::Id {
     fn from(id: Id) -> Self {
-        id.0
+        Self::new(id.0)
     }
 }
 
@@ -36,24 +37,23 @@ impl ToString for Id {
 }
 
 pub mod create {
-    use super::Id;
     use application::usecase::thought::create as uc;
     use std::result;
 
     pub type Request = uc::Request;
-    pub type Response = uc::Response<Id>;
+    pub type Response = uc::Response;
     pub type Result = result::Result<Response, Error>;
     pub type Error = uc::Error;
 }
 
 pub mod find_by_id {
-    use super::{Id, ParseIdError};
+    use super::ParseIdError;
     use application::usecase::thought::find_by_id as uc;
     use std::result;
     use thiserror::Error;
 
-    pub type Request = uc::Request<Id>;
-    pub type Response = uc::Response<Id>;
+    pub type Request = uc::Request;
+    pub type Response = uc::Response;
     pub type Result = result::Result<Response, Error>;
 
     #[derive(Debug, Error)]
@@ -68,23 +68,22 @@ pub mod find_by_id {
 }
 
 pub mod read_all {
-    use super::Id;
     use application::usecase::thought::read_all as uc;
     use std::result;
 
     pub type Request = uc::Request;
-    pub type Response = uc::Response<Id>;
+    pub type Response = uc::Response;
     pub type Result = result::Result<Response, Error>;
     pub type Error = uc::Error;
 }
 
 pub mod delete {
-    use super::{Id, ParseIdError};
+    use super::ParseIdError;
     use application::usecase::thought::delete as uc;
     use std::result;
     use thiserror::Error;
 
-    pub type Request = uc::Request<Id>;
+    pub type Request = uc::Request;
     pub type Response = uc::Response;
     pub type Result = result::Result<Response, Error>;
 

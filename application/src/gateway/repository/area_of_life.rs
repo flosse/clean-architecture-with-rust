@@ -1,4 +1,4 @@
-use domain::AreaOfLife;
+use domain::area_of_life::{AreaOfLife, Id};
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -30,15 +30,14 @@ pub enum DeleteError {
 }
 
 #[derive(Debug, Clone)]
-pub struct AreaOfLifeRecord<Id> {
-    pub id: Id,
+pub struct Record {
     pub area_of_life: AreaOfLife,
 }
 
+// TODO: make it async
 pub trait Repo: Send + Sync {
-    type Id;
-    fn save(&self, record: AreaOfLifeRecord<Self::Id>) -> Result<(), SaveError>;
-    fn get(&self, id: Self::Id) -> Result<AreaOfLifeRecord<Self::Id>, GetError>;
-    fn get_all(&self) -> Result<Vec<AreaOfLifeRecord<Self::Id>>, GetAllError>;
-    fn delete(&self, id: Self::Id) -> Result<(), DeleteError>;
+    fn save(&self, record: Record) -> Result<(), SaveError>;
+    fn get(&self, id: Id) -> Result<Record, GetError>;
+    fn get_all(&self) -> Result<Vec<Record>, GetAllError>;
+    fn delete(&self, id: Id) -> Result<(), DeleteError>;
 }

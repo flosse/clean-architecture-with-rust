@@ -1,11 +1,12 @@
 use super::*;
-use adapter::model::app::area_of_life::Id;
+use adapter::model::app::area_of_life as app;
 use application::{
     gateway::repository::area_of_life::{
-        AreaOfLifeRecord, DeleteError, GetAllError, GetError, Repo, SaveError,
+        DeleteError, GetAllError, GetError, Record, Repo, SaveError,
     },
     identifier::{NewId, NewIdError},
 };
+use domain::area_of_life::Id;
 use domain::area_of_life::{AreaOfLife, Name};
 use std::io;
 
@@ -17,12 +18,10 @@ impl NewId<Id> for JsonFile {
 }
 
 impl Repo for JsonFile {
-    type Id = Id;
-
-    fn save(&self, record: AreaOfLifeRecord<Self::Id>) -> Result<(), SaveError> {
+    fn save(&self, record: Record) -> Result<(), SaveError> {
         log::debug!("Save area of life {:?} to JSON file", record);
-        let AreaOfLifeRecord { area_of_life, id } = record;
-        let AreaOfLife { name } = area_of_life;
+        let Record { area_of_life } = record;
+        let AreaOfLife { name, id } = area_of_life;
         let model = models::AreaOfLife {
             area_of_life_id: id.to_string(),
             name: String::from(name),
@@ -38,7 +37,7 @@ impl Repo for JsonFile {
             })?;
         Ok(())
     }
-    fn get(&self, id: Self::Id) -> Result<AreaOfLifeRecord<Self::Id>, GetError> {
+    fn get(&self, id: Id) -> Result<Record, GetError> {
         log::debug!("Get area of life {:?} from JSON file", id);
         let sid = self
             .storage_id(id, MAP_AREA_OF_LIFE_ID_KEY)
@@ -62,14 +61,14 @@ impl Repo for JsonFile {
                 }
             })?;
         debug_assert_eq!(id.to_string(), model.area_of_life_id);
-        Ok(AreaOfLifeRecord {
-            id,
+        Ok(Record {
             area_of_life: AreaOfLife {
+                id,
                 name: Name::new(model.name),
             },
         })
     }
-    fn get_all(&self) -> Result<Vec<AreaOfLifeRecord<Self::Id>>, GetAllError> {
+    fn get_all(&self) -> Result<Vec<Record>, GetAllError> {
         log::debug!("Get all areas of life from JSON file");
         let areas_of_life = self
             .areas_of_life
@@ -82,20 +81,21 @@ impl Repo for JsonFile {
             .filter_map(|(_, model)| {
                 model
                     .area_of_life_id
-                    .parse()
+                    .parse::<app::Id>()
                     .ok()
+                    .map(Into::into)
                     .map(|id| (id, model.name))
             })
-            .map(|(id, name)| AreaOfLifeRecord {
-                id,
+            .map(|(id, name)| Record {
                 area_of_life: AreaOfLife {
+                    id,
                     name: Name::new(name),
                 },
             })
             .collect();
         Ok(areas_of_life)
     }
-    fn delete(&self, id: Self::Id) -> Result<(), DeleteError> {
+    fn delete(&self, id: Id) -> Result<(), DeleteError> {
         log::debug!("Delete area of life {:?} from JSON file", id);
         let sid = self
             .storage_id(id, MAP_AREA_OF_LIFE_ID_KEY)

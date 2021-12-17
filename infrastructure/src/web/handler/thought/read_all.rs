@@ -39,6 +39,6 @@ mod tests {
         let t = thoughts[0].as_object().unwrap();
 
         assert!(t.get("title").unwrap().is_string());
-        assert!(t.get("id").unwrap().is_string());
+        assert!(t.get("id").unwrap().is_number());
     }
 }

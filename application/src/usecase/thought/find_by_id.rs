@@ -1,22 +1,24 @@
-use crate::gateway::repository::thought::{GetError, Repo, ThoughtRecord};
+use crate::gateway::repository::thought::{GetError, Record, Repo};
+use domain::thought::Id;
 use std::fmt::Debug;
 use thiserror::Error;
 
 #[derive(Debug)]
-pub struct Request<Id> {
+pub struct Request {
     pub id: Id,
 }
 
 #[derive(Debug)]
-pub struct Response<Id> {
+pub struct Response {
     pub id: Id,
     pub title: String,
 }
 
-impl<Id> From<ThoughtRecord<Id>> for Response<Id> {
-    fn from(r: ThoughtRecord<Id>) -> Self {
-        let ThoughtRecord { id, thought } = r;
+impl From<Record> for Response {
+    fn from(r: Record) -> Self {
+        let Record { thought } = r;
         let title = String::from(thought.title);
+        let id = thought.id;
         Self { id, title }
     }
 }
@@ -49,12 +51,11 @@ impl From<GetError> for Error {
     }
 }
 
-impl<'r, Id, R> FindById<'r, R>
+impl<'r, R> FindById<'r, R>
 where
-    R: Repo<Id = Id>,
-    Id: Clone + Debug,
+    R: Repo,
 {
-    pub fn exec(&self, req: Request<Id>) -> Result<Response<Id>, Error> {
+    pub fn exec(&self, req: Request) -> Result<Response, Error> {
         log::debug!("Find thought by ID: {:?}", req);
         let thought_record = self.repo.get(req.id)?;
         Ok(Response::from(thought_record))

@@ -7,7 +7,7 @@ impl Present<app::create::Result> for Presenter {
     type ViewModel = String;
     fn present(&self, result: app::create::Result) -> Self::ViewModel {
         match result {
-            Ok(data) => format!("Created a new thought (ID = {})", data.id.to_string()),
+            Ok(data) => format!("Created a new thought (ID = {})", data.id),
             Err(err) => format!("Undable to create a new thought: {}", err),
         }
     }
@@ -17,7 +17,7 @@ impl Present<app::find_by_id::Result> for Presenter {
     type ViewModel = String;
     fn present(&self, result: app::find_by_id::Result) -> Self::ViewModel {
         match result {
-            Ok(thought) => format!("{} ({})", thought.title, thought.id.to_string()),
+            Ok(thought) => format!("{} ({})", thought.title, thought.id),
             Err(err) => format!("Unable find thought: {}", err),
         }
     }
@@ -30,7 +30,7 @@ impl Present<app::read_all::Result> for Presenter {
             Ok(resp) => resp
                 .thoughts
                 .into_iter()
-                .map(|t| format!("- {} ({})", t.title, t.id.to_string()))
+                .map(|t| format!("- {} ({})", t.title, t.id))
                 .collect::<Vec<_>>()
                 .join("\n"),
             Err(err) => format!("Unable read all thoughts: {}", err),

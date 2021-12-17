@@ -13,19 +13,19 @@ pub struct AreaOfLife {
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct ThoughtId(pub String);
+pub struct ThoughtId(pub u64);
 
-impl From<String> for ThoughtId {
-    fn from(id: String) -> Self {
+impl From<u64> for ThoughtId {
+    fn from(id: u64) -> Self {
         Self(id)
     }
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct AreaOfLifeId(pub String);
+pub struct AreaOfLifeId(pub u64);
 
-impl From<String> for AreaOfLifeId {
-    fn from(id: String) -> Self {
+impl From<u64> for AreaOfLifeId {
+    fn from(id: u64) -> Self {
         Self(id)
     }
 }

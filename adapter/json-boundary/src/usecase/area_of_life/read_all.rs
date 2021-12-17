@@ -10,13 +10,10 @@ mod conv {
     use application::usecase::area_of_life::read_all as uc;
     use std::convert::TryFrom;
 
-    impl<Id> From<uc::AreaOfLife<Id>> for AreaOfLife
-    where
-        Id: ToString,
-    {
-        fn from(from: uc::AreaOfLife<Id>) -> Self {
+    impl From<uc::AreaOfLife> for AreaOfLife {
+        fn from(from: uc::AreaOfLife) -> Self {
             let uc::AreaOfLife { id, name } = from;
-            let id = id.to_string().into();
+            let id = id.to_u64().into();
             Self { id, name }
         }
     }

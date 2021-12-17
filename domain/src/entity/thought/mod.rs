@@ -1,8 +1,14 @@
-mod title; // Value object
+//! All value objects and information that
+//! belong to [Thought]s.
 
-pub use title::*;
+mod id;
+mod title;
 
-#[derive(Debug, Clone, PartialEq)]
+pub use self::{id::*, title::*};
+
+/// Anything you want to remember
+#[derive(Debug, Clone)]
 pub struct Thought {
+    pub id: Id,
     pub title: Title,
 }

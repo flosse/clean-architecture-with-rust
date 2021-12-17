@@ -18,12 +18,9 @@ mod conv {
     use application::usecase::area_of_life::{create as uc, validate};
     use std::convert::TryFrom;
 
-    impl<Id> From<uc::Response<Id>> for AreaOfLifeId
-    where
-        Id: ToString,
-    {
-        fn from(from: uc::Response<Id>) -> Self {
-            AreaOfLifeId(from.id.to_string())
+    impl From<uc::Response> for AreaOfLifeId {
+        fn from(from: uc::Response) -> Self {
+            from.id.to_u64().into()
         }
     }
 

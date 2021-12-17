@@ -22,6 +22,7 @@ where
 mod tests {
     use super::{handle, Arc, Controller, Presenter};
     use crate::web::tests::{add_thought_to_db, blank_db};
+    use adapter::model::app::thought as app;
     use application::gateway::repository::thought::Repo;
     use warp::{http::StatusCode, Reply};
 
@@ -31,7 +32,7 @@ mod tests {
         add_thought_to_db(&db, "foo");
         add_thought_to_db(&db, "bar");
 
-        let id = "2".parse().unwrap();
+        let id = "2".parse::<app::Id>().unwrap().into();
 
         assert!(db.get(id).is_ok());
 

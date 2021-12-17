@@ -1,8 +1,14 @@
-mod name; // Value object
+//! All value objects and information that
+//! belong to [AreaOfLife]s.
 
-pub use self::name::*;
+mod id;
+mod name;
 
-#[derive(Debug, Clone, PartialEq)]
+pub use self::{id::*, name::*};
+
+/// An area of your life
+#[derive(Debug, Clone)]
 pub struct AreaOfLife {
+    pub id: Id,
     pub name: Name,
 }

@@ -1,9 +1,9 @@
 use crate::{
-    gateway::repository::thought::{Repo, SaveError, ThoughtRecord},
+    gateway::repository::thought::{Record, Repo, SaveError},
     identifier::{NewId, NewIdError},
     usecase::thought::validate::{validate_thought, ThoughtInvalidity},
 };
-use domain::thought::{Thought, Title};
+use domain::thought::{Id, Thought, Title};
 use thiserror::Error;
 
 #[derive(Debug)]
@@ -13,7 +13,7 @@ pub struct Request {
 }
 
 #[derive(Debug)]
-pub struct Response<Id> {
+pub struct Response {
     /// The ID of the newly created thought.
     pub id: Id,
 }
@@ -48,23 +48,22 @@ impl From<SaveError> for Error {
     }
 }
 
-impl<'r, 'g, Id, R, G> CreateThought<'r, 'g, R, G>
+impl<'r, 'g, R, G> CreateThought<'r, 'g, R, G>
 where
-    R: Repo<Id = Id>,
+    R: Repo,
     G: NewId<Id>,
-    Id: Clone + Copy,
 {
     /// Create a new thought with the given title.
-    pub fn exec(&self, req: Request) -> Result<Response<Id>, Error> {
+    pub fn exec(&self, req: Request) -> Result<Response, Error> {
         log::debug!("Create new thought: {:?}", req);
         let title = Title::new(req.title);
-        let thought = Thought { title };
-        validate_thought(&thought)?;
         let id = self.id_gen.new_id().map_err(|err| {
             log::warn!("{}", err);
             Error::NewId
         })?;
-        let record = ThoughtRecord { id, thought };
+        let thought = Thought { id, title };
+        validate_thought(&thought)?;
+        let record = Record { thought };
         self.repo.save(record)?;
         Ok(Response { id })
     }
@@ -78,32 +77,30 @@ mod tests {
 
     #[derive(Default)]
     struct MockRepo {
-        thought: RwLock<Option<ThoughtRecord<u32>>>,
+        thought: RwLock<Option<Record>>,
     }
 
     impl Repo for MockRepo {
-        type Id = u32;
-
-        fn save(&self, record: ThoughtRecord<Self::Id>) -> Result<(), SaveError> {
+        fn save(&self, record: Record) -> Result<(), SaveError> {
             *self.thought.write().unwrap() = Some(record);
             Ok(())
         }
-        fn get(&self, _: Self::Id) -> Result<ThoughtRecord<Self::Id>, GetError> {
+        fn get(&self, _: Id) -> Result<Record, GetError> {
             todo!()
         }
-        fn get_all(&self) -> Result<Vec<ThoughtRecord<Self::Id>>, GetAllError> {
+        fn get_all(&self) -> Result<Vec<Record>, GetAllError> {
             todo!()
         }
-        fn delete(&self, _: Self::Id) -> Result<(), DeleteError> {
+        fn delete(&self, _: Id) -> Result<(), DeleteError> {
             todo!()
         }
     }
 
     struct IdGen;
 
-    impl NewId<u32> for IdGen {
-        fn new_id(&self) -> Result<u32, NewIdError> {
-            Ok(42)
+    impl NewId<Id> for IdGen {
+        fn new_id(&self) -> Result<Id, NewIdError> {
+            Ok(Id::new(42))
         }
     }
 
@@ -127,7 +124,7 @@ mod tests {
                 .as_ref(),
             "foo"
         );
-        assert_eq!(res.id, 42);
+        assert_eq!(res.id, Id::new(42));
     }
 
     #[test]

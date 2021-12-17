@@ -2,7 +2,7 @@ use crate::db::in_memory::InMemory;
 use adapter::db::Db;
 use anyhow::Result;
 use application::{
-    gateway::repository::{area_of_life::AreaOfLifeRecord, thought::ThoughtRecord},
+    gateway::repository::thought::Record as ThoughtRecord,
     identifier::{NewId, NewIdError},
 };
 use serde::Deserialize;
@@ -24,21 +24,20 @@ impl Db for CorruptTestDb {}
 
 mod thought {
     use super::*;
-    use adapter::model::app::thought::Id;
-    use application::gateway::repository::thought::{self as repo, Repo};
+    use application::gateway::repository::thought::{self as repo, Record, Repo};
+    use domain::thought::Id;
 
     impl Repo for CorruptTestDb {
-        type Id = Id;
-        fn save(&self, _: ThoughtRecord<Self::Id>) -> Result<(), repo::SaveError> {
+        fn save(&self, _: Record) -> Result<(), repo::SaveError> {
             Err(repo::SaveError::Connection)
         }
-        fn get(&self, _: Self::Id) -> Result<ThoughtRecord<Self::Id>, repo::GetError> {
+        fn get(&self, _: Id) -> Result<Record, repo::GetError> {
             Err(repo::GetError::Connection)
         }
-        fn get_all(&self) -> Result<Vec<ThoughtRecord<Self::Id>>, repo::GetAllError> {
+        fn get_all(&self) -> Result<Vec<Record>, repo::GetAllError> {
             Err(repo::GetAllError::Connection)
         }
-        fn delete(&self, _: Self::Id) -> Result<(), repo::DeleteError> {
+        fn delete(&self, _: Id) -> Result<(), repo::DeleteError> {
             Err(repo::DeleteError::Connection)
         }
     }
@@ -52,21 +51,20 @@ mod thought {
 
 mod area_of_life {
     use super::*;
-    use adapter::model::app::area_of_life::Id;
-    use application::gateway::repository::area_of_life::{self as repo, Repo};
+    use application::gateway::repository::area_of_life::{self as repo, Record, Repo};
+    use domain::area_of_life::Id;
 
     impl Repo for CorruptTestDb {
-        type Id = Id;
-        fn save(&self, _: AreaOfLifeRecord<Self::Id>) -> Result<(), repo::SaveError> {
+        fn save(&self, _: Record) -> Result<(), repo::SaveError> {
             Err(repo::SaveError::Connection)
         }
-        fn get(&self, _: Self::Id) -> Result<AreaOfLifeRecord<Self::Id>, repo::GetError> {
+        fn get(&self, _: Id) -> Result<Record, repo::GetError> {
             Err(repo::GetError::Connection)
         }
-        fn get_all(&self) -> Result<Vec<AreaOfLifeRecord<Self::Id>>, repo::GetAllError> {
+        fn get_all(&self) -> Result<Vec<Record>, repo::GetAllError> {
             Err(repo::GetAllError::Connection)
         }
-        fn delete(&self, _: Self::Id) -> Result<(), repo::DeleteError> {
+        fn delete(&self, _: Id) -> Result<(), repo::DeleteError> {
             Err(repo::DeleteError::Connection)
         }
     }
@@ -93,8 +91,8 @@ pub fn add_thought_to_db(db: &Arc<InMemory>, title: &str) {
     use domain::thought::*;
 
     let thought = ThoughtRecord {
-        id: db.new_id().unwrap(),
         thought: Thought {
+            id: db.new_id().unwrap(),
             title: Title::new(title.to_string()),
         },
     };

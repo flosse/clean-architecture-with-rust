@@ -5,6 +5,7 @@ use crate::{
 use application::{
     gateway::repository::area_of_life::Repo, identifier::NewId, usecase::area_of_life as uc,
 };
+use domain::area_of_life as aol;
 use std::sync::Arc;
 
 pub struct Controller<D, P> {
@@ -14,7 +15,7 @@ pub struct Controller<D, P> {
 
 impl<D, P> Controller<D, P>
 where
-    D: Repo<Id = Id> + 'static + NewId<Id>,
+    D: Repo + 'static + NewId<aol::Id>,
     P: Present<app::create::Result> + Present<app::delete::Result> + Present<app::read_all::Result>,
 {
     pub fn new(db: Arc<D>, presenter: P) -> Self {
@@ -36,6 +37,7 @@ where
         let res = id
             .parse::<Id>()
             .map_err(|_| app::delete::Error::Id)
+            .map(Into::into)
             .map(|id| app::delete::Request { id })
             .and_then(|req| {
                 let interactor = uc::delete::Delete::new(&*self.db);

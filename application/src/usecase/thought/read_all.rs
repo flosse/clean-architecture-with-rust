@@ -1,4 +1,5 @@
-use crate::gateway::repository::thought::{GetAllError, Repo, ThoughtRecord};
+use crate::gateway::repository::thought::{GetAllError, Record, Repo};
+use domain::thought::Id;
 use std::fmt::Debug;
 use thiserror::Error;
 
@@ -6,20 +7,21 @@ use thiserror::Error;
 pub struct Request;
 
 #[derive(Debug)]
-pub struct Response<Id> {
-    pub thoughts: Vec<Thought<Id>>,
+pub struct Response {
+    pub thoughts: Vec<Thought>,
 }
 
 #[derive(Debug)]
-pub struct Thought<Id> {
+pub struct Thought {
     pub id: Id,
     pub title: String,
 }
 
-impl<Id> From<ThoughtRecord<Id>> for Thought<Id> {
-    fn from(r: ThoughtRecord<Id>) -> Self {
-        let ThoughtRecord { id, thought } = r;
+impl From<Record> for Thought {
+    fn from(r: Record) -> Self {
+        let Record { thought } = r;
         let title = String::from(thought.title);
+        let id = thought.id;
         Self { id, title }
     }
 }
@@ -49,12 +51,11 @@ impl From<GetAllError> for Error {
     }
 }
 
-impl<'r, Id, R> ReadAll<'r, R>
+impl<'r, R> ReadAll<'r, R>
 where
-    R: Repo<Id = Id>,
-    Id: Clone + Debug,
+    R: Repo,
 {
-    pub fn exec(&self, _: Request) -> Result<Response<Id>, Error> {
+    pub fn exec(&self, _: Request) -> Result<Response, Error> {
         log::debug!("Read all thoughts");
         let thoughts = self
             .repo

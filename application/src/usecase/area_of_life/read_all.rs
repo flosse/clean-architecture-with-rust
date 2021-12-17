@@ -1,4 +1,5 @@
-use crate::gateway::repository::area_of_life::{AreaOfLifeRecord, GetAllError, Repo};
+use crate::gateway::repository::area_of_life::{GetAllError, Record, Repo};
+use domain::area_of_life::Id;
 use std::fmt::Debug;
 use thiserror::Error;
 
@@ -6,20 +7,21 @@ use thiserror::Error;
 pub struct Request;
 
 #[derive(Debug)]
-pub struct Response<Id> {
-    pub areas_of_life: Vec<AreaOfLife<Id>>,
+pub struct Response {
+    pub areas_of_life: Vec<AreaOfLife>,
 }
 
 #[derive(Debug)]
-pub struct AreaOfLife<Id> {
+pub struct AreaOfLife {
     pub id: Id,
     pub name: String,
 }
 
-impl<Id> From<AreaOfLifeRecord<Id>> for AreaOfLife<Id> {
-    fn from(r: AreaOfLifeRecord<Id>) -> Self {
-        let AreaOfLifeRecord { id, area_of_life } = r;
+impl From<Record> for AreaOfLife {
+    fn from(r: Record) -> Self {
+        let Record { area_of_life } = r;
         let name = String::from(area_of_life.name);
+        let id = area_of_life.id;
         Self { id, name }
     }
 }
@@ -49,12 +51,11 @@ impl From<GetAllError> for Error {
     }
 }
 
-impl<'r, Id, R> ReadAll<'r, R>
+impl<'r, R> ReadAll<'r, R>
 where
-    R: Repo<Id = Id>,
-    Id: Clone + Debug,
+    R: Repo,
 {
-    pub fn exec(&self, _: Request) -> Result<Response<Id>, Error> {
+    pub fn exec(&self, _: Request) -> Result<Response, Error> {
         log::debug!("Read all areas of life");
         let areas_of_life = self
             .repo

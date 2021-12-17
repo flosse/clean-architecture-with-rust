@@ -1,9 +1,10 @@
 use crate::gateway::repository::area_of_life::{DeleteError, Repo};
+use domain::area_of_life::Id;
 use std::fmt::Debug;
 use thiserror::Error;
 
 #[derive(Debug)]
-pub struct Request<Id> {
+pub struct Request {
     pub id: Id,
 }
 
@@ -38,12 +39,11 @@ impl From<DeleteError> for Error {
     }
 }
 
-impl<'r, Id, R> Delete<'r, R>
+impl<'r, R> Delete<'r, R>
 where
-    R: Repo<Id = Id>,
-    Id: Clone + Debug,
+    R: Repo,
 {
-    pub fn exec(&self, req: Request<Id>) -> Result<Response, Error> {
+    pub fn exec(&self, req: Request) -> Result<Response, Error> {
         log::debug!("Delete area of life by ID: {:?}", req);
         self.repo.delete(req.id)?;
         Ok(Response {})

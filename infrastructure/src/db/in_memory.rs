@@ -1,32 +1,36 @@
-use adapter::{db::Db, model::app};
+use adapter::db::Db;
 use application::{
-    gateway::repository::{area_of_life::AreaOfLifeRecord, thought::ThoughtRecord},
+    gateway::repository::{
+        area_of_life::Record as AreaOfLifeRecord, thought::Record as ThoughtRecord,
+    },
     identifier::{NewId, NewIdError},
 };
 use std::{collections::HashMap, sync::RwLock};
 
 #[derive(Default)]
 pub struct InMemory {
-    thoughts: RwLock<HashMap<app::thought::Id, ThoughtRecord<app::thought::Id>>>,
-    areas_of_life: RwLock<HashMap<app::area_of_life::Id, AreaOfLifeRecord<app::area_of_life::Id>>>,
+    thoughts: RwLock<HashMap<domain::thought::Id, ThoughtRecord>>,
+    areas_of_life: RwLock<HashMap<domain::area_of_life::Id, AreaOfLifeRecord>>,
 }
 
 impl Db for InMemory {}
 
 mod thought {
     use super::*;
-    use adapter::model::app::thought::Id;
     use application::gateway::repository::thought::{
-        DeleteError, GetAllError, GetError, Repo, SaveError, ThoughtRecord,
+        DeleteError, GetAllError, GetError, Record, Repo, SaveError,
     };
+    use domain::thought::Id;
 
     impl Repo for InMemory {
-        type Id = Id;
-        fn save(&self, record: ThoughtRecord<Self::Id>) -> Result<(), SaveError> {
-            self.thoughts.write().unwrap().insert(record.id, record);
+        fn save(&self, record: Record) -> Result<(), SaveError> {
+            self.thoughts
+                .write()
+                .unwrap()
+                .insert(record.thought.id, record);
             Ok(())
         }
-        fn get(&self, id: Self::Id) -> Result<ThoughtRecord<Self::Id>, GetError> {
+        fn get(&self, id: Id) -> Result<Record, GetError> {
             self.thoughts
                 .read()
                 .unwrap()
@@ -34,7 +38,7 @@ mod thought {
                 .cloned()
                 .ok_or(GetError::NotFound)
         }
-        fn get_all(&self) -> Result<Vec<ThoughtRecord<Self::Id>>, GetAllError> {
+        fn get_all(&self) -> Result<Vec<Record>, GetAllError> {
             Ok(self
                 .thoughts
                 .read()
@@ -44,7 +48,7 @@ mod thought {
                 .cloned()
                 .collect())
         }
-        fn delete(&self, id: Self::Id) -> Result<(), DeleteError> {
+        fn delete(&self, id: Id) -> Result<(), DeleteError> {
             self.thoughts
                 .write()
                 .unwrap()
@@ -61,7 +65,7 @@ mod thought {
                 .read()
                 .unwrap()
                 .iter()
-                .map(|(id, _)| u32::from(*id))
+                .map(|(id, _)| id.to_u64())
                 .max()
                 .unwrap_or(0)
                 + 1;
@@ -72,21 +76,20 @@ mod thought {
 
 mod area_of_life {
     use super::*;
-    use adapter::model::app::area_of_life::Id;
     use application::gateway::repository::area_of_life::{
-        AreaOfLifeRecord, DeleteError, GetAllError, GetError, Repo, SaveError,
+        DeleteError, GetAllError, GetError, Record, Repo, SaveError,
     };
+    use domain::area_of_life::Id;
 
     impl Repo for InMemory {
-        type Id = Id;
-        fn save(&self, record: AreaOfLifeRecord<Self::Id>) -> Result<(), SaveError> {
+        fn save(&self, record: Record) -> Result<(), SaveError> {
             self.areas_of_life
                 .write()
                 .unwrap()
-                .insert(record.id, record);
+                .insert(record.area_of_life.id, record);
             Ok(())
         }
-        fn get(&self, id: Self::Id) -> Result<AreaOfLifeRecord<Self::Id>, GetError> {
+        fn get(&self, id: Id) -> Result<Record, GetError> {
             self.areas_of_life
                 .read()
                 .unwrap()
@@ -94,7 +97,7 @@ mod area_of_life {
                 .cloned()
                 .ok_or(GetError::NotFound)
         }
-        fn get_all(&self) -> Result<Vec<AreaOfLifeRecord<Self::Id>>, GetAllError> {
+        fn get_all(&self) -> Result<Vec<Record>, GetAllError> {
             Ok(self
                 .areas_of_life
                 .read()
@@ -104,7 +107,7 @@ mod area_of_life {
                 .cloned()
                 .collect())
         }
-        fn delete(&self, id: Self::Id) -> Result<(), DeleteError> {
+        fn delete(&self, id: Id) -> Result<(), DeleteError> {
             self.areas_of_life
                 .write()
                 .unwrap()
@@ -121,7 +124,7 @@ mod area_of_life {
                 .read()
                 .unwrap()
                 .iter()
-                .map(|(id, _)| u32::from(*id))
+                .map(|(id, _)| id.to_u64())
                 .max()
                 .unwrap_or(0)
                 + 1;

@@ -12,7 +12,7 @@ pub struct Controller<D, P> {
 
 impl<D, P> Controller<D, P>
 where
-    D: Repo<Id = Id> + 'static + NewId<Id>,
+    D: Repo + 'static + NewId<domain::thought::Id>,
     P: Present<app::create::Result>
         + Present<app::delete::Result>
         + Present<app::find_by_id::Result>
@@ -37,6 +37,7 @@ where
         let res = id
             .parse::<Id>()
             .map_err(|_| app::delete::Error::Id)
+            .map(Into::into)
             .map(|id| app::delete::Request { id })
             .and_then(|req| {
                 let interactor = uc::delete::Delete::new(&*self.db);
@@ -55,6 +56,7 @@ where
         let res = id
             .parse::<Id>()
             .map_err(|_| app::find_by_id::Error::Id)
+            .map(Into::into)
             .map(|id| app::find_by_id::Request { id })
             .and_then(|req| {
                 let interactor = uc::find_by_id::FindById::new(&*self.db);

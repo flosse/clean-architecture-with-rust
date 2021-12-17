@@ -10,13 +10,10 @@ mod conv {
     use application::usecase::thought::read_all as uc;
     use std::convert::TryFrom;
 
-    impl<Id> From<uc::Thought<Id>> for Thought
-    where
-        Id: ToString,
-    {
-        fn from(from: uc::Thought<Id>) -> Self {
+    impl From<uc::Thought> for Thought {
+        fn from(from: uc::Thought) -> Self {
             let uc::Thought { id, title } = from;
-            let id = id.to_string().into();
+            let id = id.to_u64().into();
             Self { id, title }
         }
     }

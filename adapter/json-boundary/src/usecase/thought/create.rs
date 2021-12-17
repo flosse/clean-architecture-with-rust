@@ -18,12 +18,9 @@ mod conv {
     use application::usecase::thought::{create as uc, validate};
     use std::convert::TryFrom;
 
-    impl<Id> From<uc::Response<Id>> for ThoughtId
-    where
-        Id: ToString,
-    {
-        fn from(from: uc::Response<Id>) -> Self {
-            ThoughtId(from.id.to_string())
+    impl From<uc::Response> for ThoughtId {
+        fn from(from: uc::Response) -> Self {
+            from.id.to_u64().into()
         }
     }
 

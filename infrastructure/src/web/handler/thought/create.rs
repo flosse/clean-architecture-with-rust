@@ -40,8 +40,8 @@ mod tests {
         assert_eq!(res.status(), StatusCode::CREATED);
 
         let body: Value = response_json_body(res).await.unwrap();
-        let id = body.as_str().unwrap().parse().unwrap();
-        let record = db.as_ref().get(id).unwrap();
+        let id = body.as_u64().unwrap();
+        let record = db.as_ref().get(id.into()).unwrap();
 
         assert_eq!(record.thought.title.as_ref(), "test 1");
     }
