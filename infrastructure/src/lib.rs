@@ -2,7 +2,6 @@ use db::json_file::JsonFile;
 use std::env;
 
 pub mod cli;
-pub mod db;
 pub mod web;
 
 pub fn run() {

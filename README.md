@@ -14,6 +14,7 @@ Currently there are these circles:
 - `adapter`
   - `json-boundary`
 - `infrastructure`
+  - `db`
 - `webapp`
 
 Depending on your system the amount and the name of circles could

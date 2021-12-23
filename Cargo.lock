@@ -134,6 +134,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "db"
+version = "0.0.0"
+dependencies = [
+ "adapter",
+ "application",
+ "domain",
+ "jfs",
+ "log",
+ "serde",
+]
+
+[[package]]
 name = "digest"
 version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -422,9 +434,8 @@ dependencies = [
  "adapter",
  "anyhow",
  "application",
- "domain",
+ "db",
  "hyper",
- "jfs",
  "log",
  "mime_guess",
  "pretty_env_logger",
@@ -475,7 +486,6 @@ name = "json-boundary"
 version = "0.0.0"
 dependencies = [
  "application",
- "domain",
  "http",
  "http-serde",
  "serde",

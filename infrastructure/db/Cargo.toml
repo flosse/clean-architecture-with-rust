@@ -1,0 +1,17 @@
+[package]
+name = "db"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+
+# Workspace dependencies
+adapter = "0.0.0"
+application = "0.0.0"
+domain = "0.0.0"
+
+# External dependencies
+log = "*"
+jfs = "*"
+serde = { version = "1", features = ["derive"] }
