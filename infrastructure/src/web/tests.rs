@@ -1,10 +1,10 @@
-use crate::db::in_memory::InMemory;
 use adapter::db::Db;
 use anyhow::Result;
 use application::{
     gateway::repository::thought::Record as ThoughtRecord,
     identifier::{NewId, NewIdError},
 };
+use db::in_memory::InMemory;
 use serde::Deserialize;
 use std::sync::Arc;
 use warp::reply::Response;
@@ -89,12 +89,12 @@ where
 pub fn add_thought_to_db(db: &Arc<InMemory>, title: &str) {
     use application::gateway::repository::thought::Repo;
     use domain::thought::*;
-
-    let thought = ThoughtRecord {
-        thought: Thought {
-            id: db.new_id().unwrap(),
-            title: Title::new(title.to_string()),
-        },
-    };
+    use std::collections::HashSet;
+    let thought = Thought::new(
+        db.new_id().unwrap(),
+        Title::new(title.to_string()),
+        HashSet::new(),
+    );
+    let thought = ThoughtRecord { thought };
     db.as_ref().save(thought).unwrap();
 }

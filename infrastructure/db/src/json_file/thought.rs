@@ -1,11 +1,10 @@
 use super::*;
-use adapter::model::app::thought as app;
+use adapter::model::app::{area_of_life as aol, thought as app};
 use application::{
     gateway::repository::thought::{DeleteError, GetAllError, GetError, Record, Repo, SaveError},
     identifier::{NewId, NewIdError},
 };
-use domain::thought::Id;
-use domain::thought::{Thought, Title};
+use domain::thought::{Id, Thought, Title};
 use std::io;
 
 impl NewId<Id> for JsonFile {
@@ -19,16 +18,23 @@ impl Repo for JsonFile {
     fn save(&self, record: Record) -> Result<(), SaveError> {
         log::debug!("Save thought {:?} to JSON file", record);
         let Record { thought } = record;
-        let Thought { id, title } = thought;
+        let thought_id = thought.id().to_string();
+        let title = String::from(thought.title().as_ref());
+        let areas_of_life = thought
+            .areas_of_life()
+            .iter()
+            .map(ToString::to_string)
+            .collect();
         let model = models::Thought {
-            thought_id: id.to_string(),
-            title: String::from(title),
+            thought_id,
+            title,
+            areas_of_life,
         };
         let storage_id = self.thoughts.save(&model).map_err(|err| {
             log::warn!("Unable to save thought: {}", err);
             SaveError::Connection
         })?;
-        self.save_id(storage_id, id, MAP_THOUGHT_ID_KEY)
+        self.save_id(storage_id, thought.id(), MAP_THOUGHT_ID_KEY)
             .map_err(|err| {
                 log::warn!("Unable to save thought ID: {}", err);
                 SaveError::Connection
@@ -54,11 +60,20 @@ impl Repo for JsonFile {
             }
         })?;
         debug_assert_eq!(id.to_string(), model.thought_id);
+        let areas_of_life = model
+            .areas_of_life
+            .into_iter()
+            .filter_map(|id| {
+                id.parse::<aol::Id>()
+                    .map_err(|err| {
+                        log::warn!("{}", err);
+                    })
+                    .map(Into::into)
+                    .ok()
+            })
+            .collect();
         Ok(Record {
-            thought: Thought {
-                id,
-                title: Title::new(model.title),
-            },
+            thought: Thought::new(id, Title::new(model.title), areas_of_life),
         })
     }
     fn get_all(&self) -> Result<Vec<Record>, GetAllError> {
@@ -72,19 +87,28 @@ impl Repo for JsonFile {
             })?
             .into_iter()
             .filter_map(|(_, model)| {
+                let areas_of_life = model
+                    .areas_of_life
+                    .into_iter()
+                    .filter_map(|id| {
+                        id.parse::<aol::Id>()
+                            .map_err(|err| {
+                                log::warn!("{}", err);
+                            })
+                            .map(Into::into)
+                            .ok()
+                    })
+                    .collect();
+
                 model
                     .thought_id
                     .parse::<app::Id>()
                     .ok()
                     .map(Into::into)
-                    .map(|id| (id, model.title))
+                    .map(|id| (id, model.title, areas_of_life))
             })
-            .map(|(id, title)| Record {
-                thought: Thought {
-                    id,
-                    title: Title::new(title),
-                },
-            })
+            .map(|(id, title, areas_of_life)| Thought::new(id, Title::new(title), areas_of_life))
+            .map(|thought| Record { thought })
             .collect();
         Ok(thoughts)
     }

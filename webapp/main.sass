@@ -61,9 +61,14 @@ $sidebar-width: 250px
 
       li
         font-size: 0.9em
-        margin-bottom: 1.25em
+        margin-bottom: 1em
+        padding-bottom: 0.3em
         cursor: pointer
         color: #777
+
+        &.active
+          color: #222
+          border-bottom: 2px solid #b5b5b5
 
         &:hover
           color: #000
@@ -75,6 +80,7 @@ $sidebar-width: 250px
           margin-right: 0.4em
           font-size: 0.9em
           border-color: transparent
+          background: transparent
 
           &:hover
             color: #000

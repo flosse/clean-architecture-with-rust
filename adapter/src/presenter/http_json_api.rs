@@ -24,11 +24,16 @@ mod thought {
                 })
                 .map_err(|err| {
                     use app::create::Error as E;
-                    match &err {
+                    match err {
+                        E::AreaOfLifeId => Error {
+                            msg: Some(err.to_string()),
+                            status: StatusCode::BAD_REQUEST,
+                            details: Some(view::create::Error::AreaOfLifeId),
+                        },
                         E::Invalidity(invalidity) => Error {
                             msg: Some(invalidity.to_string()),
                             status: StatusCode::BAD_REQUEST,
-                            details: view::create::Error::try_from(err).ok(),
+                            details: Some(view::create::Error::from(invalidity)),
                         },
                         E::Repo | E::NewId => Error::internal(),
                     }

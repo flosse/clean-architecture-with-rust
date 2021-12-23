@@ -44,8 +44,8 @@ fn update(msg: Msg, mdl: &mut Mdl, orders: &mut impl Orders<Msg>) {
         Msg::View(msg) => {
             if let Some(cmd) = view::update(msg, &mut mdl.view) {
                 match cmd {
-                    view::Cmd::CreateThought(title) => {
-                        orders.perform_cmd(create_thought(title));
+                    view::Cmd::CreateThought(title, areas_of_life) => {
+                        orders.perform_cmd(create_thought(title, areas_of_life));
                     }
                     view::Cmd::CreateAreaOfLife(name) => {
                         orders.perform_cmd(create_area_of_life(name));
@@ -67,7 +67,7 @@ fn update(msg: Msg, mdl: &mut Mdl, orders: &mut impl Orders<Msg>) {
             view::update(msg, &mut mdl.view);
         }
         Msg::CreateAreaOfLifeResult(res) => {
-            if let Ok(_) = &res {
+            if res.is_ok() {
                 orders.perform_cmd(fetch_all_areas_of_life());
             }
             let msg = view::Msg::CreateAreaOfLifeResult(res);
@@ -98,8 +98,9 @@ fn update(msg: Msg, mdl: &mut Mdl, orders: &mut impl Orders<Msg>) {
 
 // -- Map usecases to messages -- //
 
-async fn create_thought(title: String) -> Msg {
-    let res = usecase::thought::create(title).await;
+async fn create_thought(title: String, area_of_life: Option<AreaOfLifeId>) -> Msg {
+    let areas_of_life = area_of_life.map(|id| vec![id]).unwrap_or_default();
+    let res = usecase::thought::create(title, areas_of_life).await;
     Msg::CreateThoughtResult(res)
 }
 

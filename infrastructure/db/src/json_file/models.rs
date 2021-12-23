@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 pub struct Thought {
     pub(crate) thought_id: String,
     pub(crate) title: String,
+    pub(crate) areas_of_life: Vec<String>,
 }
 
 #[derive(Serialize, Deserialize)]

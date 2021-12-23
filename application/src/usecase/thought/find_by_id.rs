@@ -1,6 +1,6 @@
 use crate::gateway::repository::thought::{GetError, Record, Repo};
-use domain::thought::Id;
-use std::fmt::Debug;
+use domain::{area_of_life as aol, thought::Id};
+use std::{collections::HashSet, fmt::Debug};
 use thiserror::Error;
 
 #[derive(Debug)]
@@ -12,14 +12,20 @@ pub struct Request {
 pub struct Response {
     pub id: Id,
     pub title: String,
+    pub areas_of_life: HashSet<aol::Id>,
 }
 
 impl From<Record> for Response {
     fn from(r: Record) -> Self {
         let Record { thought } = r;
-        let title = String::from(thought.title);
-        let id = thought.id;
-        Self { id, title }
+        let title = String::from(thought.title().as_ref());
+        let id = thought.id();
+        let areas_of_life = thought.areas_of_life().clone();
+        Self {
+            id,
+            title,
+            areas_of_life,
+        }
     }
 }
 

@@ -1,12 +1,15 @@
+use crate::domain::AreaOfLifeId;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Request {
     pub title: String,
+    pub areas_of_life: Vec<AreaOfLifeId>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 pub enum Error {
+    AreaOfLifeId,
     TitleMinLength { min: usize, actual: usize },
     TitleMaxLength { max: usize, actual: usize },
 }
@@ -16,7 +19,6 @@ mod conv {
     use super::*;
     use crate::domain::ThoughtId;
     use application::usecase::thought::{create as uc, validate};
-    use std::convert::TryFrom;
 
     impl From<uc::Response> for ThoughtId {
         fn from(from: uc::Response) -> Self {
@@ -24,20 +26,13 @@ mod conv {
         }
     }
 
-    impl TryFrom<uc::Error> for Error {
-        type Error = ();
-        fn try_from(from: uc::Error) -> Result<Self, Self::Error> {
-            use uc::Error as E;
-            match from {
-                E::Repo | E::NewId => Err(()),
-                E::Invalidity(e) => {
-                    let validate::ThoughtInvalidity::Title(e) = e;
-                    use validate::TitleInvalidity as T;
-                    Ok(match e {
-                        T::MinLength { min, actual } => Self::TitleMinLength { min, actual },
-                        T::MaxLength { max, actual } => Self::TitleMaxLength { max, actual },
-                    })
-                }
+    impl From<validate::ThoughtInvalidity> for Error {
+        fn from(from: validate::ThoughtInvalidity) -> Self {
+            let validate::ThoughtInvalidity::Title(e) = from;
+            use validate::TitleInvalidity as T;
+            match e {
+                T::MinLength { min, actual } => Self::TitleMinLength { min, actual },
+                T::MaxLength { max, actual } => Self::TitleMaxLength { max, actual },
             }
         }
     }

@@ -18,6 +18,7 @@ pub struct Mdl {
     wait_for_deletion: Option<ThoughtId>,
     wait: bool,
     new_aol_dialog: new_aol_dialog::Mdl,
+    current_aol: Option<AreaOfLifeId>,
 }
 
 // ------ ------
@@ -28,6 +29,8 @@ pub struct Mdl {
 pub enum Msg {
     InputChanged(String),
     DeleteRequest(ThoughtId),
+    SelectAreaOfLife(AreaOfLifeId),
+    DeselectAreaOfLife,
     DeleteAreaOfLife(AreaOfLifeId),
     CreateRequest,
     CreateThoughtResult(Result<ThoughtId, String>),
@@ -47,7 +50,7 @@ pub enum Msg {
 
 #[derive(Debug)]
 pub enum Cmd {
-    CreateThought(String),
+    CreateThought(String, Option<AreaOfLifeId>),
     CreateAreaOfLife(String),
     DeleteThought(ThoughtId),
     DeleteAreaOfLife(AreaOfLifeId),
@@ -65,7 +68,7 @@ pub fn update(msg: Msg, mdl: &mut Mdl) -> Option<Cmd> {
         }
         Msg::CreateRequest => {
             if !mdl.input.is_empty() {
-                let cmd = Cmd::CreateThought(mdl.input.clone());
+                let cmd = Cmd::CreateThought(mdl.input.clone(), mdl.current_aol.clone());
                 mdl.wait = true;
                 return Some(cmd);
             }
@@ -73,6 +76,12 @@ pub fn update(msg: Msg, mdl: &mut Mdl) -> Option<Cmd> {
         Msg::DeleteRequest(id) => {
             let cmd = Cmd::DeleteThought(id);
             return Some(cmd);
+        }
+        Msg::SelectAreaOfLife(id) => {
+            mdl.current_aol = Some(id);
+        }
+        Msg::DeselectAreaOfLife => {
+            mdl.current_aol = None;
         }
         Msg::DeleteAreaOfLife(id) => {
             let cmd = Cmd::DeleteAreaOfLife(id);
@@ -181,7 +190,7 @@ fn main(mdl: &Mdl) -> Node<Msg> {
                 C!["container"],
                 header(),
                 new_thought_input(mdl),
-                thoughts_list(&mdl.thoughts, &mdl.wait_for_deletion)
+                thoughts_list(&mdl.thoughts, &mdl.wait_for_deletion, &mdl.current_aol)
             ]
         ],
     ]
@@ -220,32 +229,45 @@ fn main_sidebar(mdl: &Mdl) -> Node<Msg> {
                     ]
                 ]
             ],
-            if mdl.areas_of_life.is_empty() {
-                p![
-                    style! {St::Color => "#bbb"; St::FontSize => em(0.75);},
-                    "Currently there are no areas of life"
-                ]
-            } else {
-                ul![
-                    C!["menu-list", "aol"],
-                    mdl.areas_of_life.iter().map(|aol| {
-                        let id = aol.id.clone();
-                        li![
-                            &aol.name,
-                            button![
-                                ev(Ev::Click, |_| Msg::DeleteAreaOfLife(id)),
-                                C!["button"],
-                                span![
-                                    C!["icon", "is-right", "is-small"],
-                                    i![C!["fas", "fa-minus-circle"]]
-                                ]
-                            ]
-                        ]
-                    }),
-                ]
-            }
+            aol_list(mdl)
         ],
     ]
+}
+
+fn aol_list(mdl: &Mdl) -> Node<Msg> {
+    if mdl.areas_of_life.is_empty() {
+        p![
+            style! {St::Color => "#bbb"; St::FontSize => em(0.75);},
+            "Currently there are no areas of life"
+        ]
+    } else {
+        ul![
+            C!["menu-list", "aol"],
+            li![
+                C![IF!( mdl.current_aol.is_none() => "active")],
+                ev(Ev::Click, |_| Msg::DeselectAreaOfLife),
+                "All"
+            ],
+            mdl.areas_of_life.iter().map(|aol| {
+                let sel_id = aol.id.clone();
+                let del_id = aol.id.clone();
+                let active = mdl.current_aol.as_ref() == Some(&aol.id);
+                li![
+                    C![IF!( active => "active")],
+                    ev(Ev::Click, |_| Msg::SelectAreaOfLife(sel_id)),
+                    &aol.name,
+                    button![
+                        C!["button"],
+                        ev(Ev::Click, |_| Msg::DeleteAreaOfLife(del_id)),
+                        span![
+                            C!["icon", "is-right", "is-small"],
+                            i![C!["fas", "fa-minus-circle"]]
+                        ]
+                    ]
+                ]
+            }),
+        ]
+    }
 }
 
 fn header<M>() -> Node<M> {
@@ -322,20 +344,33 @@ fn new_thought_input(mdl: &Mdl) -> Node<Msg> {
     ]
 }
 
-fn thoughts_list(thoughts: &[Thought], wait_for_deletion: &Option<ThoughtId>) -> Node<Msg> {
+fn thoughts_list(
+    thoughts: &[Thought],
+    wait_for_deletion: &Option<ThoughtId>,
+    aol: &Option<AreaOfLifeId>,
+) -> Node<Msg> {
     div![
         C!["block", "thoughts"],
         h3![C!["title", "is-4"], "Thoughts"],
         if thoughts.is_empty() {
             p!["Currenty there are no thoughts."]
         } else {
-            ul![thoughts.iter().map(|t| {
-                let wait = wait_for_deletion
-                    .as_ref()
-                    .map(|id| id == &t.id)
-                    .unwrap_or(false);
-                li![thought(t, wait)]
-            })]
+            ul![thoughts
+                .iter()
+                .filter(|t| {
+                    if let Some(aol) = aol {
+                        t.areas_of_life.iter().any(|x| x == aol)
+                    } else {
+                        true
+                    }
+                })
+                .map(|t| {
+                    let wait = wait_for_deletion
+                        .as_ref()
+                        .map(|id| id == &t.id)
+                        .unwrap_or(false);
+                    li![thought(t, wait)]
+                })]
         }
     ]
 }

@@ -15,9 +15,21 @@ mod conv {
 
     impl From<uc::Response> for Thought {
         fn from(from: uc::Response) -> Self {
-            let uc::Response { id, title } = from;
+            let uc::Response {
+                id,
+                title,
+                areas_of_life,
+            } = from;
             let id = id.to_u64().into();
-            Self { id, title }
+            let areas_of_life = areas_of_life
+                .into_iter()
+                .map(|id| id.to_u64().into())
+                .collect();
+            Self {
+                id,
+                title,
+                areas_of_life,
+            }
         }
     }
 

@@ -3,13 +3,19 @@ use crate::{
     identifier::{NewId, NewIdError},
     usecase::thought::validate::{validate_thought, ThoughtInvalidity},
 };
-use domain::thought::{Id, Thought, Title};
+use domain::{
+    area_of_life as aol,
+    thought::{Id, Thought, Title},
+};
+use std::collections::HashSet;
 use thiserror::Error;
 
 #[derive(Debug)]
 pub struct Request {
     /// The title of new thought.
     pub title: String,
+    /// Associated [aol::AreaOfLife]s.
+    pub areas_of_life: HashSet<aol::Id>,
 }
 
 #[derive(Debug)]
@@ -61,7 +67,7 @@ where
             log::warn!("{}", err);
             Error::NewId
         })?;
-        let thought = Thought { id, title };
+        let thought = Thought::new(id, title, req.areas_of_life);
         validate_thought(&thought)?;
         let record = Record { thought };
         self.repo.save(record)?;
@@ -111,6 +117,7 @@ mod tests {
         let usecase = CreateThought::new(&repo, &gen);
         let req = Request {
             title: "foo".into(),
+            areas_of_life: HashSet::new(),
         };
         let res = usecase.exec(req).unwrap();
         assert_eq!(
@@ -120,7 +127,7 @@ mod tests {
                 .as_ref()
                 .unwrap()
                 .thought
-                .title
+                .title()
                 .as_ref(),
             "foo"
         );
@@ -132,7 +139,10 @@ mod tests {
         let repo = MockRepo::default();
         let gen = IdGen {};
         let usecase = CreateThought::new(&repo, &gen);
-        let req = Request { title: "".into() };
+        let req = Request {
+            title: "".into(),
+            areas_of_life: HashSet::new(),
+        };
         let err = usecase.exec(req).err().unwrap();
         assert!(matches!(err, Error::Invalidity(_)));
     }

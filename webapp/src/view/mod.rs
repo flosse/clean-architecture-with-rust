@@ -38,7 +38,7 @@ pub enum Msg {
 
 #[derive(Debug)]
 pub enum Cmd {
-    CreateThought(String),
+    CreateThought(String, Option<AreaOfLifeId>),
     CreateAreaOfLife(String),
     DeleteThought(ThoughtId),
     DeleteAreaOfLife(AreaOfLifeId),
@@ -47,7 +47,9 @@ pub enum Cmd {
 impl From<page::Cmd> for Cmd {
     fn from(cmd: page::Cmd) -> Self {
         match cmd {
-            page::Cmd::CreateThought(title) => Self::CreateThought(title),
+            page::Cmd::CreateThought(title, area_of_life) => {
+                Self::CreateThought(title, area_of_life)
+            }
             page::Cmd::CreateAreaOfLife(name) => Self::CreateAreaOfLife(name),
             page::Cmd::DeleteThought(id) => Self::DeleteThought(id),
             page::Cmd::DeleteAreaOfLife(id) => Self::DeleteAreaOfLife(id),

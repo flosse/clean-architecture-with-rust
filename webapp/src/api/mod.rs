@@ -6,7 +6,7 @@ pub use http::{Error, Result};
 mod thought {
     use crate::api::http::{self, Result};
     use json_boundary::{
-        domain::{Thought, ThoughtId},
+        domain::{AreaOfLifeId, Thought, ThoughtId},
         usecase::thought::{create, delete, find_by_id, read_all},
     };
 
@@ -18,8 +18,18 @@ mod thought {
         http::get_json("/api/thought").await
     }
 
-    pub async fn create_thought(title: String) -> Result<ThoughtId, create::Error> {
-        http::post_json("/api/thought", &create::Request { title }).await
+    pub async fn create_thought(
+        title: String,
+        areas_of_life: Vec<AreaOfLifeId>,
+    ) -> Result<ThoughtId, create::Error> {
+        http::post_json(
+            "/api/thought",
+            &create::Request {
+                title,
+                areas_of_life,
+            },
+        )
+        .await
     }
 
     pub async fn delete_thought(id: &ThoughtId) -> Result<(), delete::Error> {

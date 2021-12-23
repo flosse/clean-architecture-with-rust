@@ -435,6 +435,7 @@ dependencies = [
  "anyhow",
  "application",
  "db",
+ "domain",
  "hyper",
  "log",
  "mime_guess",

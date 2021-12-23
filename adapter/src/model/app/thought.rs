@@ -37,13 +37,41 @@ impl ToString for Id {
 }
 
 pub mod create {
-    use application::usecase::thought::create as uc;
+    use crate::model::app::area_of_life as aol;
+    use application::usecase::thought::{create as uc, validate::ThoughtInvalidity};
     use std::result;
+    use thiserror::Error;
 
     pub type Request = uc::Request;
     pub type Response = uc::Response;
     pub type Result = result::Result<Response, Error>;
-    pub type Error = uc::Error;
+
+    #[derive(Debug, Error)]
+    pub enum Error {
+        #[error("{}", aol::ParseIdError)]
+        AreaOfLifeId,
+        #[error("{}", uc::Error::NewId)]
+        NewId,
+        #[error("{}", uc::Error::Repo)]
+        Repo,
+        #[error(transparent)]
+        Invalidity(#[from] ThoughtInvalidity),
+    }
+
+    impl From<aol::ParseIdError> for Error {
+        fn from(_: aol::ParseIdError) -> Self {
+            Self::AreaOfLifeId
+        }
+    }
+    impl From<uc::Error> for Error {
+        fn from(from: uc::Error) -> Self {
+            match from {
+                uc::Error::NewId => Self::NewId,
+                uc::Error::Repo => Self::Repo,
+                uc::Error::Invalidity(i) => Self::Invalidity(i),
+            }
+        }
+    }
 }
 
 pub mod find_by_id {

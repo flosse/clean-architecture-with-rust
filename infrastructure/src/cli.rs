@@ -3,6 +3,7 @@ use adapter::{
     controller::thought::Controller as ThoughtController, db::Db, presenter::cli::Presenter,
 };
 use std::{
+    collections::HashSet,
     net::{IpAddr, SocketAddr},
     sync::Arc,
 };
@@ -35,7 +36,8 @@ where
     match cmd {
         Cmd::Create { title } => {
             let controller = ThoughtController::new(db, presenter);
-            let res = controller.create_thought(title);
+            let areas_of_life = HashSet::new(); // Areas of life needs to be added later
+            let res = controller.create_thought(title, &areas_of_life);
             println!("{}", res);
         }
         Cmd::Read { id } => {

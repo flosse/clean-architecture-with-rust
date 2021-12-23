@@ -1,6 +1,6 @@
 use crate::{
     api,
-    domain::{Thought, ThoughtId},
+    domain::{AreaOfLifeId, Thought, ThoughtId},
     usecase::{ErrorPresenter, Present},
 };
 
@@ -8,9 +8,9 @@ use crate::{
 //  Controller
 // ------ ------
 
-pub async fn create(title: String) -> Result<ThoughtId, String> {
+pub async fn create(title: String, areas_of_life: Vec<AreaOfLifeId>) -> Result<ThoughtId, String> {
     let presenter = ErrorPresenter::default();
-    api::create_thought(title)
+    api::create_thought(title, areas_of_life)
         .await
         .map_err(|e| presenter.present(e))
 }

@@ -23,5 +23,6 @@ warp = "*"
 
 [dev-dependencies]
 anyhow = "*"
+domain = "0.0.0"
 hyper = "*"
 serde_json = "1"

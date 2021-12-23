@@ -20,7 +20,7 @@ pub enum TitleInvalidity {
 
 pub fn validate_thought(thought: &Request) -> Response {
     log::debug!("Validate thought {:?}", thought);
-    validate_title(&thought.title).map_err(ThoughtInvalidity::Title)?;
+    validate_title(thought.title()).map_err(ThoughtInvalidity::Title)?;
     Ok(())
 }
 

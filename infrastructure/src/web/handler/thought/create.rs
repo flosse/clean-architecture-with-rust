@@ -13,7 +13,12 @@ pub async fn handle<D>(
 where
     D: Db,
 {
-    match controller.create_thought(req.title) {
+    let areas_of_life = req
+        .areas_of_life
+        .into_iter()
+        .map(|id| id.0.to_string())
+        .collect();
+    match controller.create_thought(req.title, &areas_of_life) {
         Ok(res) => Ok(reply::with_status(reply::json(&res.data), res.status)),
         Err(err) => Ok(reply_error(err)),
     }
@@ -34,6 +39,7 @@ mod tests {
         let controller = Arc::new(Controller::new(db.clone(), Presenter::default()));
         let req = Request {
             title: "test 1".to_string(),
+            areas_of_life: vec![],
         };
         let res = handle(req, controller).await.unwrap().into_response();
 
@@ -43,7 +49,7 @@ mod tests {
         let id = body.as_u64().unwrap();
         let record = db.as_ref().get(id.into()).unwrap();
 
-        assert_eq!(record.thought.title.as_ref(), "test 1");
+        assert_eq!(record.thought.title().as_ref(), "test 1");
     }
 
     #[tokio::test]
@@ -52,6 +58,7 @@ mod tests {
         let controller = Arc::new(Controller::new(db, Presenter::default()));
         let req = Request {
             title: "t".to_string(),
+            areas_of_life: vec![],
         };
         let res = handle(req, controller).await.unwrap().into_response();
 
@@ -76,6 +83,7 @@ mod tests {
         let controller = Arc::new(Controller::new(db, Presenter::default()));
         let req = Request {
             title: ["t"; 100].join(""),
+            areas_of_life: vec![],
         };
         let res = handle(req, controller).await.unwrap().into_response();
 

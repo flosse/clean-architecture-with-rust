@@ -27,7 +27,7 @@ mod thought {
             self.thoughts
                 .write()
                 .unwrap()
-                .insert(record.thought.id, record);
+                .insert(record.thought.id(), record);
             Ok(())
         }
         fn get(&self, id: Id) -> Result<Record, GetError> {

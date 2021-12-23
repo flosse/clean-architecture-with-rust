@@ -1,9 +1,12 @@
 use crate::{
-    model::app::thought::{self as app, Id},
+    model::app::{
+        area_of_life as aol,
+        thought::{self as app, Id},
+    },
     presenter::Present,
 };
 use application::{gateway::repository::thought::Repo, identifier::NewId, usecase::thought as uc};
-use std::sync::Arc;
+use std::{collections::HashSet, sync::Arc};
 
 pub struct Controller<D, P> {
     db: Arc<D>,
@@ -24,12 +27,25 @@ where
     pub fn create_thought(
         &self,
         title: impl Into<String>,
+        areas_of_life: &HashSet<String>,
     ) -> <P as Present<app::create::Result>>::ViewModel {
         let title = title.into();
         log::debug!("Create thought '{}'", title);
-        let req = app::create::Request { title };
-        let interactor = uc::create::CreateThought::new(&*self.db, &*self.db);
-        let res = interactor.exec(req);
+
+        let res: app::create::Result = areas_of_life
+            .iter()
+            .map(|id| id.parse())
+            .collect::<Result<HashSet<aol::Id>, _>>()
+            .map(|ids| ids.into_iter().map(Into::into).collect())
+            .map_err(Into::into)
+            .and_then(|areas_of_life: HashSet<_>| {
+                let req = app::create::Request {
+                    title,
+                    areas_of_life,
+                };
+                let interactor = uc::create::CreateThought::new(&*self.db, &*self.db);
+                interactor.exec(req).map_err(Into::into)
+            });
         self.presenter.present(res)
     }
     pub fn delete_thought(&self, id: &str) -> <P as Present<app::delete::Result>>::ViewModel {
