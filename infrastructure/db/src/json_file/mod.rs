@@ -1,7 +1,7 @@
 use adapter::db::Db;
 use application::identifier::NewIdError;
 use jfs::{Config, Store};
-use std::{collections::HashMap, io};
+use std::{collections::HashMap, io, path::Path};
 
 mod area_of_life;
 mod models;
@@ -19,15 +19,16 @@ pub struct JsonFile {
 }
 
 impl JsonFile {
-    pub fn try_new() -> Result<Self, io::Error> {
+    pub fn try_new<P: AsRef<Path>>(dir: P) -> Result<Self, io::Error> {
         let cfg = Config {
             single: true,
             pretty: true,
             ..Default::default()
         };
-        let thoughts = Store::new_with_cfg("thoughts", cfg)?;
-        let areas_of_life = Store::new_with_cfg("areas-of-life", cfg)?;
-        let ids = Store::new_with_cfg("ids", cfg)?;
+        let dir = dir.as_ref();
+        let thoughts = Store::new_with_cfg(dir.join("thoughts"), cfg)?;
+        let areas_of_life = Store::new_with_cfg(dir.join("areas-of-life"), cfg)?;
+        let ids = Store::new_with_cfg(dir.join("ids"), cfg)?;
         Ok(Self {
             thoughts,
             areas_of_life,
@@ -86,3 +87,53 @@ impl JsonFile {
 type StorageId = String;
 
 impl Db for JsonFile {}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn init() {
+        let _ = env_logger::builder().is_test(true).try_init();
+    }
+
+    mod area_of_life {
+        use super::*;
+        use domain::{
+            area_of_life::{AreaOfLife, Id as AolId, Name},
+            thought::{Id as ThoughtId, Thought, Title},
+        };
+        use std::collections::HashSet;
+        use tempdir::TempDir;
+
+        #[test]
+        fn delete_references_in_thoughts() {
+            use application::{
+                gateway::repository::{
+                    area_of_life::{Record as AolRecord, Repo as AolRepo},
+                    thought::{Record as ThoughtRecord, Repo as ThoughtRepo},
+                },
+                identifier::NewId,
+            };
+            // -- setup --
+            init();
+            let test_dir = TempDir::new("tests").unwrap();
+            log::debug!("Test directory: {}", test_dir.path().display());
+            let db = JsonFile::try_new(&test_dir).unwrap();
+            let aol_id = (&db as &dyn NewId<AolId>).new_id().unwrap();
+            let name = Name::new("test aol".to_string());
+            let area_of_life = AreaOfLife { id: aol_id, name };
+            let record = AolRecord { area_of_life };
+            (&db as &dyn AolRepo).save(record).unwrap();
+            let mut areas_of_life = HashSet::new();
+            areas_of_life.insert(aol_id);
+            let id = (&db as &dyn NewId<ThoughtId>).new_id().unwrap();
+            let thought = Thought::new(id, Title::new("foo".to_string()), areas_of_life);
+            let record = ThoughtRecord { thought };
+            (&db as &dyn ThoughtRepo).save(record).unwrap();
+            // -- test --
+            (&db as &dyn AolRepo).delete(aol_id).unwrap();
+            let rec = (&db as &dyn ThoughtRepo).get(id).unwrap();
+            assert!(rec.thought.areas_of_life().is_empty());
+        }
+    }
+}

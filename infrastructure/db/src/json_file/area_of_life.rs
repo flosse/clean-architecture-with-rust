@@ -1,13 +1,16 @@
 use super::*;
 use adapter::model::app::area_of_life as app;
 use application::{
-    gateway::repository::area_of_life::{
-        DeleteError, GetAllError, GetError, Record, Repo, SaveError,
+    gateway::repository::{
+        area_of_life::{DeleteError, GetAllError, GetError, Record, Repo, SaveError},
+        thought::Repo as ThoughtRepo,
     },
     identifier::{NewId, NewIdError},
 };
-use domain::area_of_life::Id;
-use domain::area_of_life::{AreaOfLife, Name};
+use domain::{
+    area_of_life::{AreaOfLife, Id, Name},
+    thought::Thought,
+};
 use std::io;
 
 impl NewId<Id> for JsonFile {
@@ -115,6 +118,27 @@ impl Repo for JsonFile {
                 DeleteError::Connection
             }
         })?;
+
+        let thoughts = (self as &dyn ThoughtRepo).get_all().map_err(|err| {
+            log::warn!("Unable to load thoughts: {}", err);
+            DeleteError::Connection
+        })?;
+
+        log::debug!("Delete area of life {id} from thoughts");
+        for mut rec in thoughts {
+            if rec.thought.areas_of_life().iter().any(|x| x == &id) {
+                log::debug!("Delete area of life {id} from {:?}", rec.thought);
+                let mut areas_of_life = rec.thought.areas_of_life().clone();
+                areas_of_life.retain(|x| x != &id);
+                let updated_thought =
+                    Thought::new(rec.thought.id(), rec.thought.title().clone(), areas_of_life);
+                rec.thought = updated_thought;
+                (self as &dyn ThoughtRepo).save(rec).map_err(|err| {
+                    log::warn!("Unable to save thought: {}", err);
+                    DeleteError::Connection
+                })?;
+            }
+        }
         Ok(())
     }
 }

@@ -9,6 +9,7 @@ pub fn run() {
         env::set_var("RUST_LOG", "info");
     }
     pretty_env_logger::init();
-    let db = JsonFile::try_new().expect("JSON file store");
+    let storage_dir = ".";
+    let db = JsonFile::try_new(storage_dir).expect("JSON file store");
     cli::run(db);
 }
