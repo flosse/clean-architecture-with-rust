@@ -11,3 +11,8 @@ serde = "1"
 
 [patch.crates-io]
 json-boundary = { path = "../adapter/json-boundary" }
+
+[profile.release]
+lto = true
+opt-level = 'z'
+codegen-units= 1

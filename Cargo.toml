@@ -26,3 +26,9 @@ db = { path = "infrastructure/db" }
 domain = { path = "domain" }
 infrastructure = { path = "infrastructure" }
 json-boundary = { path = "adapter/json-boundary" }
+
+[profile.release]
+lto = true
+opt-level = 3
+codegen-units = 1
+strip = true
