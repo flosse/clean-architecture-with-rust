@@ -2,25 +2,25 @@ use crate::web;
 use adapter::{
     controller::thought::Controller as ThoughtController, db::Db, presenter::cli::Presenter,
 };
+use clap::Parser;
 use std::{
     collections::HashSet,
     net::{IpAddr, SocketAddr},
     sync::Arc,
 };
-use structopt::StructOpt;
 use tokio::runtime::Runtime;
 
-#[derive(StructOpt)]
+#[derive(Parser)]
 enum Cmd {
-    #[structopt(about = "Create a new thought")]
+    #[clap(about = "Create a new thought")]
     Create { title: String },
-    #[structopt(about = "Read an specific thought")]
+    #[clap(about = "Read an specific thought")]
     Read { id: String },
-    #[structopt(about = "Run web service")]
+    #[clap(about = "Run web service")]
     Serve {
-        #[structopt(default_value = "127.0.0.1", help = "IP address", long)]
+        #[clap(default_value = "127.0.0.1", help = "IP address", long)]
         bind: IpAddr,
-        #[structopt(default_value = "3030", help = "TCP port", long)]
+        #[clap(default_value = "3030", help = "TCP port", long)]
         port: u16,
     },
 }
@@ -29,7 +29,7 @@ pub fn run<D>(db: D)
 where
     D: Db,
 {
-    let cmd = Cmd::from_args();
+    let cmd = Cmd::parse();
     let db = Arc::new(db);
     let presenter = Presenter::default();
 
