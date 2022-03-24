@@ -1,7 +1,10 @@
-use domain::area_of_life::{AreaOfLife, Name, NameConstraints};
+use domain::area_of_life::NameConstraints;
 use thiserror::Error;
 
-pub type Request = AreaOfLife;
+#[derive(Debug)]
+pub struct Request<'a> {
+    pub name: &'a str,
+}
 pub type Response = Result<(), AreaOfLifeInvalidity>;
 
 #[derive(Debug, Error)]
@@ -18,14 +21,14 @@ pub enum NameInvalidity {
     MaxLength { max: usize, actual: usize },
 }
 
-pub fn validate_area_of_life(area_of_life: &Request) -> Response {
-    log::debug!("Validate area of life {:?}", area_of_life);
-    validate_name(&area_of_life.name).map_err(AreaOfLifeInvalidity::Name)?;
+pub fn validate_area_of_life_properties(req: &Request) -> Response {
+    log::debug!("Validate area of life properties {:?}", req);
+    validate_name(req.name).map_err(AreaOfLifeInvalidity::Name)?;
     Ok(())
 }
 
-fn validate_name(name: &Name) -> Result<(), NameInvalidity> {
-    let actual = name.as_ref().len();
+fn validate_name(name: &str) -> Result<(), NameInvalidity> {
+    let actual = name.len();
     let min = NameConstraints::min_len();
 
     if actual < min {

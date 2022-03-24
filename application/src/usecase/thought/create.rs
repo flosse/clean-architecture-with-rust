@@ -1,7 +1,7 @@
 use crate::{
     gateway::repository::thought::{Record, Repo, SaveError},
     identifier::{NewId, NewIdError},
-    usecase::thought::validate::{validate_thought, ThoughtInvalidity},
+    usecase::thought::validate::{self, validate_thought_properties, ThoughtInvalidity},
 };
 use domain::{
     area_of_life as aol,
@@ -62,13 +62,13 @@ where
     /// Create a new thought with the given title.
     pub fn exec(&self, req: Request) -> Result<Response, Error> {
         log::debug!("Create new thought: {:?}", req);
+        validate_thought_properties(&validate::Request { title: &req.title })?;
         let title = Title::new(req.title);
         let id = self.id_gen.new_id().map_err(|err| {
             log::warn!("{}", err);
             Error::NewId
         })?;
         let thought = Thought::new(id, title, req.areas_of_life);
-        validate_thought(&thought)?;
         let record = Record { thought };
         self.repo.save(record)?;
         Ok(Response { id })

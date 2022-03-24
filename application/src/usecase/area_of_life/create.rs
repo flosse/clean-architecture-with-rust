@@ -1,7 +1,9 @@
 use crate::{
     gateway::repository::area_of_life::{Record, Repo, SaveError},
     identifier::{NewId, NewIdError},
-    usecase::area_of_life::validate::{validate_area_of_life, AreaOfLifeInvalidity},
+    usecase::area_of_life::validate::{
+        self, validate_area_of_life_properties, AreaOfLifeInvalidity,
+    },
 };
 use domain::area_of_life::{AreaOfLife, Id, Name};
 use thiserror::Error;
@@ -56,13 +58,13 @@ where
     /// Create a new area of life with the given name.
     pub fn exec(&self, req: Request) -> Result<Response, Error> {
         log::debug!("Create new area of life: {:?}", req);
+        validate_area_of_life_properties(&validate::Request { name: &req.name })?;
         let name = Name::new(req.name);
         let id = self.id_gen.new_id().map_err(|err| {
             log::warn!("{}", err);
             Error::NewId
         })?;
         let area_of_life = AreaOfLife { id, name };
-        validate_area_of_life(&area_of_life)?;
         let record = Record { area_of_life };
         self.repo.save(record)?;
         Ok(Response { id })

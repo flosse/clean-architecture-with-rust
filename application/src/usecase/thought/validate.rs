@@ -1,7 +1,10 @@
-use domain::thought::{Thought, Title, TitleConstraints};
+use domain::thought::TitleConstraints;
 use thiserror::Error;
 
-pub type Request = Thought;
+#[derive(Debug)]
+pub struct Request<'a> {
+    pub title: &'a str,
+}
 pub type Response = Result<(), ThoughtInvalidity>;
 
 #[derive(Debug, Error)]
@@ -18,14 +21,14 @@ pub enum TitleInvalidity {
     MaxLength { max: usize, actual: usize },
 }
 
-pub fn validate_thought(thought: &Request) -> Response {
-    log::debug!("Validate thought {:?}", thought);
-    validate_title(thought.title()).map_err(ThoughtInvalidity::Title)?;
+pub fn validate_thought_properties(req: &Request) -> Response {
+    log::debug!("Validate thought properties {:?}", req);
+    validate_title(req.title).map_err(ThoughtInvalidity::Title)?;
     Ok(())
 }
 
-fn validate_title(title: &Title) -> Result<(), TitleInvalidity> {
-    let actual = title.as_ref().len();
+fn validate_title(title: &str) -> Result<(), TitleInvalidity> {
+    let actual = title.len();
     let min = TitleConstraints::min_len();
 
     if actual < min {
@@ -48,20 +51,19 @@ mod tests {
 
         #[test]
         fn should_have_min_3_chars() {
-            let title = Title::new("".to_string());
-            let res = validate_title(&title);
+            let res = validate_title("");
             assert!(matches!(
                 res.err().unwrap(),
                 TitleInvalidity::MinLength { min: 3, actual: 0 }
             ));
 
-            let title = Title::new(["a"; 3].join(""));
+            let title = ["a"; 3].join("");
             assert!(validate_title(&title).is_ok());
         }
 
         #[test]
         fn should_have_max_80_chars() {
-            let title = Title::new(["a"; 81].join(""));
+            let title = ["a"; 81].join("");
             let res = validate_title(&title);
             assert!(matches!(
                 res.err().unwrap(),
@@ -71,7 +73,7 @@ mod tests {
                 }
             ));
 
-            let title = Title::new(["a"; 80].join(""));
+            let title = ["a"; 80].join("");
             assert!(validate_title(&title).is_ok());
         }
     }
