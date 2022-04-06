@@ -1,14 +1,17 @@
-use crate::domain::AreaOfLifeId;
+use crate::domain::{AreaOfLifeId, ThoughtId};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Request {
+    pub id: ThoughtId,
     pub title: String,
     pub areas_of_life: Vec<AreaOfLifeId>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 pub enum Error {
+    Id,
+    NotFound(ThoughtId),
     AreaOfLifeId,
     TitleMinLength { min: usize, actual: usize },
     TitleMaxLength { max: usize, actual: usize },
@@ -18,14 +21,7 @@ pub enum Error {
 #[cfg(feature = "conversions")]
 mod conv {
     use super::*;
-    use crate::domain::ThoughtId;
-    use application::usecase::thought::{create as uc, validate};
-
-    impl From<uc::Response> for ThoughtId {
-        fn from(from: uc::Response) -> Self {
-            from.id.to_u64().into()
-        }
-    }
+    use application::usecase::thought::validate;
 
     impl From<validate::ThoughtInvalidity> for Error {
         fn from(from: validate::ThoughtInvalidity) -> Self {

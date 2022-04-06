@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use std::fmt;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Thought {
@@ -13,7 +14,7 @@ pub struct AreaOfLife {
     pub name: String,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct ThoughtId(pub u64);
 
 impl From<u64> for ThoughtId {
@@ -22,11 +23,23 @@ impl From<u64> for ThoughtId {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+impl fmt::Display for ThoughtId {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        self.0.fmt(f)
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct AreaOfLifeId(pub u64);
 
 impl From<u64> for AreaOfLifeId {
     fn from(id: u64) -> Self {
         Self(id)
+    }
+}
+
+impl fmt::Display for AreaOfLifeId {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        self.0.fmt(f)
     }
 }

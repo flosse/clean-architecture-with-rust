@@ -24,6 +24,7 @@ type Result<T> = std::result::Result<T, Error>;
 pub enum Msg {
     Page(page::Msg),
     CreateThoughtResult(Result<ThoughtId>),
+    UpdateThoughtResult(Result<()>),
     CreateAreaOfLifeResult(Result<AreaOfLifeId>),
     FindThoughtResult(Result<Thought>),
     FetchAllThoughtsResult(Result<Vec<Thought>>),
@@ -39,19 +40,19 @@ pub enum Msg {
 #[derive(Debug)]
 pub enum Cmd {
     CreateThought(String, Option<AreaOfLifeId>),
-    CreateAreaOfLife(String),
+    UpdateThought(Thought),
     DeleteThought(ThoughtId),
+    CreateAreaOfLife(String),
     DeleteAreaOfLife(AreaOfLifeId),
 }
 
 impl From<page::Cmd> for Cmd {
     fn from(cmd: page::Cmd) -> Self {
         match cmd {
-            page::Cmd::CreateThought(title, area_of_life) => {
-                Self::CreateThought(title, area_of_life)
-            }
-            page::Cmd::CreateAreaOfLife(name) => Self::CreateAreaOfLife(name),
+            page::Cmd::CreateThought(title, aol) => Self::CreateThought(title, aol),
+            page::Cmd::UpdateThought(thought) => Self::UpdateThought(thought),
             page::Cmd::DeleteThought(id) => Self::DeleteThought(id),
+            page::Cmd::CreateAreaOfLife(name) => Self::CreateAreaOfLife(name),
             page::Cmd::DeleteAreaOfLife(id) => Self::DeleteAreaOfLife(id),
         }
     }
@@ -65,6 +66,7 @@ pub fn update(msg: Msg, mdl: &mut Mdl) -> Option<Cmd> {
     let page_msg = match msg {
         Msg::Page(msg) => msg,
         Msg::CreateThoughtResult(res) => page::Msg::Home(page::home::Msg::CreateThoughtResult(res)),
+        Msg::UpdateThoughtResult(res) => page::Msg::Home(page::home::Msg::UpdateThoughtResult(res)),
         Msg::CreateAreaOfLifeResult(res) => {
             page::Msg::Home(page::home::Msg::CreateAreaOfLifeResult(res))
         }
@@ -87,6 +89,6 @@ pub fn update(msg: Msg, mdl: &mut Mdl) -> Option<Cmd> {
 //     View
 // ------ ------
 
-pub fn view(mdl: &Mdl) -> Node<Msg> {
+pub fn view(mdl: &Mdl) -> Vec<Node<Msg>> {
     page::view(&mdl.page).map_msg(Msg::Page)
 }

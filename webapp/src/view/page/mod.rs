@@ -34,6 +34,7 @@ pub enum Msg {
 #[derive(Debug)]
 pub enum Cmd {
     CreateThought(String, Option<AreaOfLifeId>),
+    UpdateThought(Thought),
     CreateAreaOfLife(String),
     DeleteThought(ThoughtId),
     DeleteAreaOfLife(AreaOfLifeId),
@@ -42,7 +43,10 @@ pub enum Cmd {
 impl From<home::Cmd> for Cmd {
     fn from(cmd: home::Cmd) -> Self {
         match cmd {
-            home::Cmd::CreateThought(title, area_of_lif) => Self::CreateThought(title, area_of_lif),
+            home::Cmd::CreateThought(title, area_of_life) => {
+                Self::CreateThought(title, area_of_life)
+            }
+            home::Cmd::UpdateThought(thought) => Self::UpdateThought(thought),
             home::Cmd::CreateAreaOfLife(name) => Self::CreateAreaOfLife(name),
             home::Cmd::DeleteThought(id) => Self::DeleteThought(id),
             home::Cmd::DeleteAreaOfLife(id) => Self::DeleteAreaOfLife(id),
@@ -67,7 +71,7 @@ pub fn update(msg: Msg, mdl: &mut Mdl) -> Option<Cmd> {
 //     View
 // ------ ------
 
-pub fn view(mdl: &Mdl) -> Node<Msg> {
+pub fn view(mdl: &Mdl) -> Vec<Node<Msg>> {
     match mdl {
         Mdl::Home(mdl) => home::view(mdl).map_msg(Msg::Home),
     }

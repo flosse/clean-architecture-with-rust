@@ -1,7 +1,13 @@
 use crate::{
-    gateway::repository::thought::{Record, Repo, SaveError},
+    gateway::repository::{
+        area_of_life,
+        thought::{self, Record, SaveError},
+    },
     identifier::{NewId, NewIdError},
-    usecase::thought::validate::{self, validate_thought_properties, ThoughtInvalidity},
+    usecase::{
+        area_of_life::check_existence::{self as check_aol, CheckAreasOfLifeExistence},
+        thought::validate::{self, validate_thought_properties, ThoughtInvalidity},
+    },
 };
 use domain::{
     area_of_life as aol,
@@ -44,6 +50,8 @@ pub enum Error {
     NewId,
     #[error(transparent)]
     Invalidity(#[from] ThoughtInvalidity),
+    #[error("Areas of life {0:?} not found")]
+    AreasOfLifeNotFound(HashSet<aol::Id>),
 }
 
 impl From<SaveError> for Error {
@@ -54,15 +62,26 @@ impl From<SaveError> for Error {
     }
 }
 
+impl From<check_aol::Error> for Error {
+    fn from(e: check_aol::Error) -> Self {
+        use check_aol::Error as E;
+        match e {
+            E::Repo => Error::Repo,
+            E::NotFound(aol_ids) => Error::AreasOfLifeNotFound(aol_ids),
+        }
+    }
+}
+
 impl<'r, 'g, R, G> CreateThought<'r, 'g, R, G>
 where
-    R: Repo,
+    R: thought::Repo + area_of_life::Repo,
     G: NewId<Id>,
 {
     /// Create a new thought with the given title.
     pub fn exec(&self, req: Request) -> Result<Response, Error> {
         log::debug!("Create new thought: {:?}", req);
         validate_thought_properties(&validate::Request { title: &req.title })?;
+        CheckAreasOfLifeExistence::new(self.repo).exec(&req.areas_of_life)?;
         let title = Title::new(req.title);
         let id = self.id_gen.new_id().map_err(|err| {
             log::warn!("{}", err);
@@ -70,7 +89,7 @@ where
         })?;
         let thought = Thought::new(id, title, req.areas_of_life);
         let record = Record { thought };
-        self.repo.save(record)?;
+        thought::Repo::save(self.repo, record)?;
         Ok(Response { id })
     }
 }
@@ -86,7 +105,7 @@ mod tests {
         thought: RwLock<Option<Record>>,
     }
 
-    impl Repo for MockRepo {
+    impl thought::Repo for MockRepo {
         fn save(&self, record: Record) -> Result<(), SaveError> {
             *self.thought.write().unwrap() = Some(record);
             Ok(())
@@ -98,6 +117,21 @@ mod tests {
             todo!()
         }
         fn delete(&self, _: Id) -> Result<(), DeleteError> {
+            todo!()
+        }
+    }
+
+    impl area_of_life::Repo for MockRepo {
+        fn save(&self, _: area_of_life::Record) -> Result<(), area_of_life::SaveError> {
+            todo!()
+        }
+        fn get(&self, _: aol::Id) -> Result<area_of_life::Record, area_of_life::GetError> {
+            todo!()
+        }
+        fn get_all(&self) -> Result<Vec<area_of_life::Record>, area_of_life::GetAllError> {
+            todo!()
+        }
+        fn delete(&self, _: aol::Id) -> Result<(), area_of_life::DeleteError> {
             todo!()
         }
     }

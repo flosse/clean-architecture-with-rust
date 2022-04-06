@@ -13,6 +13,16 @@ impl Present<app::create::Result> for Presenter {
     }
 }
 
+impl Present<app::update::Result> for Presenter {
+    type ViewModel = String;
+    fn present(&self, result: app::update::Result) -> Self::ViewModel {
+        match result {
+            Ok(_) => "Updated thought".to_string(),
+            Err(err) => format!("Undable to update thought: {}", err),
+        }
+    }
+}
+
 impl Present<app::find_by_id::Result> for Presenter {
     type ViewModel = String;
     fn present(&self, result: app::find_by_id::Result) -> Self::ViewModel {

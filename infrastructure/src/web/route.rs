@@ -23,6 +23,14 @@ where
         .and(with_controller(thought_controller.clone()))
         .and_then(handler::thought::create::handle);
 
+    // PUT /api/thought/<ID>
+    let put_thought = warp::put()
+        .and(path!(String))
+        .and(path::end())
+        .and(body::json())
+        .and(with_controller(thought_controller.clone()))
+        .and_then(handler::thought::update::handle);
+
     // GET /api/thought
     let get_thoughts = warp::get()
         .and(path::end())
@@ -66,6 +74,7 @@ where
     let base_path = path("api");
     let thought = path("thought").and(
         post_thought
+            .or(put_thought)
             .or(get_thoughts)
             .or(get_thought)
             .or(delete_thought),

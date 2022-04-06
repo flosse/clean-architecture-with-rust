@@ -1,5 +1,6 @@
 use crate::{domain::*, view::new_area_of_life_dialog as new_aol_dialog};
 use seed::{prelude::*, *};
+use std::collections::HashMap;
 
 const CLEAN_ARCH_BLOG_URL: &str =
     "https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html";
@@ -10,14 +11,17 @@ const CLEAN_ARCH_BLOG_URL: &str =
 
 #[derive(Debug, Default)]
 pub struct Mdl {
-    thoughts: Vec<Thought>,
+    thoughts: HashMap<ThoughtId, Thought>,
     areas_of_life: Vec<AreaOfLife>,
     input: String,
+    title_input: String,
+    title_input_el: ElRef<web_sys::HtmlInputElement>,
     input_error: Option<String>,
     error: Option<String>,
     wait_for_deletion: Option<ThoughtId>,
     wait: bool,
     new_aol_dialog: new_aol_dialog::Mdl,
+    current_thought: Option<ThoughtId>,
     current_aol: Option<AreaOfLifeId>,
 }
 
@@ -25,21 +29,27 @@ pub struct Mdl {
 //    Message
 // ------ ------
 
+type Result<T> = std::result::Result<T, String>;
+
 #[derive(Debug)]
 pub enum Msg {
     InputChanged(String),
+    TitleChanged(String),
+    CancleTitleEdit,
+    SelectRequest(ThoughtId),
     DeleteRequest(ThoughtId),
     SelectAreaOfLife(AreaOfLifeId),
     DeselectAreaOfLife,
     DeleteAreaOfLife(AreaOfLifeId),
     CreateRequest,
-    CreateThoughtResult(Result<ThoughtId, String>),
-    CreateAreaOfLifeResult(Result<AreaOfLifeId, String>),
-    FindThoughtResult(Result<Thought, String>),
-    FetchAllThoughtsResult(Result<Vec<Thought>, String>),
-    FetchAllAreasOfLifeResult(Result<Vec<AreaOfLife>, String>),
-    DeleteThoughtResult(Result<ThoughtId, String>),
-    DeleteAreaOfLifeResult(Result<AreaOfLifeId, String>),
+    CreateThoughtResult(Result<ThoughtId>),
+    UpdateThoughtResult(Result<()>),
+    CreateAreaOfLifeResult(Result<AreaOfLifeId>),
+    FindThoughtResult(Result<Thought>),
+    FetchAllThoughtsResult(Result<Vec<Thought>>),
+    FetchAllAreasOfLifeResult(Result<Vec<AreaOfLife>>),
+    DeleteThoughtResult(Result<ThoughtId>),
+    DeleteAreaOfLifeResult(Result<AreaOfLifeId>),
     ShowNewAreaOfLifeDialog,
     NewAOLDialog(new_aol_dialog::Msg),
 }
@@ -51,8 +61,9 @@ pub enum Msg {
 #[derive(Debug)]
 pub enum Cmd {
     CreateThought(String, Option<AreaOfLifeId>),
-    CreateAreaOfLife(String),
+    UpdateThought(Thought),
     DeleteThought(ThoughtId),
+    CreateAreaOfLife(String),
     DeleteAreaOfLife(AreaOfLifeId),
 }
 
@@ -66,12 +77,43 @@ pub fn update(msg: Msg, mdl: &mut Mdl) -> Option<Cmd> {
             mdl.input_error = None;
             mdl.input = s;
         }
+        Msg::TitleChanged(title) => {
+            mdl.title_input = title.clone();
+            if let Some(id) = &mdl.current_thought {
+                if let Some(thought) = mdl.thoughts.get_mut(id) {
+                    let updated = Thought {
+                        id: thought.id,
+                        title,
+                        areas_of_life: thought.areas_of_life.clone(),
+                    };
+                    let cmd = Cmd::UpdateThought(updated);
+                    return Some(cmd);
+                }
+            }
+        }
+        Msg::CancleTitleEdit => {
+            mdl.title_input = mdl
+                .current_thought
+                .and_then(|id| mdl.thoughts.get(&id).map(|t| t.title.clone()))
+                .unwrap_or_default();
+            if let Some(el) = mdl.title_input_el.get() {
+                el.blur().expect("Unable to blur input element");
+            }
+        }
         Msg::CreateRequest => {
             if !mdl.input.is_empty() {
-                let cmd = Cmd::CreateThought(mdl.input.clone(), mdl.current_aol.clone());
+                let cmd = Cmd::CreateThought(mdl.input.clone(), mdl.current_aol);
                 mdl.wait = true;
                 return Some(cmd);
             }
+        }
+        Msg::SelectRequest(id) => {
+            mdl.title_input = mdl
+                .thoughts
+                .get(&id)
+                .map(|t| t.title.clone())
+                .unwrap_or_default();
+            mdl.current_thought = Some(id);
         }
         Msg::DeleteRequest(id) => {
             let cmd = Cmd::DeleteThought(id);
@@ -91,7 +133,7 @@ pub fn update(msg: Msg, mdl: &mut Mdl) -> Option<Cmd> {
             mdl.error = Some(err);
         }
         Msg::FindThoughtResult(Ok(thought)) => {
-            mdl.thoughts.push(thought);
+            mdl.thoughts.insert(thought.id, thought);
         }
         Msg::CreateThoughtResult(res) => {
             mdl.wait = false;
@@ -106,6 +148,12 @@ pub fn update(msg: Msg, mdl: &mut Mdl) -> Option<Cmd> {
                 }
             }
         }
+        Msg::UpdateThoughtResult(res) => {
+            mdl.error = match res {
+                Ok(_) => None,
+                Err(err) => Some(err),
+            };
+        }
         Msg::CreateAreaOfLifeResult(res) => {
             mdl.new_aol_dialog.wait = false;
             match res {
@@ -119,7 +167,7 @@ pub fn update(msg: Msg, mdl: &mut Mdl) -> Option<Cmd> {
         }
         Msg::FetchAllThoughtsResult(res) => match res {
             Ok(thoughts) => {
-                mdl.thoughts = thoughts;
+                mdl.thoughts = thoughts.into_iter().map(|t| (t.id, t)).collect();
             }
             Err(err) => {
                 mdl.error = Some(err);
@@ -135,7 +183,7 @@ pub fn update(msg: Msg, mdl: &mut Mdl) -> Option<Cmd> {
         },
         Msg::DeleteThoughtResult(res) => match res {
             Ok(id) => {
-                mdl.thoughts.retain(|t| t.id != id);
+                mdl.thoughts.remove(&id);
             }
             Err(err) => {
                 mdl.error = Some(err);
@@ -169,18 +217,18 @@ pub fn update(msg: Msg, mdl: &mut Mdl) -> Option<Cmd> {
 //     View
 // ------ ------
 
-pub fn view(mdl: &Mdl) -> Node<Msg> {
-    div![
+pub fn view(mdl: &Mdl) -> Vec<Node<Msg>> {
+    vec![
         header(),
-        div![
-            main_sidebar(mdl),
-            main(mdl),
-            new_aol_dialog::view(&mdl.new_aol_dialog).map_msg(Msg::NewAOLDialog)
-        ]
+        main_sidebar(mdl),
+        main(mdl),
+        edit_sidebar(mdl),
+        new_aol_dialog::view(&mdl.new_aol_dialog).map_msg(Msg::NewAOLDialog),
     ]
 }
 
 fn main(mdl: &Mdl) -> Node<Msg> {
+    let thoughts = mdl.thoughts.values().collect::<Vec<_>>();
     main![
         id!["main"],
         error_message(mdl),
@@ -188,9 +236,8 @@ fn main(mdl: &Mdl) -> Node<Msg> {
             C!["section"],
             div![
                 C!["container"],
-                header(),
                 new_thought_input(mdl),
-                thoughts_list(&mdl.thoughts, &mdl.wait_for_deletion, &mdl.current_aol)
+                thoughts_list(&thoughts, &mdl.wait_for_deletion, &mdl.current_aol)
             ]
         ],
     ]
@@ -234,6 +281,31 @@ fn main_sidebar(mdl: &Mdl) -> Node<Msg> {
     ]
 }
 
+fn edit_sidebar(mdl: &Mdl) -> Node<Msg> {
+    aside![
+        id!["edit-sidebar"],
+        div![
+            C!["field"],
+            div![
+                C!["control"],
+                input![
+                    C!["input"],
+                    el_ref(&mdl.title_input_el),
+                    input_ev(Ev::Input, Msg::TitleChanged),
+                    keyboard_ev(Ev::KeyUp, |ev| {
+                        if ev.key() == "Escape" {
+                            ev.prevent_default();
+                            return Some(Msg::CancleTitleEdit);
+                        }
+                        None
+                    }),
+                    attrs! { At::Value => &mdl.title_input }
+                ]
+            ]
+        ]
+    ]
+}
+
 fn aol_list(mdl: &Mdl) -> Node<Msg> {
     if mdl.areas_of_life.is_empty() {
         p![
@@ -249,16 +321,16 @@ fn aol_list(mdl: &Mdl) -> Node<Msg> {
                 "All"
             ],
             mdl.areas_of_life.iter().map(|aol| {
-                let sel_id = aol.id.clone();
-                let del_id = aol.id.clone();
+                let sel_id = aol.id;
+                let del_id = aol.id;
                 let active = mdl.current_aol.as_ref() == Some(&aol.id);
                 li![
                     C![IF!( active => "active")],
-                    ev(Ev::Click, |_| Msg::SelectAreaOfLife(sel_id)),
+                    ev(Ev::Click, move |_| Msg::SelectAreaOfLife(sel_id)),
                     &aol.name,
                     button![
                         C!["button"],
-                        ev(Ev::Click, |_| Msg::DeleteAreaOfLife(del_id)),
+                        ev(Ev::Click, move |_| Msg::DeleteAreaOfLife(del_id)),
                         span![
                             C!["icon", "is-right", "is-small"],
                             i![C!["fas", "fa-minus-circle"]]
@@ -345,7 +417,7 @@ fn new_thought_input(mdl: &Mdl) -> Node<Msg> {
 }
 
 fn thoughts_list(
-    thoughts: &[Thought],
+    thoughts: &[&Thought],
     wait_for_deletion: &Option<ThoughtId>,
     aol: &Option<AreaOfLifeId>,
 ) -> Node<Msg> {
@@ -376,24 +448,25 @@ fn thoughts_list(
 }
 
 fn thought(t: &Thought, wait_for_deletion: bool) -> Node<Msg> {
-    let id = t.id.clone();
+    let sel_id = t.id;
+    let del_id = t.id;
     div![
         C!["level"],
+        ev(Ev::Click, move |_| Msg::SelectRequest(sel_id)),
         div![C!["level-left"], div![C!["level-item"], &t.title]],
         div![
             C!["level-right"],
             div![
                 C!["level-item"],
                 button![
-                    ev(Ev::Click, |_| Msg::DeleteRequest(id)),
-                    C!["button", "is-danger"],
+                    ev(Ev::Click, move |_| Msg::DeleteRequest(del_id)),
+                    C!["button", "is-small", "is-danger"],
                     if wait_for_deletion {
                         C!["is-loading"]
                     } else {
                         C![]
                     },
                     span![C!["icon"], i![C!["fa", "fa-trash-alt"],]],
-                    span!["delete"]
                 ]
             ]
         ]

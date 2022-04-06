@@ -6,6 +6,12 @@ use thiserror::Error;
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Id(u64);
 
+impl Id {
+    pub const fn to_u64(self) -> u64 {
+        self.0
+    }
+}
+
 impl From<aol::Id> for Id {
     fn from(id: aol::Id) -> Self {
         Self(id.to_u64())

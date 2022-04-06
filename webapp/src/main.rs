@@ -27,6 +27,7 @@ type Result<T> = std::result::Result<T, Error>;
 pub enum Msg {
     View(view::Msg),
     CreateThoughtResult(Result<ThoughtId>),
+    UpdateThoughtResult(ThoughtId, Result<()>),
     CreateAreaOfLifeResult(Result<AreaOfLifeId>),
     FetchAllThoughtsResult(Result<Vec<Thought>>),
     FetchAllAreasOfLifeResult(Result<Vec<AreaOfLife>>),
@@ -47,6 +48,9 @@ fn update(msg: Msg, mdl: &mut Mdl, orders: &mut impl Orders<Msg>) {
                     view::Cmd::CreateThought(title, areas_of_life) => {
                         orders.perform_cmd(create_thought(title, areas_of_life));
                     }
+                    view::Cmd::UpdateThought(thought) => {
+                        orders.perform_cmd(update_thought(thought));
+                    }
                     view::Cmd::CreateAreaOfLife(name) => {
                         orders.perform_cmd(create_area_of_life(name));
                     }
@@ -61,9 +65,15 @@ fn update(msg: Msg, mdl: &mut Mdl, orders: &mut impl Orders<Msg>) {
         }
         Msg::CreateThoughtResult(res) => {
             if let Ok(id) = &res {
-                orders.perform_cmd(find_thought_by_id(id.clone()));
+                orders.perform_cmd(find_thought_by_id(*id));
             }
             let msg = view::Msg::CreateThoughtResult(res);
+            view::update(msg, &mut mdl.view);
+        }
+        Msg::UpdateThoughtResult(id, res) => {
+            // Re-fetch the thought
+            orders.perform_cmd(find_thought_by_id(id));
+            let msg = view::Msg::UpdateThoughtResult(res);
             view::update(msg, &mut mdl.view);
         }
         Msg::CreateAreaOfLifeResult(res) => {
@@ -102,6 +112,12 @@ async fn create_thought(title: String, area_of_life: Option<AreaOfLifeId>) -> Ms
     let areas_of_life = area_of_life.map(|id| vec![id]).unwrap_or_default();
     let res = usecase::thought::create(title, areas_of_life).await;
     Msg::CreateThoughtResult(res)
+}
+
+async fn update_thought(thought: Thought) -> Msg {
+    let id = thought.id;
+    let res = usecase::thought::update(thought).await;
+    Msg::UpdateThoughtResult(id, res)
 }
 
 async fn fetch_all_thoughts() -> Msg {
@@ -148,7 +164,7 @@ fn init(_: Url, orders: &mut impl Orders<Msg>) -> Mdl {
 //     View
 // ------ ------
 
-fn view(mdl: &Mdl) -> Node<Msg> {
+fn view(mdl: &Mdl) -> impl IntoNodes<Msg> {
     view::view(&mdl.view).map_msg(Msg::View)
 }
 

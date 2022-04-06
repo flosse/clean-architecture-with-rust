@@ -10,7 +10,10 @@ pub struct Presenter;
 
 mod thought {
     use super::*;
-    use crate::model::{app::thought as app, view::json::thought as view};
+    use crate::model::{
+        app::thought as app,
+        view::json::{area_of_life::AreaOfLifeId, thought as view},
+    };
 
     // -- Create -- //
 
@@ -35,9 +38,61 @@ mod thought {
                             status: StatusCode::BAD_REQUEST,
                             details: Some(view::create::Error::from(invalidity)),
                         },
+                        E::AreasOfLifeNotFound(ref ids) => Error {
+                            msg: Some(err.to_string()),
+                            status: StatusCode::BAD_REQUEST,
+                            details: Some(view::create::Error::AreasOfLifeNotFound(
+                                ids.clone().into_iter().map(AreaOfLifeId::from).collect(),
+                            )),
+                        },
                         E::Repo | E::NewId => Error::internal(),
                     }
                 })
+        }
+    }
+
+    // -- Update -- //
+
+    impl Present<app::update::Result> for Presenter {
+        type ViewModel = Result<(), view::update::Error>;
+        fn present(&self, res: app::update::Result) -> Self::ViewModel {
+            res.map(|_| Response {
+                data: None,
+                status: StatusCode::OK,
+            })
+            .map_err(|err| {
+                use app::update::Error as E;
+                match err {
+                    E::Id => Error {
+                        msg: Some(err.to_string()),
+                        status: StatusCode::BAD_REQUEST,
+                        details: Some(view::update::Error::Id),
+                    },
+                    E::NotFound(id) => Error {
+                        msg: Some(err.to_string()),
+                        status: StatusCode::NOT_FOUND,
+                        details: Some(view::update::Error::NotFound(id.into())),
+                    },
+                    E::AreaOfLifeId => Error {
+                        msg: Some(err.to_string()),
+                        status: StatusCode::BAD_REQUEST,
+                        details: Some(view::update::Error::AreaOfLifeId),
+                    },
+                    E::Invalidity(invalidity) => Error {
+                        msg: Some(invalidity.to_string()),
+                        status: StatusCode::BAD_REQUEST,
+                        details: Some(view::update::Error::from(invalidity)),
+                    },
+                    E::AreasOfLifeNotFound(ref ids) => Error {
+                        msg: Some(err.to_string()),
+                        status: StatusCode::BAD_REQUEST,
+                        details: Some(view::update::Error::AreasOfLifeNotFound(
+                            ids.clone().into_iter().map(AreaOfLifeId::from).collect(),
+                        )),
+                    },
+                    E::Repo => Error::internal(),
+                }
+            })
         }
     }
 

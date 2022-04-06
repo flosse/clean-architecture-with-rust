@@ -5,7 +5,7 @@ use crate::{
     },
     presenter::Present,
 };
-use application::{gateway::repository::thought::Repo, identifier::NewId, usecase::thought as uc};
+use application::{gateway::repository as repo, identifier::NewId, usecase::thought as uc};
 use std::{collections::HashSet, sync::Arc};
 
 pub struct Controller<D, P> {
@@ -15,11 +15,12 @@ pub struct Controller<D, P> {
 
 impl<D, P> Controller<D, P>
 where
-    D: Repo + 'static + NewId<domain::thought::Id>,
+    D: repo::thought::Repo + repo::area_of_life::Repo + 'static + NewId<domain::thought::Id>,
     P: Present<app::create::Result>
         + Present<app::delete::Result>
         + Present<app::find_by_id::Result>
-        + Present<app::read_all::Result>,
+        + Present<app::read_all::Result>
+        + Present<app::update::Result>,
 {
     pub fn new(db: Arc<D>, presenter: P) -> Self {
         Self { db, presenter }
@@ -31,12 +32,7 @@ where
     ) -> <P as Present<app::create::Result>>::ViewModel {
         let title = title.into();
         log::debug!("Create thought '{}'", title);
-
-        let res: app::create::Result = areas_of_life
-            .iter()
-            .map(|id| id.parse())
-            .collect::<Result<HashSet<aol::Id>, _>>()
-            .map(|ids| ids.into_iter().map(Into::into).collect())
+        let res = parse_area_of_life_ids(areas_of_life)
             .map_err(Into::into)
             .and_then(|areas_of_life: HashSet<_>| {
                 let req = app::create::Request {
@@ -45,6 +41,32 @@ where
                 };
                 let interactor = uc::create::CreateThought::new(&*self.db, &*self.db);
                 interactor.exec(req).map_err(Into::into)
+            });
+        self.presenter.present(res)
+    }
+    pub fn update_thought(
+        &self,
+        id: &str,
+        title: impl Into<String>,
+        areas_of_life: &HashSet<String>,
+    ) -> <P as Present<app::update::Result>>::ViewModel {
+        let title = title.into();
+        log::debug!("Update thought '{:?}'", id);
+        let res = id
+            .parse::<Id>()
+            .map_err(|_| app::update::Error::Id)
+            .and_then(|id| {
+                parse_area_of_life_ids(areas_of_life)
+                    .map_err(Into::into)
+                    .and_then(|areas_of_life: HashSet<_>| {
+                        let req = app::update::Request {
+                            id: id.into(),
+                            title,
+                            areas_of_life,
+                        };
+                        let interactor = uc::update::UpdateThought::new(&*self.db);
+                        interactor.exec(req).map_err(Into::into)
+                    })
             });
         self.presenter.present(res)
     }
@@ -92,4 +114,14 @@ where
         let res = interactor.exec(app::read_all::Request {});
         self.presenter.present(res)
     }
+}
+
+fn parse_area_of_life_ids(
+    areas_of_life: &HashSet<String>,
+) -> Result<HashSet<domain::area_of_life::Id>, aol::ParseIdError> {
+    areas_of_life
+        .iter()
+        .map(|id| id.parse())
+        .collect::<Result<HashSet<aol::Id>, _>>()
+        .map(|ids| ids.into_iter().map(Into::into).collect())
 }
