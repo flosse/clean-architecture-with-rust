@@ -22,7 +22,7 @@ impl<E: fmt::Debug> Present<api::Error<E>> for ErrorPresenter {
         use seed::fetch::FetchError as F;
         match err {
             api::Error::Fetch(e) => match e {
-                F::RequestError(_) | F::StatusError(_) | F::PromiseError(_) | F::SerdeError(_) => {
+                F::RequestError(_) | F::StatusError(_) | F::PromiseError(_) | F::JsonError(_) => {
                     "A communication problem with the server has occured".to_string()
                 }
                 F::DomException(e) => {

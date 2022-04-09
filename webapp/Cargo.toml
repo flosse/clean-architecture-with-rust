@@ -6,7 +6,7 @@ publish = false
 
 [dependencies]
 json-boundary = "*"
-seed = "*"
+seed = { version = "*", features = ["serde-wasm-bindgen"] }
 serde = "1"
 
 [patch.crates-io]
