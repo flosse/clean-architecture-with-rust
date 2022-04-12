@@ -16,7 +16,10 @@ pub struct Controller<D, P> {
 impl<D, P> Controller<D, P>
 where
     D: Repo + 'static + NewId<aol::Id>,
-    P: Present<app::create::Result> + Present<app::delete::Result> + Present<app::read_all::Result>,
+    P: Present<app::create::Result>
+        + Present<app::delete::Result>
+        + Present<app::read_all::Result>
+        + Present<app::update::Result>,
 {
     pub fn new(db: Arc<D>, presenter: P) -> Self {
         Self { db, presenter }
@@ -30,6 +33,26 @@ where
         let req = app::create::Request { name };
         let interactor = uc::create::CreateAreaOfLife::new(&*self.db, &*self.db);
         let res = interactor.exec(req);
+        self.presenter.present(res)
+    }
+    pub fn update_area_of_life(
+        &self,
+        id: &str,
+        name: impl Into<String>,
+    ) -> <P as Present<app::update::Result>>::ViewModel {
+        let name = name.into();
+        log::debug!("Update area of life '{:?}'", id);
+        let res = id
+            .parse::<Id>()
+            .map_err(|_| app::update::Error::Id)
+            .and_then(|id| {
+                let req = app::update::Request {
+                    id: id.into(),
+                    name,
+                };
+                let interactor = uc::update::UpdateAreaOfLife::new(&*self.db);
+                interactor.exec(req).map_err(Into::into)
+            });
         self.presenter.present(res)
     }
     pub fn delete_area_of_life(&self, id: &str) -> <P as Present<app::delete::Result>>::ViewModel {

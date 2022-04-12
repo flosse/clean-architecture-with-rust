@@ -13,6 +13,7 @@ const CLEAN_ARCH_BLOG_URL: &str =
 pub struct Mdl {
     thoughts: HashMap<ThoughtId, Thought>,
     areas_of_life: Vec<AreaOfLife>,
+    areas_of_life_edits: HashMap<AreaOfLifeId, AreaOfLife>,
     input: String,
     title_input: String,
     title_input_el: ElRef<web_sys::HtmlInputElement>,
@@ -23,6 +24,7 @@ pub struct Mdl {
     new_aol_dialog: new_aol_dialog::Mdl,
     current_thought: Option<ThoughtId>,
     current_aol: Option<AreaOfLifeId>,
+    edit_areas_of_life: bool,
 }
 
 // ------ ------
@@ -33,24 +35,31 @@ type Result<T> = std::result::Result<T, String>;
 
 #[derive(Debug)]
 pub enum Msg {
+    // -- Thought -- //
     InputChanged(String),
     TitleChanged(String),
     CancleTitleEdit,
     SelectRequest(ThoughtId),
     DeleteRequest(ThoughtId),
+    CreateRequest,
+    DeleteThoughtResult(Result<ThoughtId>),
+    FindThoughtResult(Result<Thought>),
+    FetchAllThoughtsResult(Result<Vec<Thought>>),
+    CreateThoughtResult(Result<ThoughtId>),
+    UpdateThoughtResult(Result<()>),
+    // -- Area of Life -- //
+    AreaOfLifeNameChanged(AreaOfLifeId, String),
+    CancleAreaOfLifeNameEdit(AreaOfLifeId),
     SelectAreaOfLife(AreaOfLifeId),
     DeselectAreaOfLife,
     DeleteAreaOfLife(AreaOfLifeId),
-    CreateRequest,
-    CreateThoughtResult(Result<ThoughtId>),
-    UpdateThoughtResult(Result<()>),
+    UpdateAreaOfLifeName(AreaOfLifeId),
     CreateAreaOfLifeResult(Result<AreaOfLifeId>),
-    FindThoughtResult(Result<Thought>),
-    FetchAllThoughtsResult(Result<Vec<Thought>>),
     FetchAllAreasOfLifeResult(Result<Vec<AreaOfLife>>),
-    DeleteThoughtResult(Result<ThoughtId>),
     DeleteAreaOfLifeResult(Result<AreaOfLifeId>),
+    UpdateAreaOfLifeResult(Result<()>),
     ShowNewAreaOfLifeDialog,
+    EditAreasOfLife(bool),
     NewAOLDialog(new_aol_dialog::Msg),
 }
 
@@ -60,11 +69,16 @@ pub enum Msg {
 
 #[derive(Debug)]
 pub enum Cmd {
+    // -- Thought -- //
     CreateThought(String, Option<AreaOfLifeId>),
     UpdateThought(Thought),
     DeleteThought(ThoughtId),
+    // -- Area of Life -- //
+    UpdateAreaOfLife(AreaOfLife),
     CreateAreaOfLife(String),
     DeleteAreaOfLife(AreaOfLifeId),
+    // -- Misc -- //
+    SendMessages(Vec<Msg>),
 }
 
 // ------ ------
@@ -89,6 +103,23 @@ pub fn update(msg: Msg, mdl: &mut Mdl) -> Option<Cmd> {
                     let cmd = Cmd::UpdateThought(updated);
                     return Some(cmd);
                 }
+            }
+        }
+        Msg::AreaOfLifeNameChanged(id, name) => {
+            if let Some(original_aol) = mdl.areas_of_life.iter_mut().find(|aol| aol.id == id) {
+                mdl.areas_of_life_edits
+                    .entry(id)
+                    .or_insert_with(|| original_aol.clone())
+                    .name = name;
+            }
+        }
+        Msg::CancleAreaOfLifeNameEdit(id) => {
+            mdl.areas_of_life_edits.remove(&id);
+        }
+        Msg::UpdateAreaOfLifeName(id) => {
+            if let Some(aol) = mdl.areas_of_life_edits.get(&id) {
+                let cmd = Cmd::UpdateAreaOfLife(aol.clone());
+                return Some(cmd);
             }
         }
         Msg::CancleTitleEdit => {
@@ -158,7 +189,8 @@ pub fn update(msg: Msg, mdl: &mut Mdl) -> Option<Cmd> {
             mdl.new_aol_dialog.wait = false;
             match res {
                 Ok(_) => {
-                    new_aol_dialog::update(new_aol_dialog::Msg::Cancel, &mut mdl.new_aol_dialog);
+                    let msg = Msg::NewAOLDialog(new_aol_dialog::Msg::Cancel);
+                    return Some(Cmd::SendMessages(vec![msg]));
                 }
                 Err(err) => {
                     mdl.new_aol_dialog.error = Some(err);
@@ -191,12 +223,26 @@ pub fn update(msg: Msg, mdl: &mut Mdl) -> Option<Cmd> {
         },
         Msg::DeleteAreaOfLifeResult(res) => match res {
             Ok(id) => {
+                if mdl.current_aol == Some(id) {
+                    mdl.current_aol = None;
+                }
                 mdl.areas_of_life.retain(|a| a.id != id);
             }
             Err(err) => {
                 mdl.error = Some(err);
             }
         },
+        Msg::UpdateAreaOfLifeResult(res) => {
+            if let Err(err) = res {
+                mdl.error = Some(err);
+            }
+        }
+        Msg::EditAreasOfLife(edit) => {
+            if !edit {
+                mdl.areas_of_life_edits.clear();
+            }
+            mdl.edit_areas_of_life = edit;
+        }
         Msg::ShowNewAreaOfLifeDialog => {
             mdl.new_aol_dialog.active = true;
         }
@@ -260,6 +306,7 @@ fn error_message<M>(mdl: &Mdl) -> Node<M> {
 }
 
 fn main_sidebar(mdl: &Mdl) -> Node<Msg> {
+    let aol_edit = mdl.edit_areas_of_life;
     aside![
         id!["main-sidebar"],
         nav![
@@ -268,11 +315,16 @@ fn main_sidebar(mdl: &Mdl) -> Node<Msg> {
                 C!["menu-label"],
                 "Areas of Life",
                 button![
-                    ev(Ev::Click, |_| Msg::ShowNewAreaOfLifeDialog),
+                    ev(Ev::Click, move |_| Msg::EditAreasOfLife(!aol_edit)),
                     C!["button"],
                     span![
-                        C!["icon", "is-right", "is-small"],
-                        i![C!["fas", "fa-plus-circle"]]
+                        C![
+                            "icon",
+                            "is-right",
+                            "is-small",
+                            IF!(aol_edit =>"has-text-info")
+                        ],
+                        i![C!["fas", if aol_edit { "fa-check" } else { "fa-edit" }]]
                     ]
                 ]
             ],
@@ -321,23 +373,78 @@ fn aol_list(mdl: &Mdl) -> Node<Msg> {
                 "All"
             ],
             mdl.areas_of_life.iter().map(|aol| {
-                let sel_id = aol.id;
-                let del_id = aol.id;
-                let active = mdl.current_aol.as_ref() == Some(&aol.id);
-                li![
-                    C![IF!( active => "active")],
-                    ev(Ev::Click, move |_| Msg::SelectAreaOfLife(sel_id)),
-                    &aol.name,
-                    button![
-                        C!["button"],
-                        ev(Ev::Click, move |_| Msg::DeleteAreaOfLife(del_id)),
-                        span![
-                            C!["icon", "is-right", "is-small"],
-                            i![C!["fas", "fa-minus-circle"]]
+                let id = aol.id;
+                let active = mdl.current_aol.as_ref() == Some(&id);
+                let clz = C![IF!( active => "active")];
+
+                if mdl.edit_areas_of_life {
+                    let name = mdl
+                        .areas_of_life_edits
+                        .get(&id)
+                        .map(|aol| &aol.name)
+                        .unwrap_or(&aol.name);
+                    li![
+                        clz,
+                        C!["field", "has-addons"],
+                        div![
+                            C!["control"],
+                            input![
+                                C!["input"],
+                                attrs! {
+                                  At::Value => name;
+                                },
+                                input_ev(Ev::Input, move |name| Msg::AreaOfLifeNameChanged(
+                                    id, name
+                                )),
+                                ev(Ev::Blur, move |_| Msg::UpdateAreaOfLifeName(id)),
+                                keyboard_ev(Ev::KeyUp, move |ev| {
+                                    match &*ev.key() {
+                                        "Escape" => {
+                                            ev.prevent_default();
+                                            Some(Msg::CancleAreaOfLifeNameEdit(id))
+                                        }
+                                        "Enter" => {
+                                            ev.prevent_default();
+                                            Some(Msg::UpdateAreaOfLifeName(id))
+                                        }
+                                        _ => None,
+                                    }
+                                }),
+                            ]
+                        ],
+                        div![
+                            C!["control"],
+                            button![
+                                C!["button"],
+                                ev(Ev::Click, move |_| Msg::DeleteAreaOfLife(id)),
+                                span![
+                                    C!["icon", "is-right", "is-small", "has-text-danger"],
+                                    i![C!["fas", "fa-minus-circle"]]
+                                ]
+                            ]
                         ]
                     ]
-                ]
+                } else {
+                    li![
+                        clz,
+                        ev(Ev::Click, move |_| Msg::SelectAreaOfLife(id)),
+                        &aol.name,
+                    ]
+                }
             }),
+            if mdl.edit_areas_of_life {
+                li![button![
+                    ev(Ev::Click, move |_| Msg::ShowNewAreaOfLifeDialog),
+                    C!["button"],
+                    style! { St::Float => "right"; },
+                    span![
+                        C!["icon", "is-right", "is-small", "has-text-success"],
+                        i![C!["fas", "fa-plus"]]
+                    ]
+                ]]
+            } else {
+                empty!()
+            },
         ]
     }
 }

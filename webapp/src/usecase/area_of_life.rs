@@ -15,6 +15,14 @@ pub async fn create(name: String) -> Result<AreaOfLifeId, String> {
         .map_err(|e| presenter.present(e))
 }
 
+pub async fn update(aol: AreaOfLife) -> Result<(), String> {
+    let AreaOfLife { id, name } = aol;
+    let presenter = ErrorPresenter::default();
+    api::update_area_of_life(id, name)
+        .await
+        .map_err(|e| presenter.present(e))
+}
+
 pub async fn fetch_all() -> Result<Vec<AreaOfLife>, String> {
     let presenter = ErrorPresenter::default();
     api::fetch_all_areas_of_life()

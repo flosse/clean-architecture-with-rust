@@ -1,14 +1,14 @@
 use serde::{Deserialize, Serialize};
 use std::fmt;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Thought {
     pub id: ThoughtId,
     pub title: String,
     pub areas_of_life: Vec<AreaOfLifeId>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AreaOfLife {
     pub id: AreaOfLifeId,
     pub name: String,

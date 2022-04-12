@@ -38,18 +38,21 @@ pub enum Cmd {
     CreateAreaOfLife(String),
     DeleteThought(ThoughtId),
     DeleteAreaOfLife(AreaOfLifeId),
+    UpdateAreaOfLife(AreaOfLife),
+    SendMessages(Vec<Msg>),
 }
 
 impl From<home::Cmd> for Cmd {
     fn from(cmd: home::Cmd) -> Self {
+        use home::Cmd as C;
         match cmd {
-            home::Cmd::CreateThought(title, area_of_life) => {
-                Self::CreateThought(title, area_of_life)
-            }
-            home::Cmd::UpdateThought(thought) => Self::UpdateThought(thought),
-            home::Cmd::CreateAreaOfLife(name) => Self::CreateAreaOfLife(name),
-            home::Cmd::DeleteThought(id) => Self::DeleteThought(id),
-            home::Cmd::DeleteAreaOfLife(id) => Self::DeleteAreaOfLife(id),
+            C::CreateThought(title, area_of_life) => Self::CreateThought(title, area_of_life),
+            C::UpdateThought(thought) => Self::UpdateThought(thought),
+            C::CreateAreaOfLife(name) => Self::CreateAreaOfLife(name),
+            C::DeleteThought(id) => Self::DeleteThought(id),
+            C::DeleteAreaOfLife(id) => Self::DeleteAreaOfLife(id),
+            C::UpdateAreaOfLife(aol) => Self::UpdateAreaOfLife(aol),
+            C::SendMessages(m) => Self::SendMessages(m.into_iter().map(Msg::Home).collect()),
         }
     }
 }

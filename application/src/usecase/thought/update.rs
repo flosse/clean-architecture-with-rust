@@ -42,7 +42,7 @@ impl<'r, R> UpdateThought<'r, R> {
 pub enum Error {
     #[error("{}", SaveError::Connection)]
     Repo,
-    #[error("Though {0} not found")]
+    #[error("Thought {0} not found")]
     ThoughtNotFound(Id),
     #[error(transparent)]
     Invalidity(#[from] ThoughtInvalidity),

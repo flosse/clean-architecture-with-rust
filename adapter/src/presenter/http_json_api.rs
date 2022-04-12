@@ -192,6 +192,39 @@ mod area_of_life {
         }
     }
 
+    // -- Update -- //
+
+    impl Present<app::update::Result> for Presenter {
+        type ViewModel = Result<(), view::update::Error>;
+        fn present(&self, res: app::update::Result) -> Self::ViewModel {
+            res.map(|_| Response {
+                data: None,
+                status: StatusCode::OK,
+            })
+            .map_err(|err| {
+                use app::update::Error as E;
+                match err {
+                    E::Id => Error {
+                        msg: Some(err.to_string()),
+                        status: StatusCode::BAD_REQUEST,
+                        details: Some(view::update::Error::Id),
+                    },
+                    E::NotFound(_) => Error {
+                        msg: Some(err.to_string()),
+                        status: StatusCode::NOT_FOUND,
+                        details: Some(view::update::Error::NotFound),
+                    },
+                    E::Invalidity(invalidity) => Error {
+                        msg: Some(invalidity.to_string()),
+                        status: StatusCode::BAD_REQUEST,
+                        details: Some(view::update::Error::from(invalidity)),
+                    },
+                    E::Repo => Error::internal(),
+                }
+            })
+        }
+    }
+
     // -- Read all -- //
 
     impl Present<app::read_all::Result> for Presenter {

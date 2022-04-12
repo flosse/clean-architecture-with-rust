@@ -31,6 +31,7 @@ pub enum Msg {
     FetchAllAreasOfLifeResult(Result<Vec<AreaOfLife>>),
     DeleteThoughtResult(Result<ThoughtId>),
     DeleteAreaOfLifeResult(Result<AreaOfLifeId>),
+    UpdateAreaOfLifeResult(Result<()>),
 }
 
 // ------ ------
@@ -44,16 +45,21 @@ pub enum Cmd {
     DeleteThought(ThoughtId),
     CreateAreaOfLife(String),
     DeleteAreaOfLife(AreaOfLifeId),
+    UpdateAreaOfLife(AreaOfLife),
+    SendMessages(Vec<Msg>),
 }
 
 impl From<page::Cmd> for Cmd {
     fn from(cmd: page::Cmd) -> Self {
+        use page::Cmd as C;
         match cmd {
-            page::Cmd::CreateThought(title, aol) => Self::CreateThought(title, aol),
-            page::Cmd::UpdateThought(thought) => Self::UpdateThought(thought),
-            page::Cmd::DeleteThought(id) => Self::DeleteThought(id),
-            page::Cmd::CreateAreaOfLife(name) => Self::CreateAreaOfLife(name),
-            page::Cmd::DeleteAreaOfLife(id) => Self::DeleteAreaOfLife(id),
+            C::CreateThought(title, aol) => Self::CreateThought(title, aol),
+            C::UpdateThought(thought) => Self::UpdateThought(thought),
+            C::DeleteThought(id) => Self::DeleteThought(id),
+            C::CreateAreaOfLife(name) => Self::CreateAreaOfLife(name),
+            C::DeleteAreaOfLife(id) => Self::DeleteAreaOfLife(id),
+            C::UpdateAreaOfLife(aol) => Self::UpdateAreaOfLife(aol),
+            C::SendMessages(m) => Self::SendMessages(m.into_iter().map(Msg::Page).collect()),
         }
     }
 }
@@ -74,6 +80,9 @@ pub fn update(msg: Msg, mdl: &mut Mdl) -> Option<Cmd> {
         Msg::DeleteThoughtResult(res) => page::Msg::Home(page::home::Msg::DeleteThoughtResult(res)),
         Msg::DeleteAreaOfLifeResult(res) => {
             page::Msg::Home(page::home::Msg::DeleteAreaOfLifeResult(res))
+        }
+        Msg::UpdateAreaOfLifeResult(res) => {
+            page::Msg::Home(page::home::Msg::UpdateAreaOfLifeResult(res))
         }
         Msg::FetchAllThoughtsResult(res) => {
             page::Msg::Home(page::home::Msg::FetchAllThoughtsResult(res))

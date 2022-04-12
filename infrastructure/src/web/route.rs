@@ -58,6 +58,14 @@ where
         .and(with_controller(area_of_life_controller.clone()))
         .and_then(handler::area_of_life::create::handle);
 
+    // PUT /api/area-of-life/<ID>
+    let put_area_of_life = warp::put()
+        .and(path!(String))
+        .and(path::end())
+        .and(body::json())
+        .and(with_controller(area_of_life_controller.clone()))
+        .and_then(handler::area_of_life::update::handle);
+
     // GET /api/area-of-life
     let get_areas_of_life = warp::get()
         .and(path::end())
@@ -81,6 +89,7 @@ where
     );
     let area_of_life = path("area-of-life").and(
         post_area_of_life
+            .or(put_area_of_life)
             .or(get_areas_of_life)
             .or(delete_area_of_life),
     );

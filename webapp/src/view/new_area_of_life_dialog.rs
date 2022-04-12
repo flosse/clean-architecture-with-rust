@@ -79,6 +79,12 @@ pub fn view(mdl: &Mdl) -> Node<Msg> {
                         input![
                             C!["input", IF!(mdl.error.is_some() => "is-danger")],
                             input_ev(Ev::Input, Msg::Input),
+                            keyboard_ev(Ev::KeyUp, |ev| {
+                                if ev.key() == "Enter" {
+                                    return Some(Msg::Add);
+                                }
+                                None
+                            }),
                             attrs! {
                                 At::Value => mdl.name;
                                 At::ReadOnly => mdl.wait.as_at_value();

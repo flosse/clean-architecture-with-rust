@@ -52,6 +52,45 @@ pub mod create {
     pub type Error = uc::Error;
 }
 
+pub mod update {
+    use super::{Id, ParseIdError};
+    use application::usecase::area_of_life::{update as uc, validate::AreaOfLifeInvalidity};
+    use std::result;
+    use thiserror::Error;
+
+    pub type Request = uc::Request;
+    pub type Response = uc::Response;
+    pub type Result = result::Result<Response, Error>;
+
+    #[derive(Debug, Error)]
+    pub enum Error {
+        #[error("{}", ParseIdError)]
+        Id,
+        #[error("Area of life {0:?} not found")]
+        NotFound(Id),
+        #[error("{}", uc::Error::Repo)]
+        Repo,
+        #[error(transparent)]
+        Invalidity(#[from] AreaOfLifeInvalidity),
+    }
+
+    impl From<ParseIdError> for Error {
+        fn from(_: ParseIdError) -> Self {
+            Self::Id
+        }
+    }
+
+    impl From<uc::Error> for Error {
+        fn from(from: uc::Error) -> Self {
+            match from {
+                uc::Error::NotFound(id) => Self::NotFound(id.into()),
+                uc::Error::Invalidity(i) => Self::Invalidity(i),
+                uc::Error::Repo => Self::Repo,
+            }
+        }
+    }
+}
+
 pub mod read_all {
     use application::usecase::area_of_life::read_all as uc;
     use std::result;

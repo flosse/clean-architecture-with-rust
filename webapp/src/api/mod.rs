@@ -57,18 +57,27 @@ mod area_of_life {
     use crate::api::http::{self, Result};
     use json_boundary::{
         domain::{AreaOfLife, AreaOfLifeId},
-        usecase::area_of_life::{create, delete, read_all},
+        usecase::area_of_life::{create, delete, read_all, update},
     };
+    const RESOURCE: &str = "area-of-life";
 
     pub async fn fetch_all_areas_of_life() -> Result<Vec<AreaOfLife>, read_all::Error> {
-        http::get_json("/api/area-of-life").await
+        http::get_json(&format!("/api/{RESOURCE}")).await
     }
 
     pub async fn create_area_of_life(name: String) -> Result<AreaOfLifeId, create::Error> {
-        http::post_json("/api/area-of-life", &create::Request { name }).await
+        http::post_json(&format!("/api/{RESOURCE}"), &create::Request { name }).await
+    }
+
+    pub async fn update_area_of_life(id: AreaOfLifeId, name: String) -> Result<(), update::Error> {
+        http::put_json(
+            &format!("/api/{RESOURCE}/{id}"),
+            &update::Request { id, name },
+        )
+        .await
     }
 
     pub async fn delete_area_of_life(id: &AreaOfLifeId) -> Result<(), delete::Error> {
-        http::delete_json(&format!("/api/area-of-life/{}", id.0), &()).await
+        http::delete_json(&format!("/api/{RESOURCE}/{id}"), &()).await
     }
 }

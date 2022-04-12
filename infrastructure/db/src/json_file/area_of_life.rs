@@ -29,15 +29,37 @@ impl Repo for JsonFile {
             area_of_life_id: id.to_string(),
             name: String::from(name),
         };
-        let storage_id = self.areas_of_life.save(&model).map_err(|err| {
-            log::warn!("Unable to save area of life: {}", err);
-            SaveError::Connection
-        })?;
-        self.save_id(storage_id, id, MAP_AREA_OF_LIFE_ID_KEY)
-            .map_err(|err| {
-                log::warn!("Unable to save area of life ID: {}", err);
-                SaveError::Connection
-            })?;
+
+        match self.storage_id(area_of_life.id, MAP_AREA_OF_LIFE_ID_KEY) {
+            Ok(storage_id) => {
+                log::debug!("Update area of life {}", area_of_life.id);
+                let sid = self
+                    .areas_of_life
+                    .save_with_id(&model, &storage_id)
+                    .map_err(|err| {
+                        log::warn!("Unable to save area of life: {}", err);
+                        SaveError::Connection
+                    })?;
+                debug_assert_eq!(sid, storage_id);
+            }
+            Err(err) => match err.kind() {
+                io::ErrorKind::NotFound => {
+                    log::debug!("Create new area of life record");
+                    let storage_id = self.areas_of_life.save(&model).map_err(|err| {
+                        log::warn!("Unable to save area of life: {}", err);
+                        SaveError::Connection
+                    })?;
+                    self.save_id(storage_id, id, MAP_AREA_OF_LIFE_ID_KEY)
+                        .map_err(|err| {
+                            log::warn!("Unable to save area of life ID: {}", err);
+                            SaveError::Connection
+                        })?;
+                }
+                _ => {
+                    return Err(SaveError::Connection);
+                }
+            },
+        }
         Ok(())
     }
     fn get(&self, id: Id) -> Result<Record, GetError> {

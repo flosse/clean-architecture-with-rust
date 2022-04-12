@@ -29,6 +29,7 @@ pub enum Msg {
     CreateThoughtResult(Result<ThoughtId>),
     UpdateThoughtResult(ThoughtId, Result<()>),
     CreateAreaOfLifeResult(Result<AreaOfLifeId>),
+    UpdateAreaOfLifeResult(AreaOfLifeId, Result<()>),
     FetchAllThoughtsResult(Result<Vec<Thought>>),
     FetchAllAreasOfLifeResult(Result<Vec<AreaOfLife>>),
     FindThoughtResult(Result<Thought>),
@@ -41,6 +42,7 @@ pub enum Msg {
 // ------ ------
 
 fn update(msg: Msg, mdl: &mut Mdl, orders: &mut impl Orders<Msg>) {
+    seed::log!(msg);
     match msg {
         Msg::View(msg) => {
             if let Some(cmd) = view::update(msg, &mut mdl.view) {
@@ -59,6 +61,15 @@ fn update(msg: Msg, mdl: &mut Mdl, orders: &mut impl Orders<Msg>) {
                     }
                     view::Cmd::DeleteAreaOfLife(id) => {
                         orders.perform_cmd(delete_area_of_life(id));
+                    }
+                    view::Cmd::UpdateAreaOfLife(aol) => {
+                        orders.perform_cmd(update_area_of_life(aol));
+                    }
+                    view::Cmd::SendMessages(messages) => {
+                        orders.skip();
+                        for m in messages {
+                            orders.send_msg(Msg::View(m));
+                        }
                     }
                 }
             }
@@ -81,6 +92,12 @@ fn update(msg: Msg, mdl: &mut Mdl, orders: &mut impl Orders<Msg>) {
                 orders.perform_cmd(fetch_all_areas_of_life());
             }
             let msg = view::Msg::CreateAreaOfLifeResult(res);
+            view::update(msg, &mut mdl.view);
+        }
+        Msg::UpdateAreaOfLifeResult(_id, res) => {
+            // Re-fetch
+            orders.perform_cmd(fetch_all_areas_of_life());
+            let msg = view::Msg::UpdateAreaOfLifeResult(res);
             view::update(msg, &mut mdl.view);
         }
         Msg::FindThoughtResult(res) => {
@@ -138,6 +155,12 @@ async fn delete_thought(id: domain::ThoughtId) -> Msg {
 async fn create_area_of_life(name: String) -> Msg {
     let res = usecase::area_of_life::create(name).await;
     Msg::CreateAreaOfLifeResult(res)
+}
+
+async fn update_area_of_life(aol: AreaOfLife) -> Msg {
+    let id = aol.id;
+    let res = usecase::area_of_life::update(aol).await;
+    Msg::UpdateAreaOfLifeResult(id, res)
 }
 
 async fn fetch_all_areas_of_life() -> Msg {
