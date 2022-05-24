@@ -1,10 +1,12 @@
 //! All value objects and information that
 //! belong to [AreaOfLife]s.
 
-mod id;
-mod name;
+use crate::value_object;
 
-pub use self::{id::*, name::*};
+mod name;
+pub use self::name::*;
+
+pub type Id = value_object::Id<AreaOfLife>;
 
 /// An area of your life
 #[derive(Debug, Clone)]

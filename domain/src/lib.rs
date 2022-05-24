@@ -20,5 +20,6 @@
 //! In this project, therefore, all entites (or root aggregates) use an ID.
 
 mod entity;
+mod value_object;
 
 pub use self::entity::{area_of_life::AreaOfLife, thought::Thought, *};

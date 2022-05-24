@@ -1,13 +1,13 @@
 //! All value objects and information that
 //! belong to [Thought]s.
 
-mod id;
-mod title;
-
-use crate::entity::area_of_life as aol;
+use crate::{entity::area_of_life as aol, value_object};
 use std::collections::HashSet;
 
-pub use self::{id::*, title::*};
+mod title;
+pub use self::title::*;
+
+pub type Id = value_object::Id<Thought>;
 
 /// Anything you want to remember
 #[derive(Debug, Clone)]
