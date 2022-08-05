@@ -37,3 +37,9 @@ fix:
   cargo clippy --workspace --all-targets --fix
   cd webapp && cargo fix --workspace --all-targets
   cd webapp && cargo clippy --workspace --all-targets --fix
+
+# Run tests
+test:
+  RUST_BACKTRACE=1 cargo test --locked --workspace -- --nocapture
+  RUST_BACKTRACE=1 cargo test --locked --workspace --manifest-path webapp/Cargo.toml -- --nocapture
+  RUST_BACKTRACE=1 wasm-pack test --chrome --headless webapp/

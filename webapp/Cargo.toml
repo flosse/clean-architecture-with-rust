@@ -21,3 +21,6 @@ json-boundary = { path = "../adapter/json-boundary" }
 lto = true
 opt-level = 'z'
 codegen-units= 1
+
+[dev-dependencies]
+wasm-bindgen-test = "0.3"
