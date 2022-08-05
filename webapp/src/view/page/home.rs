@@ -314,19 +314,11 @@ fn main_sidebar(mdl: &Mdl) -> Node<Msg> {
             p![
                 C!["menu-label"],
                 "Areas of Life",
-                button![
-                    ev(Ev::Click, move |_| Msg::EditAreasOfLife(!aol_edit)),
-                    C!["button"],
-                    span![
-                        C![
-                            "icon",
-                            "is-right",
-                            "is-small",
-                            IF!(aol_edit =>"has-text-info")
-                        ],
-                        i![C!["fas", if aol_edit { "fa-check" } else { "fa-edit" }]]
-                    ]
-                ]
+                if mdl.areas_of_life.is_empty() {
+                    new_area_of_life_button()
+                } else {
+                    edit_areas_of_life_button(aol_edit)
+                }
             ],
             aol_list(mdl)
         ],
@@ -433,20 +425,40 @@ fn aol_list(mdl: &Mdl) -> Node<Msg> {
                 }
             }),
             if mdl.edit_areas_of_life {
-                li![button![
-                    ev(Ev::Click, move |_| Msg::ShowNewAreaOfLifeDialog),
-                    C!["button"],
-                    style! { St::Float => "right"; },
-                    span![
-                        C!["icon", "is-right", "is-small", "has-text-success"],
-                        i![C!["fas", "fa-plus"]]
-                    ]
-                ]]
+                li![new_area_of_life_button()]
             } else {
                 empty!()
             },
         ]
     }
+}
+
+fn new_area_of_life_button() -> Node<Msg> {
+    button![
+        ev(Ev::Click, move |_| Msg::ShowNewAreaOfLifeDialog),
+        C!["button"],
+        style! { St::Float => "right"; },
+        span![
+            C!["icon", "is-right", "is-small", "has-text-success"],
+            i![C!["fas", "fa-plus"]]
+        ]
+    ]
+}
+
+fn edit_areas_of_life_button(aol_edit: bool) -> Node<Msg> {
+    button![
+        ev(Ev::Click, move |_| Msg::EditAreasOfLife(!aol_edit)),
+        C!["button"],
+        span![
+            C![
+                "icon",
+                "is-right",
+                "is-small",
+                IF!(aol_edit =>"has-text-info")
+            ],
+            i![C!["fas", if aol_edit { "fa-check" } else { "fa-edit" }]]
+        ]
+    ]
 }
 
 fn header<M>() -> Node<M> {
