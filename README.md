@@ -30,11 +30,9 @@ that means
 ## Build & run
 
 ```
-cd webapp/
-trunk build
-cd ..
-cargo build
-./target/debug/clean-architecture-with-rust serve
+cargo install just
+just setup
+just run
 ```
 
 ## Example Szenario
