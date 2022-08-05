@@ -1,4 +1,4 @@
-use domain::area_of_life::NameConstraints;
+use domain::area_of_life::Name;
 use thiserror::Error;
 
 #[derive(Debug)]
@@ -29,12 +29,12 @@ pub fn validate_area_of_life_properties(req: &Request) -> Response {
 
 fn validate_name(name: &str) -> Result<(), NameInvalidity> {
     let actual = name.len();
-    let min = NameConstraints::min_len();
+    let min = Name::min_len();
 
     if actual < min {
         return Err(NameInvalidity::MinLength { min, actual });
     }
-    let max = NameConstraints::max_len();
+    let max = Name::max_len();
     if actual > max {
         return Err(NameInvalidity::MaxLength { max, actual });
     }

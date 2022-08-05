@@ -1,4 +1,4 @@
-use domain::thought::TitleConstraints;
+use domain::thought::Title;
 use thiserror::Error;
 
 #[derive(Debug)]
@@ -29,12 +29,12 @@ pub fn validate_thought_properties(req: &Request) -> Response {
 
 fn validate_title(title: &str) -> Result<(), TitleInvalidity> {
     let actual = title.len();
-    let min = TitleConstraints::min_len();
+    let min = Title::min_len();
 
     if actual < min {
         return Err(TitleInvalidity::MinLength { min, actual });
     }
-    let max = TitleConstraints::max_len();
+    let max = Title::max_len();
     if actual > max {
         return Err(TitleInvalidity::MaxLength { max, actual });
     }
