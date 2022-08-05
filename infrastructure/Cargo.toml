@@ -12,12 +12,13 @@ application = "0.0.0"
 db = "0.0.0"
 
 # External dependencies
+clap = { version = "3", features = ["derive"] }
+directories = "4"
 log = "*"
 mime_guess = "*"
 pretty_env_logger = "*"
 rust-embed = "*"
 serde = { version = "1", features = ["derive"] }
-clap = { version = "3", features = ["derive"] }
 tokio = { version = "1", features = ["full"] }
 warp = "*"
 

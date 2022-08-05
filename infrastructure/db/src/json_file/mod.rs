@@ -1,7 +1,7 @@
 use adapter::db::Db;
 use application::identifier::NewIdError;
 use jfs::{Config, Store};
-use std::{collections::HashMap, io, path::Path};
+use std::{collections::HashMap, fs, io, path::Path};
 
 mod area_of_life;
 mod models;
@@ -26,6 +26,7 @@ impl JsonFile {
             ..Default::default()
         };
         let dir = dir.as_ref();
+        fs::create_dir_all(dir)?;
         let thoughts = Store::new_with_cfg(dir.join("thoughts"), cfg)?;
         let areas_of_life = Store::new_with_cfg(dir.join("areas-of-life"), cfg)?;
         let ids = Store::new_with_cfg(dir.join("ids"), cfg)?;
