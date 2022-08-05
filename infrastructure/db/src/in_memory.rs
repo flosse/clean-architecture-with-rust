@@ -86,7 +86,7 @@ mod area_of_life {
             self.areas_of_life
                 .write()
                 .unwrap()
-                .insert(record.area_of_life.id, record);
+                .insert(record.area_of_life.id(), record);
             Ok(())
         }
         fn get(&self, id: Id) -> Result<Record, GetError> {

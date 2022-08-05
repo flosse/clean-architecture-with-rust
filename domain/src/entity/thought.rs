@@ -16,7 +16,10 @@ pub struct Thought {
 }
 
 impl Thought {
-    pub const fn new(id: Id, title: Title, areas_of_life: HashSet<aol::Id>) -> Self {
+    pub fn new(id: Id, title: Title, areas_of_life: HashSet<aol::Id>) -> Self {
+        // Never construct a thought with invalid title
+        debug_assert!(title.as_ref().len() <= Title::max_len());
+        debug_assert!(title.as_ref().len() >= Title::min_len());
         Self {
             id,
             title,

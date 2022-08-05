@@ -64,7 +64,7 @@ where
         log::debug!("Update area of life: {:?}", req);
         validate_area_of_life_properties(&validate::Request { name: &req.name })?;
         let name = Name::new(req.name);
-        let area_of_life = AreaOfLife { id: req.id, name };
+        let area_of_life = AreaOfLife::new(req.id, name);
         let record = Record { area_of_life };
         let _ = self.repo.get(req.id).map_err(|err| (err, req.id))?;
         self.repo.save(record)?;

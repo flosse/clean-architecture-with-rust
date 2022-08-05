@@ -20,8 +20,8 @@ pub struct AreaOfLife {
 impl From<Record> for AreaOfLife {
     fn from(r: Record) -> Self {
         let Record { area_of_life } = r;
-        let name = String::from(area_of_life.name);
-        let id = area_of_life.id;
+        let name = String::from(area_of_life.name().as_ref());
+        let id = area_of_life.id();
         Self { id, name }
     }
 }

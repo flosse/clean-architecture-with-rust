@@ -64,7 +64,7 @@ where
             log::warn!("{}", err);
             Error::NewId
         })?;
-        let area_of_life = AreaOfLife { id, name };
+        let area_of_life = AreaOfLife::new(id, name);
         let record = Record { area_of_life };
         self.repo.save(record)?;
         Ok(Response { id })

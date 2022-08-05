@@ -24,15 +24,16 @@ impl Repo for JsonFile {
     fn save(&self, record: Record) -> Result<(), SaveError> {
         log::debug!("Save area of life {:?} to JSON file", record);
         let Record { area_of_life } = record;
-        let AreaOfLife { name, id } = area_of_life;
+        let name = area_of_life.name();
+        let id = area_of_life.id();
         let model = models::AreaOfLife {
             area_of_life_id: id.to_string(),
-            name: String::from(name),
+            name: String::from(name.as_ref()),
         };
 
-        match self.storage_id(area_of_life.id, MAP_AREA_OF_LIFE_ID_KEY) {
+        match self.storage_id(area_of_life.id(), MAP_AREA_OF_LIFE_ID_KEY) {
             Ok(storage_id) => {
-                log::debug!("Update area of life {}", area_of_life.id);
+                log::debug!("Update area of life {}", area_of_life.id());
                 let sid = self
                     .areas_of_life
                     .save_with_id(&model, &storage_id)
@@ -87,10 +88,7 @@ impl Repo for JsonFile {
             })?;
         debug_assert_eq!(id.to_string(), model.area_of_life_id);
         Ok(Record {
-            area_of_life: AreaOfLife {
-                id,
-                name: Name::new(model.name),
-            },
+            area_of_life: AreaOfLife::new(id, Name::new(model.name)),
         })
     }
     fn get_all(&self) -> Result<Vec<Record>, GetAllError> {
@@ -112,10 +110,7 @@ impl Repo for JsonFile {
                     .map(|id| (id, model.name))
             })
             .map(|(id, name)| Record {
-                area_of_life: AreaOfLife {
-                    id,
-                    name: Name::new(name),
-                },
+                area_of_life: AreaOfLife::new(id, Name::new(name)),
             })
             .collect();
         Ok(areas_of_life)

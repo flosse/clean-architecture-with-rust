@@ -122,7 +122,7 @@ mod tests {
             let db = JsonFile::try_new(&test_dir).unwrap();
             let aol_id = (&db as &dyn NewId<AolId>).new_id().unwrap();
             let name = Name::new("test aol".to_string());
-            let area_of_life = AreaOfLife { id: aol_id, name };
+            let area_of_life = AreaOfLife::new(aol_id, name);
             let record = AolRecord { area_of_life };
             (&db as &dyn AolRepo).save(record).unwrap();
             let mut areas_of_life = HashSet::new();

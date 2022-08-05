@@ -9,8 +9,23 @@ pub type Name = value_object::Name<AreaOfLife>;
 /// An area of your life
 #[derive(Debug, Clone)]
 pub struct AreaOfLife {
-    pub id: Id,
-    pub name: Name,
+    id: Id,
+    name: Name,
+}
+
+impl AreaOfLife {
+    pub fn new(id: Id, name: Name) -> Self {
+        // Never construct an area of life with invalid name
+        debug_assert!(name.as_ref().len() <= Name::max_len());
+        debug_assert!(name.as_ref().len() >= Name::min_len());
+        Self { id, name }
+    }
+    pub const fn id(&self) -> Id {
+        self.id
+    }
+    pub const fn name(&self) -> &Name {
+        &self.name
+    }
 }
 
 const MAX_NAME_LEN: usize = 30;
