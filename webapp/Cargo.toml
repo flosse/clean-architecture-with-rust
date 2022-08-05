@@ -9,6 +9,11 @@ json-boundary = "*"
 seed = { version = "*", features = ["serde-wasm-bindgen"] }
 serde = "1"
 
+[dependencies.derive_more]
+version = "0.99"
+default-features = false
+features = ["from"]
+
 [patch.crates-io]
 json-boundary = { path = "../adapter/json-boundary" }
 

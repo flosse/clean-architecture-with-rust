@@ -23,8 +23,9 @@ pub struct Mdl {
 type Error = String;
 type Result<T> = std::result::Result<T, Error>;
 
-#[derive(Debug)]
+#[derive(derive_more::From, Debug)]
 pub enum Msg {
+    #[from]
     View(view::Msg),
     CreateThoughtResult(Result<ThoughtId>),
     UpdateThoughtResult(ThoughtId, Result<()>),
@@ -79,46 +80,46 @@ fn update(msg: Msg, mdl: &mut Mdl, orders: &mut impl Orders<Msg>) {
                 orders.perform_cmd(find_thought_by_id(*id));
             }
             let msg = view::Msg::CreateThoughtResult(res);
-            view::update(msg, &mut mdl.view);
+            orders.send_msg(msg.into());
         }
         Msg::UpdateThoughtResult(id, res) => {
             // Re-fetch the thought
             orders.perform_cmd(find_thought_by_id(id));
             let msg = view::Msg::UpdateThoughtResult(res);
-            view::update(msg, &mut mdl.view);
+            orders.send_msg(msg.into());
         }
         Msg::CreateAreaOfLifeResult(res) => {
             if res.is_ok() {
                 orders.perform_cmd(fetch_all_areas_of_life());
             }
             let msg = view::Msg::CreateAreaOfLifeResult(res);
-            view::update(msg, &mut mdl.view);
+            orders.send_msg(msg.into());
         }
         Msg::UpdateAreaOfLifeResult(_id, res) => {
             // Re-fetch
             orders.perform_cmd(fetch_all_areas_of_life());
             let msg = view::Msg::UpdateAreaOfLifeResult(res);
-            view::update(msg, &mut mdl.view);
+            orders.send_msg(msg.into());
         }
         Msg::FindThoughtResult(res) => {
             let msg = view::Msg::FindThoughtResult(res);
-            view::update(msg, &mut mdl.view);
+            orders.send_msg(msg.into());
         }
         Msg::FetchAllThoughtsResult(res) => {
             let msg = view::Msg::FetchAllThoughtsResult(res);
-            view::update(msg, &mut mdl.view);
+            orders.send_msg(msg.into());
         }
         Msg::FetchAllAreasOfLifeResult(res) => {
             let msg = view::Msg::FetchAllAreasOfLifeResult(res);
-            view::update(msg, &mut mdl.view);
+            orders.send_msg(msg.into());
         }
         Msg::DeleteThoughtResult(res) => {
             let msg = view::Msg::DeleteThoughtResult(res);
-            view::update(msg, &mut mdl.view);
+            orders.send_msg(msg.into());
         }
         Msg::DeleteAreaOfLifeResult(res) => {
             let msg = view::Msg::DeleteAreaOfLifeResult(res);
-            view::update(msg, &mut mdl.view);
+            orders.send_msg(msg.into());
         }
     }
 }

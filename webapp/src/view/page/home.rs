@@ -85,6 +85,7 @@ pub enum Cmd {
 //    Update
 // ------ ------
 
+#[must_use]
 pub fn update(msg: Msg, mdl: &mut Mdl) -> Option<Cmd> {
     match msg {
         Msg::InputChanged(s) => {

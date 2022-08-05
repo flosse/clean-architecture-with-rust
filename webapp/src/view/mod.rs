@@ -68,6 +68,7 @@ impl From<page::Cmd> for Cmd {
 //    Update
 // ------ ------
 
+#[must_use]
 pub fn update(msg: Msg, mdl: &mut Mdl) -> Option<Cmd> {
     let page_msg = match msg {
         Msg::Page(msg) => msg,
