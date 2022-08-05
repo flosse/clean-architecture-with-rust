@@ -1,5 +1,2 @@
 [build]
 release = true
-
-[tools]
-sass = "1.49.9"
