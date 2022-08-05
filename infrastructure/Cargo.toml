@@ -8,22 +8,12 @@ publish = false
 
 # Workspace dependencies
 adapter = "0.0.0"
-application = "0.0.0"
 db = "0.0.0"
+web-server = "0.0.0"
 
 # External dependencies
 clap = { version = "3", features = ["derive"] }
 directories = "4"
 log = "*"
-mime_guess = "*"
 pretty_env_logger = "*"
-rust-embed = "*"
-serde = { version = "1", features = ["derive"] }
 tokio = { version = "1", features = ["full"] }
-warp = "*"
-
-[dev-dependencies]
-anyhow = "*"
-domain = "0.0.0"
-hyper = "*"
-serde_json = "1"

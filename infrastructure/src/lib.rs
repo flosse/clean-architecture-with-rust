@@ -1,7 +1,6 @@
 use std::env;
 
 pub mod cli;
-pub mod web;
 
 pub fn run() {
     if env::var("RUST_LOG").is_err() {

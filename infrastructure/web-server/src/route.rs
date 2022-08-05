@@ -1,4 +1,4 @@
-use crate::web::handler;
+use crate::handler;
 use adapter::{controller, db::Db, presenter::http_json_api::Presenter};
 use std::{convert::Infallible, sync::Arc};
 use warp::{body, path, Filter, Rejection, Reply};

@@ -1,0 +1,26 @@
+[package]
+name = "web-server"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+
+# Workspace dependencies
+adapter = "0.0.0"
+
+# External dependencies
+log = "*"
+mime_guess = "*"
+rust-embed = "*"
+serde = { version = "1", features = ["derive"] }
+warp = "*"
+
+[dev-dependencies]
+anyhow = "*"
+application = "0.0.0"
+db = "0.0.0"
+domain = "0.0.0"
+hyper = "*"
+serde_json = "1"
+tokio = { version = "1", features = ["full"] }

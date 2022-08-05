@@ -1,4 +1,4 @@
-use crate::web::handler::{reply_error, Result};
+use crate::handler::{reply_error, Result};
 use adapter::{
     controller::area_of_life::Controller, db::Db, model::view::json::area_of_life::update::Request,
     presenter::http_json_api::Presenter,

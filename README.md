@@ -15,6 +15,7 @@ Currently there are these circles:
   - `json-boundary`
 - `infrastructure`
   - `db`
+  - `web-server`
 - `webapp`
 
 Depending on your system the amount and the name of circles could

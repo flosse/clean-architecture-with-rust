@@ -1,4 +1,3 @@
-use crate::web;
 use adapter::{controller::thought::Controller as ThoughtController, presenter::cli::Presenter};
 use clap::{Parser, Subcommand};
 use db::json_file::JsonFile;
@@ -57,7 +56,7 @@ pub fn run() {
         Command::Serve { bind, port } => {
             let rt = Runtime::new().expect("tokio runtime");
             let addr = SocketAddr::from((bind, port));
-            rt.block_on(web::run(db, addr));
+            rt.block_on(web_server::run(db, addr));
         }
     }
 }

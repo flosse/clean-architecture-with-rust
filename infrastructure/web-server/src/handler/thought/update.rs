@@ -1,4 +1,4 @@
-use crate::web::handler::{reply_error, Result};
+use crate::handler::{reply_error, Result};
 use adapter::{
     controller::thought::Controller, db::Db, model::view::json::thought::update::Request,
     presenter::http_json_api::Presenter,

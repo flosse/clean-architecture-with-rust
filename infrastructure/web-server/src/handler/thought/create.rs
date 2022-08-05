@@ -1,4 +1,4 @@
-use crate::web::handler::{reply_error, Result};
+use crate::handler::{reply_error, Result};
 use adapter::{
     controller::thought::Controller, db::Db, model::view::json::thought::create::Request,
     presenter::http_json_api::Presenter,
@@ -27,7 +27,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::{handle, Arc, Controller, Presenter, Request};
-    use crate::web::tests::{blank_db, response_json_body};
+    use crate::tests::{blank_db, response_json_body};
     use adapter::model::view::json::{thought::create as uc, Error};
     use application::gateway::repository::thought::Repo;
     use serde_json::Value;

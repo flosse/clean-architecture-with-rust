@@ -1,4 +1,4 @@
-use crate::web::handler::{reply_error, Result};
+use crate::handler::{reply_error, Result};
 use adapter::{controller::thought::Controller, db::Db, presenter::http_json_api::Presenter};
 use std::sync::Arc;
 use warp::{reply, Reply};
@@ -21,7 +21,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::{handle, Arc, Controller, Presenter};
-    use crate::web::tests::{add_thought_to_db, blank_db};
+    use crate::tests::{add_thought_to_db, blank_db};
     use adapter::model::app::thought as app;
     use application::gateway::repository::thought::Repo;
     use warp::{http::StatusCode, Reply};
