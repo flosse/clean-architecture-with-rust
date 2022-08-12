@@ -33,7 +33,7 @@ that means
 ```
 cargo install just
 just setup
-just run
+just run-web
 ```
 
 ## Example Szenario

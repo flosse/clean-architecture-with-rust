@@ -7,11 +7,21 @@ _default:
 setup:
   cargo install trunk
 
-run: webapp
-  cargo run -- serve
+# Run the web server
+run-web: webapp
+  cargo run --bin clean-architecture-with-rust-web
 
-build: webapp
-  cargo build --release
+# Run the CLI
+run-cli:
+  cargo run --bin clean-architecture-with-rust-cli
+
+# Build the web server
+build-web: webapp
+  cargo build --bin clean-architecture-with-rust-web --release
+
+# Build the CLI
+build-cli:
+  cargo build --bin clean-architecture-with-rust-cli --release
 
 # Build the web app
 webapp:
@@ -20,11 +30,17 @@ webapp:
 # Read version from Cargo.toml
 pkg-version := `sed -En 's/version[[:space:]]*=[[:space:]]*"([^"]+)"/v\1/p' Cargo.toml | head -1`
 
-# Create a tarball
-pack: build
+# Create a tarball with the webserver
+pack-web: build-web
   tar -C target/release/ \
-      -cvpJf clean-architecture-with-rust_{{pkg-version}}.tar.xz \
-      clean-architecture-with-rust
+      -cvpJf clean-architecture-with-rust-web_{{pkg-version}}.tar.xz \
+      clean-architecture-with-rust-web
+
+# Create a tarball with the CLI
+pack-cli: build-cli
+  tar -C target/release/ \
+      -cvpJf clean-architecture-with-rust-cli_{{pkg-version}}.tar.xz \
+      clean-architecture-with-rust-cli
 
 # Format source code
 fmt:

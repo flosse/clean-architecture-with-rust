@@ -5,6 +5,14 @@ authors = ["Markus Kohlhase <markus.kohlhase@slowtec.de>"]
 edition = "2021"
 publish = false
 
+[[bin]]
+name = "clean-architecture-with-rust-cli"
+path = "src/bin/cli.rs"
+
+[[bin]]
+name = "clean-architecture-with-rust-web"
+path = "src/bin/web.rs"
+
 [workspace]
 members = [
   "adapter",
