@@ -79,13 +79,7 @@ where
             .map(|id| app::delete::Request { id })
             .and_then(|req| {
                 let interactor = uc::delete::Delete::new(&*self.db);
-                interactor.exec(req).map_err(|e| {
-                    // TODO: impl From<uc::Error> for app::Error
-                    match e {
-                        uc::delete::Error::Repo => app::delete::Error::Repo,
-                        uc::delete::Error::NotFound => app::delete::Error::NotFound,
-                    }
-                })
+                interactor.exec(req).map_err(app::delete::Error::from)
             });
         self.presenter.present(res)
     }
@@ -98,13 +92,7 @@ where
             .map(|id| app::find_by_id::Request { id })
             .and_then(|req| {
                 let interactor = uc::find_by_id::FindById::new(&*self.db);
-                interactor.exec(req).map_err(|e| {
-                    // TODO: impl From<uc::Error> for app::Error
-                    match e {
-                        uc::find_by_id::Error::Repo => app::find_by_id::Error::Repo,
-                        uc::find_by_id::Error::NotFound => app::find_by_id::Error::NotFound,
-                    }
-                })
+                interactor.exec(req).map_err(app::find_by_id::Error::from)
             });
         self.presenter.present(res)
     }

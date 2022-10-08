@@ -3,7 +3,8 @@ use crate::{
     presenter::Present,
 };
 use http::StatusCode;
-use std::convert::TryFrom;
+
+mod to_json;
 
 #[derive(Default, Clone)]
 pub struct Presenter;
@@ -20,7 +21,7 @@ mod thought {
     impl Present<app::create::Result> for Presenter {
         type ViewModel = Result<view::ThoughtId, view::create::Error>;
         fn present(&self, res: app::create::Result) -> Self::ViewModel {
-            res.map(view::ThoughtId::from)
+            res.map(to_json::thought::create::thought_id_from_response)
                 .map(|id| Response {
                     data: Some(id),
                     status: StatusCode::CREATED,
@@ -36,7 +37,9 @@ mod thought {
                         E::Invalidity(invalidity) => Error {
                             msg: Some(invalidity.to_string()),
                             status: StatusCode::BAD_REQUEST,
-                            details: Some(view::create::Error::from(invalidity)),
+                            details: Some(to_json::thought::create::from_thought_invalidity(
+                                invalidity,
+                            )),
                         },
                         E::AreasOfLifeNotFound(ref ids) => Error {
                             msg: Some(err.to_string()),
@@ -81,7 +84,9 @@ mod thought {
                     E::Invalidity(invalidity) => Error {
                         msg: Some(invalidity.to_string()),
                         status: StatusCode::BAD_REQUEST,
-                        details: Some(view::update::Error::from(invalidity)),
+                        details: Some(to_json::thought::update::from_thought_invalidity(
+                            invalidity,
+                        )),
                     },
                     E::AreasOfLifeNotFound(ref ids) => Error {
                         msg: Some(err.to_string()),
@@ -101,7 +106,7 @@ mod thought {
     impl Present<app::find_by_id::Result> for Presenter {
         type ViewModel = Result<view::Thought, view::find_by_id::Error>;
         fn present(&self, res: app::find_by_id::Result) -> Self::ViewModel {
-            res.map(view::Thought::from)
+            res.map(to_json::thought::find_by_id::from_response)
                 .map(|data| Response {
                     data: Some(data),
                     status: StatusCode::OK,
@@ -127,14 +132,19 @@ mod thought {
     impl Present<app::read_all::Result> for Presenter {
         type ViewModel = Result<Vec<view::Thought>, view::read_all::Error>;
         fn present(&self, res: app::read_all::Result) -> Self::ViewModel {
-            res.map(|resp| resp.thoughts.into_iter().map(view::Thought::from).collect())
-                .map(|data| Response {
-                    data: Some(data),
-                    status: StatusCode::OK,
-                })
-                .map_err(|err| match err {
-                    app::read_all::Error::Repo => Error::internal(),
-                })
+            res.map(|resp| {
+                resp.thoughts
+                    .into_iter()
+                    .map(to_json::thought::read_all::from_thought)
+                    .collect()
+            })
+            .map(|data| Response {
+                data: Some(data),
+                status: StatusCode::OK,
+            })
+            .map_err(|err| match err {
+                app::read_all::Error::Repo => Error::internal(),
+            })
         }
     }
 
@@ -173,7 +183,7 @@ mod area_of_life {
     impl Present<app::create::Result> for Presenter {
         type ViewModel = Result<view::AreaOfLifeId, view::create::Error>;
         fn present(&self, res: app::create::Result) -> Self::ViewModel {
-            res.map(view::AreaOfLifeId::from)
+            res.map(to_json::area_of_life::create::from_response)
                 .map(|id| Response {
                     data: Some(id),
                     status: StatusCode::CREATED,
@@ -184,7 +194,7 @@ mod area_of_life {
                         E::Invalidity(invalidity) => Error {
                             msg: Some(invalidity.to_string()),
                             status: StatusCode::BAD_REQUEST,
-                            details: view::create::Error::try_from(err).ok(),
+                            details: to_json::area_of_life::create::try_from_error(err).ok(),
                         },
                         E::Repo | E::NewId => Error::internal(),
                     }
@@ -217,7 +227,9 @@ mod area_of_life {
                     E::Invalidity(invalidity) => Error {
                         msg: Some(invalidity.to_string()),
                         status: StatusCode::BAD_REQUEST,
-                        details: Some(view::update::Error::from(invalidity)),
+                        details: Some(to_json::area_of_life::update::from_area_of_life_invalidity(
+                            invalidity,
+                        )),
                     },
                     E::Repo => Error::internal(),
                 }
@@ -233,7 +245,7 @@ mod area_of_life {
             res.map(|resp| {
                 resp.areas_of_life
                     .into_iter()
-                    .map(view::AreaOfLife::from)
+                    .map(to_json::area_of_life::read_all::from_area_of_life)
                     .collect()
             })
             .map(|data| Response {

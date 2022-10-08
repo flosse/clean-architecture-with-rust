@@ -17,20 +17,3 @@ pub enum Error {
     TitleMaxLength { max: usize, actual: usize },
     AreasOfLifeNotFound(Vec<AreaOfLifeId>),
 }
-
-#[cfg(feature = "conversions")]
-mod conv {
-    use super::*;
-    use application::usecase::thought::validate;
-
-    impl From<validate::ThoughtInvalidity> for Error {
-        fn from(from: validate::ThoughtInvalidity) -> Self {
-            let validate::ThoughtInvalidity::Title(e) = from;
-            use validate::TitleInvalidity as T;
-            match e {
-                T::MinLength { min, actual } => Self::TitleMinLength { min, actual },
-                T::MaxLength { max, actual } => Self::TitleMaxLength { max, actual },
-            }
-        }
-    }
-}

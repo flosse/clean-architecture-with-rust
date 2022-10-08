@@ -150,6 +150,15 @@ pub mod find_by_id {
         #[error("{}", uc::Error::Repo)]
         Repo,
     }
+
+    impl From<uc::Error> for Error {
+        fn from(e: uc::Error) -> Self {
+            match e {
+                uc::Error::Repo => Error::Repo,
+                uc::Error::NotFound => Error::NotFound,
+            }
+        }
+    }
 }
 
 pub mod read_all {
@@ -180,5 +189,14 @@ pub mod delete {
         NotFound,
         #[error("{}", uc::Error::Repo)]
         Repo,
+    }
+
+    impl From<uc::Error> for Error {
+        fn from(e: uc::Error) -> Self {
+            match e {
+                uc::Error::Repo => Error::Repo,
+                uc::Error::NotFound => Error::NotFound,
+            }
+        }
     }
 }
