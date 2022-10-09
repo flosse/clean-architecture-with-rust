@@ -15,27 +15,27 @@ path = "src/bin/web.rs"
 
 [workspace]
 members = [
-  "adapter",
-  "adapter/json-boundary",
-  "application",
-  "domain",
-  "infrastructure",
-  "infrastructure/db",
-  "infrastructure/web-server"
+  "crates/adapter",
+  "crates/application",
+  "crates/db",
+  "crates/domain",
+  "crates/infrastructure",
+  "crates/json-boundary",
+  "crates/web-server"
 ]
-exclude = [ "webapp" ]
+exclude = [ "crates/webapp" ]
 
 [dependencies]
 cawr-infrastructure = "0.0.0"
 
 [patch.crates-io]
-cawr-adapter        = { path = "adapter"                   }
-cawr-application    = { path = "application"               }
-cawr-db             = { path = "infrastructure/db"         }
-cawr-domain         = { path = "domain"                    }
-cawr-infrastructure = { path = "infrastructure"            }
-cawr-json-boundary  = { path = "adapter/json-boundary"     }
-cawr-web-server     = { path = "infrastructure/web-server" }
+cawr-adapter        = { path = "crates/adapter"        }
+cawr-application    = { path = "crates/application"    }
+cawr-db             = { path = "crates/db"             }
+cawr-domain         = { path = "crates/domain"         }
+cawr-infrastructure = { path = "crates/infrastructure" }
+cawr-json-boundary  = { path = "crates/json-boundary"  }
+cawr-web-server     = { path = "crates/web-server"     }
 
 [profile.release]
 lto = true

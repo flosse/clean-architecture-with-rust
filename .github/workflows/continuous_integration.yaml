@@ -35,7 +35,7 @@ jobs:
 
       - name: Build webapp
         run: |
-          cd webapp/
+          cd crates/webapp/
           rustup target add wasm32-unknown-unknown
           trunk -V
           trunk build

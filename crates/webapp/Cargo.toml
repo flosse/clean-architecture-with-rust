@@ -15,7 +15,7 @@ default-features = false
 features = ["from"]
 
 [patch.crates-io]
-cawr-json-boundary = { path = "../adapter/json-boundary" }
+cawr-json-boundary = { path = "../json-boundary" }
 
 [profile.release]
 lto = true

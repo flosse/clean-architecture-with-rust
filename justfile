@@ -25,7 +25,7 @@ build-cli:
 
 # Build the web app
 webapp:
-  cd webapp/ && trunk build
+  cd crates/webapp/ && trunk build
 
 # Read version from Cargo.toml
 pkg-version := `sed -En 's/version[[:space:]]*=[[:space:]]*"([^"]+)"/v\1/p' Cargo.toml | head -1`
@@ -45,17 +45,22 @@ pack-cli: build-cli
 # Format source code
 fmt:
   cargo fmt --all
-  cd webapp/ && cargo fmt --all
+  cd crates/webapp/ && cargo fmt --all
+
+# Run clippy linter
+clippy:
+  cargo clippy --workspace
+  cd crates/webapp/ && cargo clippy --workspace
 
 # Fix lint warnings
 fix:
   cargo fix --workspace --all-targets
   cargo clippy --workspace --all-targets --fix
-  cd webapp && cargo fix --workspace --all-targets
-  cd webapp && cargo clippy --workspace --all-targets --fix
+  cd crates/webapp && cargo fix --workspace --all-targets
+  cd crates/webapp && cargo clippy --workspace --all-targets --fix
 
 # Run tests
 test:
   RUST_BACKTRACE=1 cargo test --locked --workspace -- --nocapture
-  RUST_BACKTRACE=1 cargo test --locked --workspace --manifest-path webapp/Cargo.toml -- --nocapture
-  RUST_BACKTRACE=1 wasm-pack test --chrome --headless webapp/
+  RUST_BACKTRACE=1 cargo test --locked --workspace --manifest-path crates/webapp/Cargo.toml -- --nocapture
+  RUST_BACKTRACE=1 wasm-pack test --chrome --headless crates/webapp/
