@@ -1,4 +1,4 @@
-use json_boundary as boundary;
+use cawr_json_boundary as boundary;
 use seed::browser::fetch::{fetch, FetchError, Method, Request, Response};
 use serde::{Deserialize, Serialize};
 use std::result;

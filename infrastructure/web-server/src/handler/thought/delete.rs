@@ -1,5 +1,5 @@
 use crate::handler::{reply_error, Result};
-use adapter::{controller::thought::Controller, db::Db, presenter::http_json_api::Presenter};
+use cawr_adapter::{controller::thought::Controller, db::Db, presenter::http_json_api::Presenter};
 use std::sync::Arc;
 use warp::{reply, Reply};
 
@@ -22,8 +22,8 @@ where
 mod tests {
     use super::{handle, Arc, Controller, Presenter};
     use crate::tests::{add_thought_to_db, blank_db};
-    use adapter::model::app::thought as app;
-    use application::gateway::repository::thought::Repo;
+    use cawr_adapter::model::app::thought as app;
+    use cawr_application::gateway::repository::thought::Repo;
     use warp::{http::StatusCode, Reply};
 
     #[tokio::test]

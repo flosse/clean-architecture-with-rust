@@ -1,5 +1,5 @@
 use crate::handler::{reply_error, Result};
-use adapter::{
+use cawr_adapter::{
     controller::area_of_life::Controller, db::Db, model::view::json::area_of_life::create::Request,
     presenter::http_json_api::Presenter,
 };

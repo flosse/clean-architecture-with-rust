@@ -1,5 +1,7 @@
 use crate::handler::{reply_error, Result};
-use adapter::{controller::area_of_life::Controller, db::Db, presenter::http_json_api::Presenter};
+use cawr_adapter::{
+    controller::area_of_life::Controller, db::Db, presenter::http_json_api::Presenter,
+};
 use std::sync::Arc;
 use warp::{reply, Reply};
 

@@ -5,7 +5,7 @@ use crate::{
         self, validate_area_of_life_properties, AreaOfLifeInvalidity,
     },
 };
-use domain::area_of_life::{AreaOfLife, Id, Name};
+use cawr_domain::area_of_life::{AreaOfLife, Id, Name};
 use thiserror::Error;
 
 #[derive(Debug)]

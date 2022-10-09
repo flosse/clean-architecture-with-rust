@@ -1,10 +1,10 @@
-use adapter::db::Db;
 use anyhow::Result;
-use application::{
+use cawr_adapter::db::Db;
+use cawr_application::{
     gateway::repository::thought::Record as ThoughtRecord,
     identifier::{NewId, NewIdError},
 };
-use db::in_memory::InMemory;
+use cawr_db::in_memory::InMemory;
 use serde::Deserialize;
 use std::sync::Arc;
 use warp::reply::Response;
@@ -24,8 +24,8 @@ impl Db for CorruptTestDb {}
 
 mod thought {
     use super::*;
-    use application::gateway::repository::thought::{self as repo, Record, Repo};
-    use domain::thought::Id;
+    use cawr_application::gateway::repository::thought::{self as repo, Record, Repo};
+    use cawr_domain::thought::Id;
 
     impl Repo for CorruptTestDb {
         fn save(&self, _: Record) -> Result<(), repo::SaveError> {
@@ -51,8 +51,8 @@ mod thought {
 
 mod area_of_life {
     use super::*;
-    use application::gateway::repository::area_of_life::{self as repo, Record, Repo};
-    use domain::area_of_life::Id;
+    use cawr_application::gateway::repository::area_of_life::{self as repo, Record, Repo};
+    use cawr_domain::area_of_life::Id;
 
     impl Repo for CorruptTestDb {
         fn save(&self, _: Record) -> Result<(), repo::SaveError> {
@@ -87,8 +87,8 @@ where
 }
 
 pub fn add_thought_to_db(db: &Arc<InMemory>, title: &str) {
-    use application::gateway::repository::thought::Repo;
-    use domain::thought::*;
+    use cawr_application::gateway::repository::thought::Repo;
+    use cawr_domain::thought::*;
     use std::collections::HashSet;
     let thought = Thought::new(
         db.new_id().unwrap(),

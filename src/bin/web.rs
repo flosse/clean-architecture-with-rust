@@ -1,4 +1,4 @@
-use infrastructure::{logger, web};
+use cawr_infrastructure::{logger, web};
 
 pub fn main() {
     logger::init_default_logger();

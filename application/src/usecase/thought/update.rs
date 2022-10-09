@@ -8,7 +8,7 @@ use crate::{
         thought::validate::{self, validate_thought_properties, ThoughtInvalidity},
     },
 };
-use domain::{
+use cawr_domain::{
     area_of_life as aol,
     thought::{Id, Thought, Title},
 };

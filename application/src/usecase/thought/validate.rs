@@ -1,4 +1,4 @@
-use domain::thought::Title;
+use cawr_domain::thought::Title;
 use thiserror::Error;
 
 #[derive(Debug)]

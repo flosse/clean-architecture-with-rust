@@ -22,5 +22,5 @@ pub fn run() {
     let db = Arc::new(data_storage(args.data_dir));
     let rt = Runtime::new().expect("tokio runtime");
     let addr = SocketAddr::from((args.bind, args.port));
-    rt.block_on(web_server::run(db, addr));
+    rt.block_on(cawr_web_server::run(db, addr));
 }

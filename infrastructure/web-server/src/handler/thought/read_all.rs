@@ -1,5 +1,5 @@
 use crate::handler::{reply_error, Result};
-use adapter::{controller::thought::Controller, db::Db, presenter::http_json_api::Presenter};
+use cawr_adapter::{controller::thought::Controller, db::Db, presenter::http_json_api::Presenter};
 use std::sync::Arc;
 use warp::{reply, Reply};
 

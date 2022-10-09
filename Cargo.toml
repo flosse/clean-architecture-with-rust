@@ -26,16 +26,16 @@ members = [
 exclude = [ "webapp" ]
 
 [dependencies]
-infrastructure = "0.0.0"
+cawr-infrastructure = "0.0.0"
 
 [patch.crates-io]
-adapter        = { path = "adapter"                   }
-application    = { path = "application"               }
-db             = { path = "infrastructure/db"         }
-domain         = { path = "domain"                    }
-infrastructure = { path = "infrastructure"            }
-json-boundary  = { path = "adapter/json-boundary"     }
-web-server     = { path = "infrastructure/web-server" }
+cawr-adapter        = { path = "adapter"                   }
+cawr-application    = { path = "application"               }
+cawr-db             = { path = "infrastructure/db"         }
+cawr-domain         = { path = "domain"                    }
+cawr-infrastructure = { path = "infrastructure"            }
+cawr-json-boundary  = { path = "adapter/json-boundary"     }
+cawr-web-server     = { path = "infrastructure/web-server" }
 
 [profile.release]
 lto = true

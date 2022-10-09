@@ -1,5 +1,5 @@
 use crate::gateway::repository::thought::{GetAllError, Record, Repo};
-use domain::{area_of_life as aol, thought::Id};
+use cawr_domain::{area_of_life as aol, thought::Id};
 use std::{collections::HashSet, fmt::Debug};
 use thiserror::Error;
 

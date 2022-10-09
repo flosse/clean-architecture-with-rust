@@ -1,10 +1,10 @@
 use super::*;
-use adapter::model::app::{area_of_life as aol, thought as app};
-use application::{
+use cawr_adapter::model::app::{area_of_life as aol, thought as app};
+use cawr_application::{
     gateway::repository::thought::{DeleteError, GetAllError, GetError, Record, Repo, SaveError},
     identifier::{NewId, NewIdError},
 };
-use domain::thought::{Id, Thought, Title};
+use cawr_domain::thought::{Id, Thought, Title};
 use std::io;
 
 impl NewId<Id> for JsonFile {

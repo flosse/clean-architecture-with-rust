@@ -1,4 +1,4 @@
-use domain::area_of_life as aol;
+use cawr_domain::area_of_life as aol;
 use std::str::FromStr;
 use thiserror::Error;
 
@@ -43,7 +43,7 @@ impl ToString for Id {
 }
 
 pub mod create {
-    use application::usecase::area_of_life::create as uc;
+    use cawr_application::usecase::area_of_life::create as uc;
     use std::result;
 
     pub type Request = uc::Request;
@@ -54,7 +54,7 @@ pub mod create {
 
 pub mod update {
     use super::{Id, ParseIdError};
-    use application::usecase::area_of_life::{update as uc, validate::AreaOfLifeInvalidity};
+    use cawr_application::usecase::area_of_life::{update as uc, validate::AreaOfLifeInvalidity};
     use std::result;
     use thiserror::Error;
 
@@ -92,7 +92,7 @@ pub mod update {
 }
 
 pub mod read_all {
-    use application::usecase::area_of_life::read_all as uc;
+    use cawr_application::usecase::area_of_life::read_all as uc;
     use std::result;
 
     pub type Request = uc::Request;
@@ -103,7 +103,7 @@ pub mod read_all {
 
 pub mod delete {
     use super::ParseIdError;
-    use application::usecase::area_of_life::delete as uc;
+    use cawr_application::usecase::area_of_life::delete as uc;
     use std::result;
     use thiserror::Error;
 

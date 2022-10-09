@@ -5,7 +5,7 @@ pub use http::{Error, Result};
 
 mod thought {
     use crate::api::http::{self, Result};
-    use json_boundary::{
+    use cawr_json_boundary::{
         domain::{AreaOfLifeId, Thought, ThoughtId},
         usecase::thought::{create, delete, find_by_id, read_all, update},
     };
@@ -55,7 +55,7 @@ mod thought {
 
 mod area_of_life {
     use crate::api::http::{self, Result};
-    use json_boundary::{
+    use cawr_json_boundary::{
         domain::{AreaOfLife, AreaOfLifeId},
         usecase::area_of_life::{create, delete, read_all, update},
     };

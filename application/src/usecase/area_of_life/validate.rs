@@ -1,4 +1,4 @@
-use domain::area_of_life::Name;
+use cawr_domain::area_of_life::Name;
 use thiserror::Error;
 
 #[derive(Debug)]

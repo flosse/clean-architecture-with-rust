@@ -21,6 +21,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ec8a7b6a70fde80372154c65702f00a0f56f3e1c36abbc6c440484be248856db"
 
 [[package]]
+name = "cawr-json-boundary"
+version = "0.0.0"
+dependencies = [
+ "http",
+ "http-serde",
+ "serde",
+]
+
+[[package]]
 name = "cfg-if"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -277,15 +286,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "258451ab10b34f8af53416d1fdab72c22e805f0c92a1136d59470ec0b11138b2"
 dependencies = [
  "wasm-bindgen",
-]
-
-[[package]]
-name = "json-boundary"
-version = "0.0.0"
-dependencies = [
- "http",
- "http-serde",
- "serde",
 ]
 
 [[package]]
@@ -656,8 +656,8 @@ dependencies = [
 name = "webapp"
 version = "0.0.0"
 dependencies = [
+ "cawr-json-boundary",
  "derive_more",
- "json-boundary",
  "seed",
  "serde",
  "wasm-bindgen-test",

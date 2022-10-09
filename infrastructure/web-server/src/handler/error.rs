@@ -1,4 +1,4 @@
-use adapter::model::view::json::Error;
+use cawr_adapter::model::view::json::Error;
 use std::result;
 use warp::{reply, Rejection};
 

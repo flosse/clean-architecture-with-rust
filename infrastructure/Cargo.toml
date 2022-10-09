@@ -1,5 +1,5 @@
 [package]
-name = "infrastructure"
+name = "cawr-infrastructure"
 version = "0.0.0"
 edition = "2021"
 publish = false
@@ -7,9 +7,9 @@ publish = false
 [dependencies]
 
 # Workspace dependencies
-adapter = "0.0.0"
-db = "0.0.0"
-web-server = "0.0.0"
+cawr-adapter = "0.0.0"
+cawr-db = "0.0.0"
+cawr-web-server = "0.0.0"
 
 # External dependencies
 clap = { version = "3", features = ["derive"] }

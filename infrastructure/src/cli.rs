@@ -1,5 +1,7 @@
 use crate::storage::data_storage;
-use adapter::{controller::thought::Controller as ThoughtController, presenter::cli::Presenter};
+use cawr_adapter::{
+    controller::thought::Controller as ThoughtController, presenter::cli::Presenter,
+};
 use clap::{Parser, Subcommand};
 use std::{collections::HashSet, path::PathBuf, sync::Arc};
 

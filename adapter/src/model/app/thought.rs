@@ -1,4 +1,4 @@
-use domain::thought;
+use cawr_domain::thought;
 use std::str::FromStr;
 use thiserror::Error;
 
@@ -44,7 +44,7 @@ impl ToString for Id {
 
 pub mod create {
     use crate::model::app::area_of_life as aol;
-    use application::usecase::thought::{create as uc, validate::ThoughtInvalidity};
+    use cawr_application::usecase::thought::{create as uc, validate::ThoughtInvalidity};
     use std::{collections::HashSet, result};
     use thiserror::Error;
 
@@ -88,7 +88,7 @@ pub mod create {
 pub mod update {
     use super::ParseIdError;
     use crate::model::app::{area_of_life as aol, thought::Id};
-    use application::usecase::thought::{update as uc, validate::ThoughtInvalidity};
+    use cawr_application::usecase::thought::{update as uc, validate::ThoughtInvalidity};
     use std::{collections::HashSet, result};
     use thiserror::Error;
 
@@ -133,7 +133,7 @@ pub mod update {
 
 pub mod find_by_id {
     use super::ParseIdError;
-    use application::usecase::thought::find_by_id as uc;
+    use cawr_application::usecase::thought::find_by_id as uc;
     use std::result;
     use thiserror::Error;
 
@@ -162,7 +162,7 @@ pub mod find_by_id {
 }
 
 pub mod read_all {
-    use application::usecase::thought::read_all as uc;
+    use cawr_application::usecase::thought::read_all as uc;
     use std::result;
 
     pub type Request = uc::Request;
@@ -173,7 +173,7 @@ pub mod read_all {
 
 pub mod delete {
     use super::ParseIdError;
-    use application::usecase::thought::delete as uc;
+    use cawr_application::usecase::thought::delete as uc;
     use std::result;
     use thiserror::Error;
 

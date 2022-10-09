@@ -1,12 +1,12 @@
 [package]
-name = "application"
+name = "cawr-application"
 version = "0.0.0"
 edition = "2021"
 publish = false
 
 [dependencies]
 # Workspace dependencies
-domain = "0.0.0"
+cawr-domain = "0.0.0"
 
 # External dependencies
 log = "*"

@@ -18,7 +18,7 @@ pub(crate) mod thought {
             app::thought::create::Response, view::json::thought::create::Error,
             view::json::thought::ThoughtId,
         };
-        use application::usecase::thought::validate::{self, ThoughtInvalidity};
+        use cawr_application::usecase::thought::validate::{self, ThoughtInvalidity};
 
         pub fn thought_id_from_response(res: Response) -> ThoughtId {
             res.id.to_u64().into()
@@ -35,7 +35,7 @@ pub(crate) mod thought {
     }
     pub mod update {
         use crate::model::view::json::thought::update::Error;
-        use application::usecase::thought::validate::{self, ThoughtInvalidity};
+        use cawr_application::usecase::thought::validate::{self, ThoughtInvalidity};
 
         pub fn from_thought_invalidity(from: ThoughtInvalidity) -> Error {
             let ThoughtInvalidity::Title(e) = from;
@@ -48,7 +48,7 @@ pub(crate) mod thought {
     }
     pub mod read_all {
         use crate::model::view::json::thought::Thought;
-        use application::usecase::thought::read_all as uc;
+        use cawr_application::usecase::thought::read_all as uc;
 
         pub fn from_thought(from: uc::Thought) -> Thought {
             let uc::Thought {
@@ -70,7 +70,7 @@ pub(crate) mod thought {
     }
     pub mod find_by_id {
         use crate::model::view::json::thought::Thought;
-        use application::usecase::thought::find_by_id as uc;
+        use cawr_application::usecase::thought::find_by_id as uc;
 
         pub fn from_response(from: uc::Response) -> Thought {
             let uc::Response {
@@ -95,7 +95,7 @@ pub(crate) mod thought {
 pub(crate) mod area_of_life {
     pub mod create {
         use crate::model::view::json::area_of_life::{create::Error, AreaOfLifeId};
-        use application::usecase::area_of_life::{create as uc, validate};
+        use cawr_application::usecase::area_of_life::{create as uc, validate};
 
         pub fn from_response(from: uc::Response) -> AreaOfLifeId {
             from.id.to_u64().into()
@@ -117,7 +117,9 @@ pub(crate) mod area_of_life {
     }
     pub mod update {
         use crate::model::view::json::area_of_life::update::Error;
-        use application::usecase::area_of_life::validate::{AreaOfLifeInvalidity, NameInvalidity};
+        use cawr_application::usecase::area_of_life::validate::{
+            AreaOfLifeInvalidity, NameInvalidity,
+        };
 
         pub fn from_area_of_life_invalidity(from: AreaOfLifeInvalidity) -> Error {
             let AreaOfLifeInvalidity::Name(e) = from;
@@ -130,7 +132,7 @@ pub(crate) mod area_of_life {
     }
     pub mod read_all {
         use crate::model::view::json::area_of_life::AreaOfLife;
-        use application::usecase::area_of_life::read_all as uc;
+        use cawr_application::usecase::area_of_life::read_all as uc;
 
         pub fn from_area_of_life(from: uc::AreaOfLife) -> AreaOfLife {
             let uc::AreaOfLife { id, name } = from;

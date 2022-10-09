@@ -2,10 +2,10 @@ use crate::{
     model::app::area_of_life::{self as app, Id},
     presenter::Present,
 };
-use application::{
+use cawr_application::{
     gateway::repository::area_of_life::Repo, identifier::NewId, usecase::area_of_life as uc,
 };
-use domain::area_of_life as aol;
+use cawr_domain::area_of_life as aol;
 use std::sync::Arc;
 
 pub struct Controller<D, P> {

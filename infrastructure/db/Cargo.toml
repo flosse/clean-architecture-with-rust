@@ -1,5 +1,5 @@
 [package]
-name = "db"
+name = "cawr-db"
 version = "0.0.0"
 edition = "2021"
 publish = false
@@ -7,9 +7,9 @@ publish = false
 [dependencies]
 
 # Workspace dependencies
-adapter = "0.0.0"
-application = "0.0.0"
-domain = "0.0.0"
+cawr-adapter = "0.0.0"
+cawr-application = "0.0.0"
+cawr-domain = "0.0.0"
 
 # External dependencies
 log = "*"

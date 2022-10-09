@@ -5,7 +5,7 @@ use crate::{
     },
     presenter::Present,
 };
-use application::{gateway::repository as repo, identifier::NewId, usecase::thought as uc};
+use cawr_application::{gateway::repository as repo, identifier::NewId, usecase::thought as uc};
 use std::{collections::HashSet, sync::Arc};
 
 pub struct Controller<D, P> {
@@ -15,7 +15,7 @@ pub struct Controller<D, P> {
 
 impl<D, P> Controller<D, P>
 where
-    D: repo::thought::Repo + repo::area_of_life::Repo + 'static + NewId<domain::thought::Id>,
+    D: repo::thought::Repo + repo::area_of_life::Repo + 'static + NewId<cawr_domain::thought::Id>,
     P: Present<app::create::Result>
         + Present<app::delete::Result>
         + Present<app::find_by_id::Result>
@@ -106,7 +106,7 @@ where
 
 fn parse_area_of_life_ids(
     areas_of_life: &HashSet<String>,
-) -> Result<HashSet<domain::area_of_life::Id>, aol::ParseIdError> {
+) -> Result<HashSet<cawr_domain::area_of_life::Id>, aol::ParseIdError> {
     areas_of_life
         .iter()
         .map(|id| id.parse())

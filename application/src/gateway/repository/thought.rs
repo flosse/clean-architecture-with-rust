@@ -1,4 +1,4 @@
-use domain::thought::{Id, Thought};
+use cawr_domain::thought::{Id, Thought};
 use thiserror::Error;
 
 #[derive(Debug, Error)]

@@ -1,13 +1,13 @@
 use super::*;
-use adapter::model::app::area_of_life as app;
-use application::{
+use cawr_adapter::model::app::area_of_life as app;
+use cawr_application::{
     gateway::repository::{
         area_of_life::{DeleteError, GetAllError, GetError, Record, Repo, SaveError},
         thought::Repo as ThoughtRepo,
     },
     identifier::{NewId, NewIdError},
 };
-use domain::{
+use cawr_domain::{
     area_of_life::{AreaOfLife, Id, Name},
     thought::Thought,
 };

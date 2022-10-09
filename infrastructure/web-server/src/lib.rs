@@ -1,4 +1,4 @@
-use adapter::db::Db;
+use cawr_adapter::db::Db;
 use std::{net::SocketAddr, sync::Arc};
 use warp::Filter;
 

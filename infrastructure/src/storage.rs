@@ -1,4 +1,4 @@
-use db::json_file::JsonFile;
+use cawr_db::json_file::JsonFile;
 use directories::UserDirs;
 use std::path::{Path, PathBuf};
 

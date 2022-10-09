@@ -1,5 +1,5 @@
 use crate::gateway::repository::area_of_life::{GetAllError, Record, Repo};
-use domain::area_of_life::Id;
+use cawr_domain::area_of_life::Id;
 use std::fmt::Debug;
 use thiserror::Error;
 

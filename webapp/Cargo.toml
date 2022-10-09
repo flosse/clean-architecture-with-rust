@@ -5,7 +5,7 @@ edition = "2021"
 publish = false
 
 [dependencies]
-json-boundary = "*"
+cawr-json-boundary = "*"
 seed = { version = "*", features = ["serde-wasm-bindgen"] }
 serde = "1"
 
@@ -15,7 +15,7 @@ default-features = false
 features = ["from"]
 
 [patch.crates-io]
-json-boundary = { path = "../adapter/json-boundary" }
+cawr-json-boundary = { path = "../adapter/json-boundary" }
 
 [profile.release]
 lto = true

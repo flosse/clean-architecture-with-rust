@@ -1,5 +1,5 @@
-use adapter::db::Db;
-use application::{
+use cawr_adapter::db::Db;
+use cawr_application::{
     gateway::repository::{
         area_of_life::Record as AreaOfLifeRecord, thought::Record as ThoughtRecord,
     },
@@ -9,18 +9,18 @@ use std::{collections::HashMap, sync::RwLock};
 
 #[derive(Default)]
 pub struct InMemory {
-    thoughts: RwLock<HashMap<domain::thought::Id, ThoughtRecord>>,
-    areas_of_life: RwLock<HashMap<domain::area_of_life::Id, AreaOfLifeRecord>>,
+    thoughts: RwLock<HashMap<cawr_domain::thought::Id, ThoughtRecord>>,
+    areas_of_life: RwLock<HashMap<cawr_domain::area_of_life::Id, AreaOfLifeRecord>>,
 }
 
 impl Db for InMemory {}
 
 mod thought {
     use super::*;
-    use application::gateway::repository::thought::{
+    use cawr_application::gateway::repository::thought::{
         DeleteError, GetAllError, GetError, Record, Repo, SaveError,
     };
-    use domain::thought::Id;
+    use cawr_domain::thought::Id;
 
     impl Repo for InMemory {
         fn save(&self, record: Record) -> Result<(), SaveError> {
@@ -76,10 +76,10 @@ mod thought {
 
 mod area_of_life {
     use super::*;
-    use application::gateway::repository::area_of_life::{
+    use cawr_application::gateway::repository::area_of_life::{
         DeleteError, GetAllError, GetError, Record, Repo, SaveError,
     };
-    use domain::area_of_life::Id;
+    use cawr_domain::area_of_life::Id;
 
     impl Repo for InMemory {
         fn save(&self, record: Record) -> Result<(), SaveError> {

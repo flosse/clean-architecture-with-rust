@@ -1,5 +1,5 @@
 use crate::gateway::repository::thought::{DeleteError, Repo};
-use domain::thought::Id;
+use cawr_domain::thought::Id;
 use std::fmt::Debug;
 use thiserror::Error;
 

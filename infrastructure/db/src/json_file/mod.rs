@@ -1,5 +1,5 @@
-use adapter::db::Db;
-use application::identifier::NewIdError;
+use cawr_adapter::db::Db;
+use cawr_application::identifier::NewIdError;
 use jfs::{Config, Store};
 use std::{collections::HashMap, fs, io, path::Path};
 
@@ -99,7 +99,7 @@ mod tests {
 
     mod area_of_life {
         use super::*;
-        use domain::{
+        use cawr_domain::{
             area_of_life::{AreaOfLife, Id as AolId, Name},
             thought::{Id as ThoughtId, Thought, Title},
         };
@@ -108,7 +108,7 @@ mod tests {
 
         #[test]
         fn delete_references_in_thoughts() {
-            use application::{
+            use cawr_application::{
                 gateway::repository::{
                     area_of_life::{Record as AolRecord, Repo as AolRepo},
                     thought::{Record as ThoughtRecord, Repo as ThoughtRepo},
