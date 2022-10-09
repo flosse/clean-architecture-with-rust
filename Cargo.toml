@@ -17,6 +17,7 @@ path = "src/bin/web.rs"
 members = [
   "crates/adapter",
   "crates/application",
+  "crates/cli",
   "crates/db",
   "crates/domain",
   "crates/infrastructure",
@@ -31,6 +32,7 @@ cawr-infrastructure = "0.0.0"
 [patch.crates-io]
 cawr-adapter        = { path = "crates/adapter"        }
 cawr-application    = { path = "crates/application"    }
+cawr-cli            = { path = "crates/cli"            }
 cawr-db             = { path = "crates/db"             }
 cawr-domain         = { path = "crates/domain"         }
 cawr-infrastructure = { path = "crates/infrastructure" }

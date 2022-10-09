@@ -16,6 +16,7 @@ Currently there are these circles:
 - `infrastructure`
   - `db`
   - `web-server`
+  - `cli`
 - `webapp`
 
 Depending on your system the amount and the name of circles could
