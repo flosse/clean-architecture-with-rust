@@ -1,15 +1,11 @@
-use crate::handler::{reply_error, Result};
-use cawr_adapter::{
-    controller::thought::Controller, db::Db, model::view::json::thought::create::Request,
-    presenter::http_json_api::Presenter,
+use crate::{
+    handler::{reply_error, Result},
+    AppApi,
 };
-use std::sync::Arc;
+use cawr_adapter::{db::Db, model::view::json::thought::create::Request};
 use warp::{reply, Reply};
 
-pub async fn handle<D>(
-    req: Request,
-    controller: Arc<Controller<D, Presenter>>,
-) -> Result<impl Reply>
+pub async fn handle<D>(req: Request, api: AppApi<D>) -> Result<impl Reply>
 where
     D: Db,
 {
@@ -18,7 +14,7 @@ where
         .into_iter()
         .map(|id| id.0.to_string())
         .collect();
-    match controller.create_thought(req.title, &areas_of_life) {
+    match api.create_thought(req.title, &areas_of_life) {
         Ok(res) => Ok(reply::with_status(reply::json(&res.data), res.status)),
         Err(err) => Ok(reply_error(err)),
     }
@@ -26,8 +22,8 @@ where
 
 #[cfg(test)]
 mod tests {
-    use super::{handle, Arc, Controller, Presenter, Request};
-    use crate::tests::{blank_db, response_json_body};
+    use super::{handle, Request};
+    use crate::tests::{app_api, blank_db, response_json_body};
     use cawr_adapter::model::view::json::{thought::create as uc, Error};
     use cawr_application::gateway::repository::thought::Repo;
     use serde_json::Value;
@@ -36,12 +32,12 @@ mod tests {
     #[tokio::test]
     async fn create() {
         let db = blank_db();
-        let controller = Arc::new(Controller::new(db.clone(), Presenter::default()));
+        let app_api = app_api(db.clone());
         let req = Request {
             title: "test 1".to_string(),
             areas_of_life: vec![],
         };
-        let res = handle(req, controller).await.unwrap().into_response();
+        let res = handle(req, app_api).await.unwrap().into_response();
 
         assert_eq!(res.status(), StatusCode::CREATED);
 
@@ -55,12 +51,12 @@ mod tests {
     #[tokio::test]
     async fn create_with_too_short_title() {
         let db = blank_db();
-        let controller = Arc::new(Controller::new(db, Presenter::default()));
+        let app_api = app_api(db);
         let req = Request {
             title: "t".to_string(),
             areas_of_life: vec![],
         };
-        let res = handle(req, controller).await.unwrap().into_response();
+        let res = handle(req, app_api).await.unwrap().into_response();
 
         assert_eq!(res.status(), StatusCode::BAD_REQUEST);
 
@@ -80,12 +76,12 @@ mod tests {
     #[tokio::test]
     async fn create_with_too_long_title() {
         let db = blank_db();
-        let controller = Arc::new(Controller::new(db, Presenter::default()));
+        let app_api = app_api(db);
         let req = Request {
             title: ["t"; 100].join(""),
             areas_of_life: vec![],
         };
-        let res = handle(req, controller).await.unwrap().into_response();
+        let res = handle(req, app_api).await.unwrap().into_response();
 
         assert_eq!(res.status(), StatusCode::BAD_REQUEST);
 

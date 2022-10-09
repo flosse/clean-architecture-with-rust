@@ -1,7 +1,5 @@
 use crate::storage::data_storage;
-use cawr_adapter::{
-    controller::thought::Controller as ThoughtController, presenter::cli::Presenter,
-};
+use cawr_adapter::{api::Api, presenter::cli::Presenter};
 use clap::{Parser, Subcommand};
 use std::{collections::HashSet, path::PathBuf, sync::Arc};
 
@@ -24,18 +22,16 @@ enum Command {
 pub fn run() {
     let args = Args::parse();
     let db = Arc::new(data_storage(args.data_dir));
-    let presenter = Presenter::default();
+    let app_api = Api::new(db, Presenter::default());
 
     match args.command {
         Command::Create { title } => {
-            let controller = ThoughtController::new(db, presenter);
             let areas_of_life = HashSet::new(); // Areas of life needs to be added later
-            let res = controller.create_thought(title, &areas_of_life);
+            let res = app_api.create_thought(title, &areas_of_life);
             println!("{}", res);
         }
         Command::Read { id } => {
-            let controller = ThoughtController::new(db, presenter);
-            let res = controller.find_thought(&id);
+            let res = app_api.find_thought(&id);
             println!("{}", res);
         }
     }

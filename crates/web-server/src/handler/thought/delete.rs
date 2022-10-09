@@ -1,18 +1,17 @@
-use crate::handler::{reply_error, Result};
-use cawr_adapter::{controller::thought::Controller, db::Db, presenter::http_json_api::Presenter};
-use std::sync::Arc;
+use crate::{
+    handler::{reply_error, Result},
+    AppApi,
+};
+use cawr_adapter::db::Db;
 use warp::{reply, Reply};
 
 pub type Request = String;
 
-pub async fn handle<D>(
-    req: Request,
-    controller: Arc<Controller<D, Presenter>>,
-) -> Result<impl Reply>
+pub async fn handle<D>(req: Request, api: AppApi<D>) -> Result<impl Reply>
 where
     D: Db,
 {
-    match controller.delete_thought(&req) {
+    match api.delete_thought(&req) {
         Ok(res) => Ok(reply::with_status(reply::json(&res.data), res.status)),
         Err(err) => Ok(reply_error(err)),
     }
@@ -20,8 +19,8 @@ where
 
 #[cfg(test)]
 mod tests {
-    use super::{handle, Arc, Controller, Presenter};
-    use crate::tests::{add_thought_to_db, blank_db};
+    use super::handle;
+    use crate::tests::{add_thought_to_db, app_api, blank_db};
     use cawr_adapter::model::app::thought as app;
     use cawr_application::gateway::repository::thought::Repo;
     use warp::{http::StatusCode, Reply};
@@ -36,9 +35,9 @@ mod tests {
 
         assert!(db.get(id).is_ok());
 
-        let controller = Arc::new(Controller::new(db.clone(), Presenter::default()));
+        let app_api = app_api(db.clone());
         let req = id.to_string();
-        let res = handle(req, controller).await.unwrap().into_response();
+        let res = handle(req, app_api).await.unwrap().into_response();
 
         assert_eq!(res.status(), StatusCode::OK);
         assert!(db.get(id).is_err());

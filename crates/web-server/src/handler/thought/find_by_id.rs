@@ -1,18 +1,17 @@
-use crate::handler::{reply_error, Result};
-use cawr_adapter::{controller::thought::Controller, db::Db, presenter::http_json_api::Presenter};
-use std::sync::Arc;
+use crate::{
+    handler::{reply_error, Result},
+    AppApi,
+};
+use cawr_adapter::db::Db;
 use warp::{reply, Reply};
 
 pub type Request = String;
 
-pub async fn handle<D>(
-    req: Request,
-    controller: Arc<Controller<D, Presenter>>,
-) -> Result<impl Reply>
+pub async fn handle<D>(req: Request, api: AppApi<D>) -> Result<impl Reply>
 where
     D: Db,
 {
-    match controller.find_thought(&req) {
+    match api.find_thought(&req) {
         Ok(res) => Ok(reply::with_status(reply::json(&res.data), res.status)),
         Err(err) => Ok(reply_error(err)),
     }
@@ -20,8 +19,8 @@ where
 
 #[cfg(test)]
 mod tests {
-    use super::{handle, Arc, Controller, Presenter};
-    use crate::tests::{add_thought_to_db, blank_db, corrupt_db, response_json_body};
+    use super::handle;
+    use crate::tests::{add_thought_to_db, app_api, blank_db, corrupt_db, response_json_body};
     use cawr_adapter::model::view::json::{thought::find_by_id as uc, Error};
     use serde_json::Value;
     use warp::{http::StatusCode, Reply};
@@ -32,9 +31,9 @@ mod tests {
         add_thought_to_db(&db, "foo");
         add_thought_to_db(&db, "bar");
 
-        let controller = Arc::new(Controller::new(db, Presenter::default()));
+        let app_api = app_api(db.clone());
         let req = "2".to_string();
-        let res = handle(req, controller).await.unwrap().into_response();
+        let res = handle(req, app_api).await.unwrap().into_response();
 
         assert_eq!(res.status(), StatusCode::OK);
 
@@ -49,9 +48,9 @@ mod tests {
     async fn read_non_existent() {
         let db = blank_db();
 
-        let controller = Arc::new(Controller::new(db, Presenter::default()));
+        let app_api = app_api(db.clone());
         let req = "5".to_string();
-        let res = handle(req, controller).await.unwrap().into_response();
+        let res = handle(req, app_api).await.unwrap().into_response();
 
         assert_eq!(res.status(), StatusCode::NOT_FOUND);
 
@@ -66,9 +65,9 @@ mod tests {
     async fn read_invalid_id() {
         let db = blank_db();
 
-        let controller = Arc::new(Controller::new(db, Presenter::default()));
+        let app_api = app_api(db.clone());
         let req = "invalid-id".to_string();
-        let res = handle(req, controller).await.unwrap().into_response();
+        let res = handle(req, app_api).await.unwrap().into_response();
 
         assert_eq!(res.status(), StatusCode::BAD_REQUEST);
 
@@ -82,9 +81,9 @@ mod tests {
     async fn read_with_corrupt_db() {
         let db = corrupt_db();
 
-        let controller = Arc::new(Controller::new(db, Presenter::default()));
+        let app_api = app_api(db.clone());
         let req = "1".to_string();
-        let res = handle(req, controller).await.unwrap().into_response();
+        let res = handle(req, app_api).await.unwrap().into_response();
 
         assert_eq!(res.status(), StatusCode::INTERNAL_SERVER_ERROR);
 

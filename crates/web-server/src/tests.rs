@@ -1,5 +1,6 @@
+use crate::AppApi;
 use anyhow::Result;
-use cawr_adapter::db::Db;
+use cawr_adapter::{api::Api, db::Db, presenter::http_json_api::Presenter};
 use cawr_application::{
     gateway::repository::thought::Record as ThoughtRecord,
     identifier::{NewId, NewIdError},
@@ -15,6 +16,13 @@ pub fn blank_db() -> Arc<InMemory> {
 
 pub fn corrupt_db() -> Arc<CorruptTestDb> {
     Arc::new(CorruptTestDb::default())
+}
+
+pub fn app_api<D>(db: Arc<D>) -> AppApi<D>
+where
+    D: Db,
+{
+    Api::new(db, Presenter::default())
 }
 
 #[derive(Default)]
