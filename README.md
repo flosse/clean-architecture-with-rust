@@ -14,10 +14,11 @@ Currently there are these circles:
 - `adapter`
   - `json-boundary`
 - `infrastructure`
-  - `db`
-  - `web-server`
   - `cli`
-- `webapp`
+  - `db`
+  - `desktop`
+  - `webapp`
+  - `web-server`
 
 Depending on your system the amount and the name of circles could
 be different but the main **dependency rule** must be ensured:

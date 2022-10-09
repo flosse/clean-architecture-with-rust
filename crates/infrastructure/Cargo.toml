@@ -10,6 +10,7 @@ publish = false
 cawr-adapter = "0.0.0"
 cawr-cli = "0.0.0"
 cawr-db = "0.0.0"
+cawr-desktop = "0.0.0"
 cawr-web-server = "0.0.0"
 
 # External dependencies

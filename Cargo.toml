@@ -13,12 +13,17 @@ path = "src/bin/cli.rs"
 name = "clean-architecture-with-rust-web"
 path = "src/bin/web.rs"
 
+[[bin]]
+name = "clean-architecture-with-rust-desktop"
+path = "src/bin/desktop.rs"
+
 [workspace]
 members = [
   "crates/adapter",
   "crates/application",
   "crates/cli",
   "crates/db",
+  "crates/desktop",
   "crates/domain",
   "crates/infrastructure",
   "crates/json-boundary",
@@ -34,6 +39,7 @@ cawr-adapter        = { path = "crates/adapter"        }
 cawr-application    = { path = "crates/application"    }
 cawr-cli            = { path = "crates/cli"            }
 cawr-db             = { path = "crates/db"             }
+cawr-desktop        = { path = "crates/desktop"        }
 cawr-domain         = { path = "crates/domain"         }
 cawr-infrastructure = { path = "crates/infrastructure" }
 cawr-json-boundary  = { path = "crates/json-boundary"  }

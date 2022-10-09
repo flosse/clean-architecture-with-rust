@@ -15,6 +15,10 @@ run-web: webapp
 run-cli:
   cargo run --bin clean-architecture-with-rust-cli
 
+# Run the desktop app
+run-desktop:
+  cargo run --bin clean-architecture-with-rust-desktop
+
 # Build the web server
 build-web: webapp
   cargo build --bin clean-architecture-with-rust-web --release
@@ -22,6 +26,10 @@ build-web: webapp
 # Build the CLI
 build-cli:
   cargo build --bin clean-architecture-with-rust-cli --release
+
+# Build the desktop app
+build-desktop:
+  cargo build --bin clean-architecture-with-rust-desktop --release
 
 # Build the web app
 webapp:
