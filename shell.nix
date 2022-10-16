@@ -6,7 +6,7 @@ let
   };
   rust = (rustChannel.rust.override {
     targets = [
-      "wasm32-unknown-unknown" # required for the webapp
+      "wasm32-unknown-unknown" # required for the web-app
     ];
   });
 
@@ -28,7 +28,7 @@ in
       rust
       pkgconfig
 
-      # required for the webapp
+      # required for the web-app
       sassc
 
       # required for the desktop
