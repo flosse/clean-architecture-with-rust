@@ -5,14 +5,14 @@ use warp::{http::HeaderValue, hyper::header::CONTENT_TYPE, path::Tail, Filter, R
 #[folder = "../web-app/dist/"]
 struct Asset;
 
-pub fn get_index() -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
+pub fn get_index() -> impl Filter<Extract = (impl Reply,), Error = Rejection> + Clone {
     let index = warp::path("index.html")
         .and(warp::path::end())
         .or(warp::path::end());
     warp::get().and(index).and_then(|_| serve_index())
 }
 
-pub fn get_assets() -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
+pub fn get_assets() -> impl Filter<Extract = (impl Reply,), Error = Rejection> + Clone {
     warp::get().and(warp::path::tail()).and_then(serve)
 }
 

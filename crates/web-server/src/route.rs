@@ -3,7 +3,7 @@ use cawr_adapter::db::Db;
 use std::convert::Infallible;
 use warp::{body, path, Filter, Rejection, Reply};
 
-pub fn api<D>(app: AppApi<D>) -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone
+pub fn api<D>(app: AppApi<D>) -> impl Filter<Extract = (impl Reply,), Error = Rejection> + Clone
 where
     D: Db,
 {
