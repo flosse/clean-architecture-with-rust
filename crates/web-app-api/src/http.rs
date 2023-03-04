@@ -1,28 +1,23 @@
 use cawr_json_boundary as boundary;
-use seed::browser::fetch::{fetch, FetchError, Method, Request, Response};
+use gloo_net::http::{Method, Request, Response};
 use serde::{Deserialize, Serialize};
 use std::result;
+use thiserror::Error;
 
-#[derive(Debug)]
+#[derive(Debug, Error)]
 pub enum Error<E> {
-    Fetch(FetchError),
+    Fetch(#[from] gloo_net::Error),
     Api(boundary::Error<E>),
 }
 
-impl<E> From<FetchError> for Error<E> {
-    fn from(e: FetchError) -> Self {
-        Self::Fetch(e)
-    }
-}
-
-pub type Result<T, E> = result::Result<T, Error<E>>;
+pub(crate) type Result<T, E> = result::Result<T, Error<E>>;
 
 pub async fn get_json<T, E>(url: &str) -> Result<T, E>
 where
     T: for<'de> Deserialize<'de> + 'static,
     E: for<'de> Deserialize<'de> + 'static,
 {
-    let res = fetch(url).await?;
+    let res = Request::get(url).send().await?;
     to_result(res).await
 }
 
@@ -32,8 +27,8 @@ where
     T: for<'de> Deserialize<'de> + 'static,
     E: for<'de> Deserialize<'de> + 'static,
 {
-    let req = Request::new(url).method(Method::Post).json(req)?;
-    let res = fetch(req).await?;
+    let req = Request::new(url).method(Method::POST).json(req)?;
+    let res = req.send().await?;
     to_result(res).await
 }
 
@@ -43,8 +38,8 @@ where
     T: for<'de> Deserialize<'de> + 'static,
     E: for<'de> Deserialize<'de> + 'static,
 {
-    let req = Request::new(url).method(Method::Put).json(req)?;
-    let res = fetch(req).await?;
+    let req = Request::new(url).method(Method::PUT).json(req)?;
+    let res = req.send().await?;
     to_result(res).await
 }
 
@@ -54,8 +49,8 @@ where
     T: for<'de> Deserialize<'de> + 'static,
     E: for<'de> Deserialize<'de> + 'static,
 {
-    let req = Request::new(url).method(Method::Delete).json(req)?;
-    let res = fetch(req).await?;
+    let req = Request::new(url).method(Method::DELETE).json(req)?;
+    let res = req.send().await?;
     to_result(res).await
 }
 
@@ -64,7 +59,7 @@ where
     T: for<'de> Deserialize<'de> + 'static,
     E: for<'de> Deserialize<'de> + 'static,
 {
-    if res.status().is_ok() {
+    if res.ok() {
         let data = res.json().await?;
         Ok(data)
     } else {

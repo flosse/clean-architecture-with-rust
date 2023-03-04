@@ -1,10 +1,10 @@
-mod http;
+pub mod http;
 
 pub use self::{area_of_life::*, thought::*};
-pub use http::{Error, Result};
+pub use http::Error;
 
 mod thought {
-    use crate::api::http::{self, Result};
+    use crate::http::{self, Result};
     use cawr_json_boundary::{
         domain::{AreaOfLifeId, Thought, ThoughtId},
         usecase::thought::{create, delete, find_by_id, read_all, update},
@@ -54,7 +54,7 @@ mod thought {
 }
 
 mod area_of_life {
-    use crate::api::http::{self, Result};
+    use crate::http::{self, Result};
     use cawr_json_boundary::{
         domain::{AreaOfLife, AreaOfLifeId},
         usecase::area_of_life::{create, delete, read_all, update},

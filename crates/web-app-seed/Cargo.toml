@@ -6,6 +6,8 @@ publish = false
 
 [dependencies]
 cawr-json-boundary = "*"
+cawr-web-app-api = "*"
+gloo-net = { version = "0.2", default-featues = false }
 seed = { version = "*", features = ["serde-wasm-bindgen"] }
 serde = "1"
 
@@ -16,6 +18,7 @@ features = ["from"]
 
 [patch.crates-io]
 cawr-json-boundary = { path = "../json-boundary" }
+cawr-web-app-api   = { path = "../web-app-api"   }
 
 [profile.release]
 lto = true

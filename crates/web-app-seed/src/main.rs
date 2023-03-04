@@ -1,6 +1,6 @@
+use cawr_web_app_api as api;
 use seed::prelude::*;
 
-mod api;
 mod domain;
 mod usecase;
 mod view;

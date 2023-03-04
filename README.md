@@ -17,8 +17,10 @@ Currently there are these circles:
   - `cli`
   - `db`
   - `desktop`
-  - `web-app-seed`
-  - `web-server`
+  - `web`
+    - `web-app-api`
+    - `web-app-seed`
+    - `web-server`
 
 Depending on your system the amount and the name of circles could
 be different but the main **dependency rule** must be ensured:

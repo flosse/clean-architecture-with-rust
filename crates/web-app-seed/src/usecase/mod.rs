@@ -19,16 +19,15 @@ struct ErrorPresenter;
 impl<E: fmt::Debug> Present<api::Error<E>> for ErrorPresenter {
     type ViewModel = String;
     fn present(&self, err: api::Error<E>) -> Self::ViewModel {
-        use seed::fetch::FetchError as F;
+        use gloo_net::Error as F;
         match err {
             api::Error::Fetch(e) => match e {
-                F::RequestError(_) | F::StatusError(_) | F::PromiseError(_) | F::JsonError(_) => {
+                F::JsError(_) | F::GlooError(_) => {
                     "A communication problem with the server has occured".to_string()
                 }
-                F::DomException(e) => {
-                    format!("A problem within the browser has occured: {:?}", e)
+                F::SerdeError(_) => {
+                    "A problem has arisen in the interpretation of the data".to_string()
                 }
-                F::NetworkError(_) => "A network error has occured".to_string(),
             },
             api::Error::Api(e) => {
                 if let Some(d) = &e.details {

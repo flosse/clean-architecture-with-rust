@@ -27,6 +27,7 @@ members = [
   "crates/domain",
   "crates/infrastructure",
   "crates/json-boundary",
+  "crates/web-app-api",
   "crates/web-server"
 ]
 exclude = [ "crates/web-app-seed" ]
@@ -43,6 +44,7 @@ cawr-desktop        = { path = "crates/desktop"        }
 cawr-domain         = { path = "crates/domain"         }
 cawr-infrastructure = { path = "crates/infrastructure" }
 cawr-json-boundary  = { path = "crates/json-boundary"  }
+cawr-web-app-api    = { path = "crates/web-app-api"    }
 cawr-web-server     = { path = "crates/web-server"     }
 
 [profile.release]

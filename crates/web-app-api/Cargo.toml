@@ -1,0 +1,15 @@
+[package]
+name = "cawr-web-app-api"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+cawr-json-boundary = { version = "0.0.0", path = "../json-boundary" }
+serde = "1.0.152"
+thiserror = "1.0.38"
+
+[dependencies.gloo-net]
+version = "0.2"
+default-features = false
+features = ["http", "json"]
