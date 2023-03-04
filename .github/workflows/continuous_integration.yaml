@@ -33,9 +33,9 @@ jobs:
         run: |
           wget -qO- https://github.com/thedodd/trunk/releases/download/v0.16.0/trunk-x86_64-unknown-linux-gnu.tar.gz | tar -C ~/.cargo/bin -xzf-
 
-      - name: Build web-app
+      - name: Build web-app-seed
         run: |
-          cd crates/web-app/
+          cd crates/web-app-seed/
           rustup target add wasm32-unknown-unknown
           trunk -V
           trunk build

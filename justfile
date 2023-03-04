@@ -8,7 +8,7 @@ setup:
   cargo install trunk
 
 # Run the web server
-run-web: web-app
+run-web: web-app-seed
   cargo run --bin clean-architecture-with-rust-web
 
 # Run the CLI
@@ -20,7 +20,7 @@ run-desktop:
   cargo run --bin clean-architecture-with-rust-desktop
 
 # Build the web server
-build-web: web-app
+build-web: web-app-seed
   cargo build --bin clean-architecture-with-rust-web --release
 
 # Build the CLI
@@ -32,8 +32,8 @@ build-desktop:
   cargo build --bin clean-architecture-with-rust-desktop --release
 
 # Build the web app
-web-app:
-  cd crates/web-app/ && trunk build
+web-app-seed:
+  cd crates/web-app-seed/ && trunk build
 
 # Read version from Cargo.toml
 pkg-version := `sed -En 's/version[[:space:]]*=[[:space:]]*"([^"]+)"/v\1/p' Cargo.toml | head -1`
@@ -53,22 +53,22 @@ pack-cli: build-cli
 # Format source code
 fmt:
   cargo fmt --all
-  cd crates/web-app/ && cargo fmt --all
+  cd crates/web-app-seed/ && cargo fmt --all
 
 # Run clippy linter
 clippy:
   cargo clippy --workspace
-  cd crates/web-app/ && cargo clippy --workspace
+  cd crates/web-app-seed/ && cargo clippy --workspace
 
 # Fix lint warnings
 fix:
   cargo fix --workspace --all-targets
   cargo clippy --workspace --all-targets --fix
-  cd crates/web-app && cargo fix --workspace --all-targets
-  cd crates/web-app && cargo clippy --workspace --all-targets --fix
+  cd crates/web-app-seed && cargo fix --workspace --all-targets
+  cd crates/web-app-seed && cargo clippy --workspace --all-targets --fix
 
 # Run tests
 test:
   RUST_BACKTRACE=1 cargo test --locked --workspace -- --nocapture
-  RUST_BACKTRACE=1 cargo test --locked --workspace --manifest-path crates/web-app/Cargo.toml -- --nocapture
-  RUST_BACKTRACE=1 wasm-pack test --chrome --headless crates/web-app/
+  RUST_BACKTRACE=1 cargo test --locked --workspace --manifest-path crates/web-app-seed/Cargo.toml -- --nocapture
+  RUST_BACKTRACE=1 wasm-pack test --chrome --headless crates/web-app-seed/

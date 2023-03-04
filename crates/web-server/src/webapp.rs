@@ -2,7 +2,7 @@ use rust_embed::RustEmbed;
 use warp::{http::HeaderValue, hyper::header::CONTENT_TYPE, path::Tail, Filter, Rejection, Reply};
 
 #[derive(RustEmbed)]
-#[folder = "../web-app/dist/"]
+#[folder = "../web-app-seed/dist/"]
 struct Asset;
 
 pub fn get_index() -> impl Filter<Extract = (impl Reply,), Error = Rejection> + Clone {

@@ -17,7 +17,7 @@ Currently there are these circles:
   - `cli`
   - `db`
   - `desktop`
-  - `web-app`
+  - `web-app-seed`
   - `web-server`
 
 Depending on your system the amount and the name of circles could
