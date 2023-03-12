@@ -7,12 +7,13 @@ publish = false
 [dependencies]
 cawr-json-boundary = "*"
 cawr-web-app-api = "*"
-gloo-net = { version = "0.2", default-featues = false }
-seed = { version = "*", features = ["serde-wasm-bindgen"] }
+gloo-console = "*"
+gloo-net = { version = "*", default-features = false }
+seed = "*"
 serde = "1"
 
 [dependencies.derive_more]
-version = "0.99"
+version = "*"
 default-features = false
 features = ["from"]
 

@@ -1,4 +1,5 @@
 use cawr_web_app_api as api;
+use gloo_console as console;
 use seed::prelude::*;
 
 mod domain;
@@ -43,7 +44,7 @@ pub enum Msg {
 // ------ ------
 
 fn update(msg: Msg, mdl: &mut Mdl, orders: &mut impl Orders<Msg>) {
-    seed::log!(msg);
+    console::log!(format!("{msg:?}"));
     match msg {
         Msg::View(msg) => {
             if let Some(cmd) = view::update(msg, &mut mdl.view) {

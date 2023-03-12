@@ -9,6 +9,7 @@ publish = false
 cawr-adapter = "0.0.0"
 
 # External dependencies
+anyhow = "1"
 eframe = "*"
 log = "*"
 tokio = { version = "1", features = ["rt-multi-thread"] }

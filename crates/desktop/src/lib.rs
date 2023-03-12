@@ -1,3 +1,4 @@
+use anyhow::{anyhow, Result};
 use cawr_adapter::{api, db::Db, presenter::http_json_api::Presenter};
 use eframe::egui;
 use std::sync::{mpsc, Arc};
@@ -10,7 +11,9 @@ mod ui;
 //    Start
 // ----- ------
 
-pub fn run<D>(db: Arc<D>)
+const TITLE: &str = "Clean Architecture with Rust";
+
+pub fn run<D>(db: Arc<D>) -> Result<()>
 where
     D: Db,
 {
@@ -22,7 +25,7 @@ where
     let app_api = Api::new(db, Presenter::default());
     let options = eframe::NativeOptions::default();
     eframe::run_native(
-        "Clean Architecture with Rust",
+        TITLE,
         options,
         Box::new(|cc| {
             let ctx = cc.egui_ctx.clone();
@@ -31,7 +34,8 @@ where
             handle_commands(init_cmds, &mut app);
             Box::new(app)
         }),
-    );
+    )
+    .map_err(|err| anyhow!("Unable to start dektop application: {err}"))
 }
 
 // ----- ------

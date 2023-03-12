@@ -14,6 +14,7 @@ cawr-desktop = "0.0.0"
 cawr-web-server = "0.0.0"
 
 # External dependencies
+anyhow = "1"
 clap = { version = "4", features = ["derive"] }
 directories = "4"
 log = "*"

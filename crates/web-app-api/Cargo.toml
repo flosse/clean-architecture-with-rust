@@ -6,10 +6,10 @@ publish = false
 
 [dependencies]
 cawr-json-boundary = { version = "0.0.0", path = "../json-boundary" }
-serde = "1.0.152"
-thiserror = "1.0.38"
+serde = "1"
+thiserror = "1"
 
 [dependencies.gloo-net]
-version = "0.2"
+version = "*"
 default-features = false
 features = ["http", "json"]
