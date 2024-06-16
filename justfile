@@ -3,8 +3,8 @@
 _default:
   @just --list
 
-# Set up (and update) tooling
-setup:
+# Installs the trunk packager
+install-trunk:
   cargo install trunk
 
 # Run the web server
@@ -32,7 +32,7 @@ build-desktop:
   cargo build --bin clean-architecture-with-rust-desktop --release
 
 # Build the web app
-web-app-seed:
+web-app-seed: install-trunk
   cd crates/web-app-seed/ && trunk build
 
 # Read version from Cargo.toml
@@ -72,3 +72,10 @@ test:
   RUST_BACKTRACE=1 cargo test --locked --workspace -- --nocapture
   RUST_BACKTRACE=1 cargo test --locked --workspace --manifest-path crates/web-app-seed/Cargo.toml -- --nocapture
   RUST_BACKTRACE=1 wasm-pack test --chrome --headless crates/web-app-seed/
+
+# Upgrade (and update) dependencies and tools
+upgrade:
+  cargo upgrade --incompatible
+  cargo update
+  cd crates/web-app-seed && cargo upgrade --incompatible
+  cd crates/web-app-seed && cargo update

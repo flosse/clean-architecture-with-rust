@@ -1,8 +1,10 @@
-use cawr_json_boundary as boundary;
-use gloo_net::http::{Method, Request, Response};
-use serde::{Deserialize, Serialize};
 use std::result;
+
+use gloo_net::http::{Request, Response};
+use serde::{Deserialize, Serialize};
 use thiserror::Error;
+
+use cawr_json_boundary as boundary;
 
 #[derive(Debug, Error)]
 pub enum Error<E> {
@@ -27,7 +29,7 @@ where
     T: for<'de> Deserialize<'de> + 'static,
     E: for<'de> Deserialize<'de> + 'static,
 {
-    let req = Request::new(url).method(Method::POST).json(req)?;
+    let req = Request::post(url).json(req)?;
     let res = req.send().await?;
     to_result(res).await
 }
@@ -38,7 +40,7 @@ where
     T: for<'de> Deserialize<'de> + 'static,
     E: for<'de> Deserialize<'de> + 'static,
 {
-    let req = Request::new(url).method(Method::PUT).json(req)?;
+    let req = Request::put(url).json(req)?;
     let res = req.send().await?;
     to_result(res).await
 }
@@ -49,7 +51,7 @@ where
     T: for<'de> Deserialize<'de> + 'static,
     E: for<'de> Deserialize<'de> + 'static,
 {
-    let req = Request::new(url).method(Method::DELETE).json(req)?;
+    let req = Request::delete(url).json(req)?;
     let res = req.send().await?;
     to_result(res).await
 }

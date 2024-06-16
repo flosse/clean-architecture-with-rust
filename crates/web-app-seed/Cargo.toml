@@ -5,15 +5,16 @@ edition = "2021"
 publish = false
 
 [dependencies]
-cawr-json-boundary = "*"
-cawr-web-app-api = "*"
-gloo-console = "*"
-gloo-net = { version = "*", default-features = false }
-seed = "*"
-serde = "1"
+cawr-json-boundary = "=0.0.0"
+cawr-web-app-api = "=0.0.0"
+console_log = { version = "1.0.0", features = ["color"] }
+gloo-net = { version = "0.5", default-features = false }
+log = "0.4"
+seed = "0.10"
+serde = "1.0"
 
 [dependencies.derive_more]
-version = "*"
+version = "0.99"
 default-features = false
 features = ["from"]
 

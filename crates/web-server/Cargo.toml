@@ -1,30 +1,31 @@
 [package]
 name = "cawr-web-server"
-version = "0.0.0"
-edition = "2021"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
 publish = false
 
 [dependencies]
 
 # Workspace dependencies
-cawr-adapter = "0.0.0"
+cawr-adapter = "=0.0.0"
 
 # External dependencies
-log = "*"
-mime_guess = "*"
-rust-embed = "*"
-serde = { version = "1", features = ["derive"] }
-warp = "*"
+log = "0.4"
+mime_guess = "2.0"
+rust-embed = "8.4"
+serde = { version = "1.0", features = ["derive"] }
+warp = "0.3"
 
 [dev-dependencies]
 
 # Workspace dependencies
-cawr-application = "0.0.0"
-cawr-db = "0.0.0"
-cawr-domain = "0.0.0"
+cawr-application = "=0.0.0"
+cawr-db = "=0.0.0"
+cawr-domain = "=0.0.0"
 
 # External dependencies
-anyhow = "*"
-hyper = "*"
-serde_json = "1"
-tokio = { version = "1", features = ["full"] }
+anyhow = "1.0"
+hyper = "0.14" # warp still uses this version
+serde_json = "1.0"
+tokio = { version = "1.38", features = ["full"] }

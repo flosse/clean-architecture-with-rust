@@ -1,22 +1,23 @@
 [package]
 name = "cawr-infrastructure"
-version = "0.0.0"
-edition = "2021"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
 publish = false
 
 [dependencies]
 
 # Workspace dependencies
-cawr-adapter = "0.0.0"
-cawr-cli = "0.0.0"
-cawr-db = "0.0.0"
-cawr-desktop = "0.0.0"
-cawr-web-server = "0.0.0"
+cawr-adapter = "=0.0.0"
+cawr-cli = "=0.0.0"
+cawr-db = "=0.0.0"
+cawr-desktop = "=0.0.0"
+cawr-web-server = "=0.0.0"
 
 # External dependencies
-anyhow = "1"
-clap = { version = "4", features = ["derive"] }
-directories = "4"
-log = "*"
-pretty_env_logger = "*"
-tokio = { version = "1", features = ["full"] }
+anyhow = "1.0"
+clap = { version = "4.5", features = ["derive"] }
+directories = "5.0"
+log = "0.4"
+pretty_env_logger = "0.5"
+tokio = { version = "1.38", features = ["full"] }

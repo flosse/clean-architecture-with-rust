@@ -1,12 +1,12 @@
-use cawr_web_app_api as api;
-use gloo_console as console;
 use seed::prelude::*;
+
+use cawr_web_app_api as api;
 
 mod domain;
 mod usecase;
 mod view;
 
-use domain::*;
+use self::domain::*;
 
 // ------ ------
 //     Model
@@ -44,7 +44,7 @@ pub enum Msg {
 // ------ ------
 
 fn update(msg: Msg, mdl: &mut Mdl, orders: &mut impl Orders<Msg>) {
-    console::log!(format!("{msg:?}"));
+    log::debug!("{msg:?}");
     match msg {
         Msg::View(msg) => {
             if let Some(cmd) = view::update(msg, &mut mdl.view) {
@@ -198,5 +198,6 @@ fn view(mdl: &Mdl) -> impl IntoNodes<Msg> {
 // ------ ------
 
 fn main() {
+    _ = console_log::init_with_level(log::Level::Debug);
     App::start("app", init, update, view);
 }

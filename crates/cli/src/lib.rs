@@ -1,6 +1,8 @@
-use cawr_adapter::{api::Api, db::Db, presenter::cli::Presenter};
-use clap::Subcommand;
 use std::{collections::HashSet, sync::Arc};
+
+use clap::Subcommand;
+
+use cawr_adapter::{api::Api, db::Db, presenter::cli::Presenter};
 
 #[derive(Subcommand)]
 pub enum Command {

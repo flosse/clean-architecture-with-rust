@@ -13,6 +13,8 @@ let
   # required for the desktop
   runtime_deps = with pkgs; [
       libGL
+      libxkbcommon
+      wayland
   ] ++ (with pkgs.xorg; [
       libX11
       libXcursor
@@ -26,10 +28,13 @@ in
     buildInputs = [
 
       rust
-      pkgconfig
+      just
+      trunk
+
+      pkg-config
 
       # required for the web-app
-      sassc
+      dart-sass
 
       # required for the desktop
       freetype

@@ -93,7 +93,7 @@ pub fn update(msg: Msg, mdl: &mut Mdl) -> Option<Cmd> {
             mdl.input = s;
         }
         Msg::TitleChanged(title) => {
-            mdl.title_input = title.clone();
+            mdl.title_input.clone_from(&title);
             if let Some(id) = &mdl.current_thought {
                 if let Some(thought) = mdl.thoughts.get_mut(id) {
                     let updated = Thought {

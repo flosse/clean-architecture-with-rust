@@ -1,12 +1,13 @@
 [package]
 name = "cawr-cli"
-version = "0.0.0"
-edition = "2021"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
 publish = false
 
 [dependencies]
 # Workspace dependencies
-cawr-adapter = "0.0.0"
+cawr-adapter = "=0.0.0"
 
 # External dependencies
-clap = { version = "4", features = ["derive"] }
+clap = { version = "4.5", features = ["derive"] }

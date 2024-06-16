@@ -1,8 +1,9 @@
 [package]
 name = "clean-architecture-with-rust"
-version = "0.0.0"
-authors = ["Markus Kohlhase <markus.kohlhase@slowtec.de>"]
-edition = "2021"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+rust-version.workspace = true
 publish = false
 
 [[bin]]
@@ -31,6 +32,12 @@ members = [
   "crates/web-server"
 ]
 exclude = [ "crates/web-app-seed" ]
+
+[workspace.package]
+authors = ["Markus Kohlhase <markus.kohlhase@slowtec.de>"]
+version = "0.0.0"
+edition = "2021"
+rust-version = "1.79"
 
 [dependencies]
 cawr-infrastructure = "0.0.0"

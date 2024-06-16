@@ -34,10 +34,27 @@ that means
 
 ## Build & run
 
+First install [just](https://just.systems/):
+
 ```
 cargo install just
-just setup
+```
+
+Then you can run
+
+```
 just run-web
+```
+or
+
+```
+just run-desktop
+```
+
+or
+
+```
+just run-cli
 ```
 
 ## Example Szenario

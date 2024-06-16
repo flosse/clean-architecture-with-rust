@@ -1,10 +1,11 @@
 [package]
 name = "cawr-json-boundary"
-version = "0.0.0"
-edition = "2021"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
 publish = false
 
 [dependencies]
-serde = { version = "1", features =  ["derive"] }
-http = "*"
-http-serde = "*"
+serde = { version = "1.0", features =  ["derive"] }
+http = "=0.2" # This is because warp still uses hyper v0.14
+http-serde = "=1.1"  # This is because warp still uses hyper v0.14 

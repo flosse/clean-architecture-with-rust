@@ -1,5 +1,6 @@
-use crate::domain::*;
 use seed::prelude::*;
+
+use crate::domain::*;
 
 pub mod new_area_of_life_dialog;
 pub mod page;

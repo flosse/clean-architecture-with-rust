@@ -1,13 +1,14 @@
 [package]
 name = "cawr-application"
-version = "0.0.0"
-edition = "2021"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
 publish = false
 
 [dependencies]
 # Workspace dependencies
-cawr-domain = "0.0.0"
+cawr-domain = "=0.0.0"
 
 # External dependencies
-log = "*"
-thiserror = "1"
+log = "0.4"
+thiserror = "1.0"

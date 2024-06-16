@@ -1,15 +1,16 @@
 [package]
 name = "cawr-desktop"
-version = "0.0.0"
-edition = "2021"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
 publish = false
 
 [dependencies]
 # Workspace dependencies
-cawr-adapter = "0.0.0"
+cawr-adapter = "=0.0.0"
 
 # External dependencies
-anyhow = "1"
-eframe = "*"
-log = "*"
-tokio = { version = "1", features = ["rt-multi-thread"] }
+anyhow = "1.0"
+eframe = "0.27"
+log = "0.4"
+tokio = { version = "1.38", features = ["rt-multi-thread"] }
