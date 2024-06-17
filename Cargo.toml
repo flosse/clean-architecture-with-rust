@@ -24,7 +24,7 @@ members = [
   "crates/application",
   "crates/cli",
   "crates/db",
-  "crates/desktop",
+  "crates/desktop-egui",
   "crates/domain",
   "crates/infrastructure",
   "crates/json-boundary",
@@ -47,7 +47,7 @@ cawr-adapter         = { path = "crates/adapter"         }
 cawr-application     = { path = "crates/application"     }
 cawr-cli             = { path = "crates/cli"             }
 cawr-db              = { path = "crates/db"              }
-cawr-desktop         = { path = "crates/desktop"         }
+cawr-desktop-egui    = { path = "crates/desktop-egui"    }
 cawr-domain          = { path = "crates/domain"          }
 cawr-infrastructure  = { path = "crates/infrastructure"  }
 cawr-json-boundary   = { path = "crates/json-boundary"   }

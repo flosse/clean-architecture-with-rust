@@ -731,7 +731,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "cawr-desktop"
+name = "cawr-desktop-egui"
 version = "0.0.0"
 dependencies = [
  "anyhow",
@@ -753,7 +753,7 @@ dependencies = [
  "cawr-adapter",
  "cawr-cli",
  "cawr-db",
- "cawr-desktop",
+ "cawr-desktop-egui",
  "cawr-web-server-warp",
  "clap",
  "directories",

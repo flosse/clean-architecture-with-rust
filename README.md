@@ -16,11 +16,11 @@ Currently there are these circles:
 - `infrastructure`
   - `cli`
   - `db`
-  - `desktop`
+  - `desktop-egui`
   - `web`
     - `web-app-api`
     - `web-app-seed`
-    - `web-server`
+    - `web-server-warp`
 
 Depending on your system the amount and the name of circles could
 be different but the main **dependency rule** must be ensured:

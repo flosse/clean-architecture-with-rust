@@ -11,7 +11,7 @@ publish = false
 cawr-adapter = "=0.0.0"
 cawr-cli = "=0.0.0"
 cawr-db = "=0.0.0"
-cawr-desktop = "=0.0.0"
+cawr-desktop-egui = "=0.0.0"
 cawr-web-server-warp = "=0.0.0"
 
 # External dependencies
