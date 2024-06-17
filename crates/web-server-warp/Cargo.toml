@@ -26,6 +26,6 @@ cawr-domain = "=0.0.0"
 
 # External dependencies
 anyhow = "1.0"
-hyper = "0.14" # warp still uses this version
+hyper = "=0.14" # warp still uses this version
 serde_json = "1.0"
 tokio = { version = "1.38", features = ["full"] }

@@ -104,7 +104,7 @@ mod tests {
             thought::{Id as ThoughtId, Thought, Title},
         };
         use std::collections::HashSet;
-        use tempdir::TempDir;
+        use tempfile::TempDir;
 
         #[test]
         fn delete_references_in_thoughts() {
@@ -117,7 +117,7 @@ mod tests {
             };
             // -- setup --
             init();
-            let test_dir = TempDir::new("tests").unwrap();
+            let test_dir = TempDir::new().unwrap();
             log::debug!("Test directory: {}", test_dir.path().display());
             let db = JsonFile::try_new(&test_dir).unwrap();
             let aol_id = (&db as &dyn NewId<AolId>).new_id().unwrap();
