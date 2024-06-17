@@ -1,3 +1,7 @@
+use std::collections::HashMap;
+
+use parking_lot::RwLock;
+
 use cawr_adapter::db::Db;
 use cawr_application::{
     gateway::repository::{
@@ -5,7 +9,6 @@ use cawr_application::{
     },
     identifier::{NewId, NewIdError},
 };
-use std::{collections::HashMap, sync::RwLock};
 
 #[derive(Default)]
 pub struct InMemory {
@@ -24,16 +27,12 @@ mod thought {
 
     impl Repo for InMemory {
         fn save(&self, record: Record) -> Result<(), SaveError> {
-            self.thoughts
-                .write()
-                .unwrap()
-                .insert(record.thought.id(), record);
+            self.thoughts.write().insert(record.thought.id(), record);
             Ok(())
         }
         fn get(&self, id: Id) -> Result<Record, GetError> {
             self.thoughts
                 .read()
-                .unwrap()
                 .get(&id)
                 .cloned()
                 .ok_or(GetError::NotFound)
@@ -42,7 +41,6 @@ mod thought {
             Ok(self
                 .thoughts
                 .read()
-                .unwrap()
                 .iter()
                 .map(|(_, r)| r)
                 .cloned()
@@ -51,7 +49,6 @@ mod thought {
         fn delete(&self, id: Id) -> Result<(), DeleteError> {
             self.thoughts
                 .write()
-                .unwrap()
                 .remove(&id)
                 .map(|_| ())
                 .ok_or(DeleteError::NotFound)
@@ -63,7 +60,6 @@ mod thought {
             let next = self
                 .thoughts
                 .read()
-                .unwrap()
                 .iter()
                 .map(|(id, _)| id.to_u64())
                 .max()
@@ -85,14 +81,12 @@ mod area_of_life {
         fn save(&self, record: Record) -> Result<(), SaveError> {
             self.areas_of_life
                 .write()
-                .unwrap()
                 .insert(record.area_of_life.id(), record);
             Ok(())
         }
         fn get(&self, id: Id) -> Result<Record, GetError> {
             self.areas_of_life
                 .read()
-                .unwrap()
                 .get(&id)
                 .cloned()
                 .ok_or(GetError::NotFound)
@@ -101,7 +95,6 @@ mod area_of_life {
             Ok(self
                 .areas_of_life
                 .read()
-                .unwrap()
                 .iter()
                 .map(|(_, r)| r)
                 .cloned()
@@ -110,7 +103,6 @@ mod area_of_life {
         fn delete(&self, id: Id) -> Result<(), DeleteError> {
             self.areas_of_life
                 .write()
-                .unwrap()
                 .remove(&id)
                 .map(|_| ())
                 .ok_or(DeleteError::NotFound)
@@ -122,7 +114,6 @@ mod area_of_life {
             let next = self
                 .areas_of_life
                 .read()
-                .unwrap()
                 .iter()
                 .map(|(id, _)| id.to_u64())
                 .max()

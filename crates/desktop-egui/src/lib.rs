@@ -22,7 +22,7 @@ where
         .enable_all()
         .build()
         .unwrap();
-    let app_api = Api::new(db, Presenter::default());
+    let app_api = Api::new(db, Presenter);
     let options = eframe::NativeOptions::default();
     eframe::run_native(
         TITLE,

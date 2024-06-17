@@ -14,7 +14,7 @@ pub async fn run<D>(db: Arc<D>, addr: SocketAddr)
 where
     D: Db,
 {
-    let web_app_api = Api::new(db, Presenter::default());
+    let web_app_api = Api::new(db, Presenter);
     let api = route::api(web_app_api);
     let routes = api.or(webapp::get_index()).or(webapp::get_assets());
     warp::serve(routes).run(addr).await;

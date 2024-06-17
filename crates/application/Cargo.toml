@@ -11,4 +11,5 @@ cawr-domain = "=0.0.0"
 
 # External dependencies
 log = "0.4"
+parking_lot = "0.12"
 thiserror = "1.0"

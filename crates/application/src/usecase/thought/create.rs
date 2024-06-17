@@ -1,3 +1,7 @@
+use std::collections::HashSet;
+
+use thiserror::Error;
+
 use crate::{
     gateway::repository::{
         area_of_life,
@@ -13,8 +17,6 @@ use cawr_domain::{
     area_of_life as aol,
     thought::{Id, Thought, Title},
 };
-use std::collections::HashSet;
-use thiserror::Error;
 
 #[derive(Debug)]
 pub struct Request {
@@ -98,7 +100,7 @@ where
 mod tests {
     use super::*;
     use crate::gateway::repository::thought::{DeleteError, GetAllError, GetError};
-    use std::sync::RwLock;
+    use parking_lot::RwLock;
 
     #[derive(Default)]
     struct MockRepo {
@@ -107,7 +109,7 @@ mod tests {
 
     impl thought::Repo for MockRepo {
         fn save(&self, record: Record) -> Result<(), SaveError> {
-            *self.thought.write().unwrap() = Some(record);
+            *self.thought.write() = Some(record);
             Ok(())
         }
         fn get(&self, _: Id) -> Result<Record, GetError> {
@@ -157,7 +159,6 @@ mod tests {
         assert_eq!(
             repo.thought
                 .read()
-                .unwrap()
                 .as_ref()
                 .unwrap()
                 .thought

@@ -1,6 +1,8 @@
-use cawr_domain::thought;
-use std::str::FromStr;
+use std::{fmt, str::FromStr};
+
 use thiserror::Error;
+
+use cawr_domain::thought;
 
 /// This is the public ID of a thought.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -36,9 +38,9 @@ impl FromStr for Id {
     }
 }
 
-impl ToString for Id {
-    fn to_string(&self) -> String {
-        self.0.to_string()
+impl fmt::Display for Id {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.0)
     }
 }
 

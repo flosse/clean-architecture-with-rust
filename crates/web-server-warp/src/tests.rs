@@ -15,14 +15,14 @@ pub fn blank_db() -> Arc<InMemory> {
 }
 
 pub fn corrupt_db() -> Arc<CorruptTestDb> {
-    Arc::new(CorruptTestDb::default())
+    Arc::new(CorruptTestDb)
 }
 
 pub fn app_api<D>(db: Arc<D>) -> AppApi<D>
 where
     D: Db,
 {
-    Api::new(db, Presenter::default())
+    Api::new(db, Presenter)
 }
 
 #[derive(Default)]

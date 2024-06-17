@@ -27,7 +27,7 @@ impl<T> Id<T> {
 
 impl<T> Clone for Id<T> {
     fn clone(&self) -> Self {
-        Self::new(self.id)
+        *self
     }
 }
 

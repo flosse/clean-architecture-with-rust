@@ -16,7 +16,7 @@ pub fn run<D>(db: Arc<D>, cmd: Command)
 where
     D: Db,
 {
-    let app_api = Api::new(db, Presenter::default());
+    let app_api = Api::new(db, Presenter);
 
     match cmd {
         Command::Create { title } => {

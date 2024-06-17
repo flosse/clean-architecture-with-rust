@@ -91,6 +91,6 @@ mod tests {
 
         assert_eq!(err.msg, None);
         assert_eq!(err.status, json::StatusCode::INTERNAL_SERVER_ERROR);
-        assert!(matches!(err.details, None));
+        assert!(err.details.is_none());
     }
 }

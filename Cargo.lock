@@ -705,6 +705,7 @@ version = "0.0.0"
 dependencies = [
  "cawr-domain",
  "log",
+ "parking_lot",
  "thiserror",
 ]
 
@@ -726,6 +727,7 @@ dependencies = [
  "env_logger 0.11.3",
  "jfs",
  "log",
+ "parking_lot",
  "serde",
  "tempfile",
 ]
