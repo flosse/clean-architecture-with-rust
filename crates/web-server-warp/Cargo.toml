@@ -1,5 +1,5 @@
 [package]
-name = "cawr-web-server"
+name = "cawr-web-server-warp"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true

@@ -29,7 +29,7 @@ members = [
   "crates/infrastructure",
   "crates/json-boundary",
   "crates/web-app-api",
-  "crates/web-server"
+  "crates/web-server-warp"
 ]
 exclude = [ "crates/web-app-seed" ]
 
@@ -43,16 +43,16 @@ rust-version = "1.79"
 cawr-infrastructure = "0.0.0"
 
 [patch.crates-io]
-cawr-adapter        = { path = "crates/adapter"        }
-cawr-application    = { path = "crates/application"    }
-cawr-cli            = { path = "crates/cli"            }
-cawr-db             = { path = "crates/db"             }
-cawr-desktop        = { path = "crates/desktop"        }
-cawr-domain         = { path = "crates/domain"         }
-cawr-infrastructure = { path = "crates/infrastructure" }
-cawr-json-boundary  = { path = "crates/json-boundary"  }
-cawr-web-app-api    = { path = "crates/web-app-api"    }
-cawr-web-server     = { path = "crates/web-server"     }
+cawr-adapter         = { path = "crates/adapter"         }
+cawr-application     = { path = "crates/application"     }
+cawr-cli             = { path = "crates/cli"             }
+cawr-db              = { path = "crates/db"              }
+cawr-desktop         = { path = "crates/desktop"         }
+cawr-domain          = { path = "crates/domain"          }
+cawr-infrastructure  = { path = "crates/infrastructure"  }
+cawr-json-boundary   = { path = "crates/json-boundary"   }
+cawr-web-app-api     = { path = "crates/web-app-api"     }
+cawr-web-server-warp = { path = "crates/web-server-warp" }
 
 [profile.release]
 lto = true

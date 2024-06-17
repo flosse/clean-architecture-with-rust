@@ -754,7 +754,7 @@ dependencies = [
  "cawr-cli",
  "cawr-db",
  "cawr-desktop",
- "cawr-web-server",
+ "cawr-web-server-warp",
  "clap",
  "directories",
  "log",
@@ -780,7 +780,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "cawr-web-server"
+name = "cawr-web-server-warp"
 version = "0.0.0"
 dependencies = [
  "anyhow",
