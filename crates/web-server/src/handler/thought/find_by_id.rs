@@ -1,9 +1,9 @@
 use crate::{
-    handler::{reply_error, Result},
+    handler::{reply_error, reply_json, Result},
     AppApi,
 };
 use cawr_adapter::db::Db;
-use warp::{reply, Reply};
+use warp::Reply;
 
 pub type Request = String;
 
@@ -12,7 +12,7 @@ where
     D: Db,
 {
     match api.find_thought(&req) {
-        Ok(res) => Ok(reply::with_status(reply::json(&res.data), res.status)),
+        Ok(res) => Ok(reply_json(&res.data, res.status)),
         Err(err) => Ok(reply_error(err)),
     }
 }
@@ -21,7 +21,7 @@ where
 mod tests {
     use super::handle;
     use crate::tests::{add_thought_to_db, app_api, blank_db, corrupt_db, response_json_body};
-    use cawr_adapter::model::view::json::{thought::find_by_id as uc, Error};
+    use cawr_adapter::model::view::json::{self as json, thought::find_by_id as uc, Error};
     use serde_json::Value;
     use warp::{http::StatusCode, Reply};
 
@@ -57,7 +57,7 @@ mod tests {
         let err: Error<uc::Error> = response_json_body(res).await.unwrap();
 
         assert_eq!(err.msg.unwrap(), "Could not find thought");
-        assert_eq!(err.status, StatusCode::NOT_FOUND);
+        assert_eq!(err.status, json::StatusCode::NOT_FOUND);
         assert!(matches!(err.details.unwrap(), uc::Error::NotFound));
     }
 
@@ -73,7 +73,7 @@ mod tests {
 
         let err: Error<uc::Error> = response_json_body(res).await.unwrap();
         assert_eq!(err.msg.unwrap(), "Unable to parse thought ID");
-        assert_eq!(err.status, StatusCode::BAD_REQUEST);
+        assert_eq!(err.status, json::StatusCode::BAD_REQUEST);
         assert!(matches!(err.details.unwrap(), uc::Error::Id));
     }
 
@@ -90,7 +90,7 @@ mod tests {
         let err: Error<uc::Error> = response_json_body(res).await.unwrap();
 
         assert_eq!(err.msg, None);
-        assert_eq!(err.status, StatusCode::INTERNAL_SERVER_ERROR);
+        assert_eq!(err.status, json::StatusCode::INTERNAL_SERVER_ERROR);
         assert!(matches!(err.details, None));
     }
 }

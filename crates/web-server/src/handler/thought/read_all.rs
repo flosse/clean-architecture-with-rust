@@ -1,16 +1,16 @@
 use crate::{
-    handler::{reply_error, Result},
+    handler::{reply_error, reply_json, Result},
     AppApi,
 };
 use cawr_adapter::db::Db;
-use warp::{reply, Reply};
+use warp::Reply;
 
 pub async fn handle<D>(api: AppApi<D>) -> Result<impl Reply>
 where
     D: Db,
 {
     match api.read_all_thoughts() {
-        Ok(res) => Ok(reply::with_status(reply::json(&res.data), res.status)),
+        Ok(res) => Ok(reply_json(&res.data, res.status)),
         Err(err) => Ok(reply_error(err)),
     }
 }

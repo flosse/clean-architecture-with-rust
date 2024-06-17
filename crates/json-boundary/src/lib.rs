@@ -1,6 +1,9 @@
-use http::StatusCode;
-use serde::{Deserialize, Serialize};
 use std::result;
+
+use serde::{Deserialize, Serialize};
+
+mod status_code;
+pub use self::status_code::StatusCode;
 
 pub mod domain;
 pub mod usecase;
@@ -12,7 +15,6 @@ pub struct Error<T> {
     pub msg: Option<String>,
 
     /// HTTP status code
-    #[serde(with = "http_serde::status_code")]
     pub status: StatusCode,
 
     /// Structured error details
@@ -34,7 +36,6 @@ impl<T> Error<T> {
 pub struct Response<T> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub data: Option<T>,
-    #[serde(with = "http_serde::status_code")]
     pub status: StatusCode,
 }
 

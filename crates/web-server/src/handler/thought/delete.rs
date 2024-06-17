@@ -1,9 +1,9 @@
 use crate::{
-    handler::{reply_error, Result},
+    handler::{reply_error, reply_json, Result},
     AppApi,
 };
 use cawr_adapter::db::Db;
-use warp::{reply, Reply};
+use warp::Reply;
 
 pub type Request = String;
 
@@ -12,7 +12,7 @@ where
     D: Db,
 {
     match api.delete_thought(&req) {
-        Ok(res) => Ok(reply::with_status(reply::json(&res.data), res.status)),
+        Ok(res) => Ok(reply_json(&res.data, res.status)),
         Err(err) => Ok(reply_error(err)),
     }
 }

@@ -10,4 +10,4 @@ pub mod area_of_life {
         usecase::area_of_life::*,
     };
 }
-pub use cawr_json_boundary::{Error, Response, Result};
+pub use cawr_json_boundary::{Error, Response, Result, StatusCode};

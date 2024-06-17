@@ -1,8 +1,7 @@
 use crate::{
-    model::view::json::{Error, Response, Result},
+    model::view::json::{Error, Response, Result, StatusCode},
     presenter::Present,
 };
-use http::StatusCode;
 
 mod to_json;
 
