@@ -29,9 +29,11 @@ members = [
   "crates/infrastructure",
   "crates/json-boundary",
   "crates/web-app-api",
+  "crates/web-app-kern",
+  "crates/web-app-seed",
   "crates/web-server-warp"
 ]
-exclude = [ "crates/web-app-seed" ]
+exclude = [ "crates/web-app" ]
 
 [workspace.package]
 authors = ["Markus Kohlhase <markus.kohlhase@slowtec.de>"]
@@ -52,6 +54,8 @@ cawr-domain          = { path = "crates/domain"          }
 cawr-infrastructure  = { path = "crates/infrastructure"  }
 cawr-json-boundary   = { path = "crates/json-boundary"   }
 cawr-web-app-api     = { path = "crates/web-app-api"     }
+cawr-web-app-kern    = { path = "crates/web-app-kern"    }
+cawr-web-app-seed    = { path = "crates/web-app-seed"    }
 cawr-web-server-warp = { path = "crates/web-server-warp" }
 
 [profile.release]

@@ -18,8 +18,10 @@ Currently there are these circles:
   - `db`
   - `desktop-egui`
   - `web`
-    - `web-app-api`
-    - `web-app-seed`
+    - `web-app`
+      - `web-app-api`
+      - `web-app-kern`
+      - `web-app-seed`
     - `web-server-warp`
 
 Depending on your system the amount and the name of circles could

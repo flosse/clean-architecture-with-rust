@@ -1,0 +1,29 @@
+[package]
+name = "cawr-web-app"
+version = "0.0.0"
+edition = "2021"
+rust-version= "1.79"
+publish = false
+
+[dependencies]
+console_error_panic_hook = "0.1.7"
+console_log = "1.0.0"
+gloo-utils = { version = "0.2.0", default-features = false }
+log = "0.4.21"
+
+[dependencies.cawr-web-app-seed]
+version = "=0.0.0"
+
+[dev-dependencies]
+wasm-bindgen-test = "0.2"
+
+[patch.crates-io]
+cawr-json-boundary  = { path = "../json-boundary"  }
+cawr-web-app-api    = { path = "../web-app-api"    }
+cawr-web-app-kern   = { path = "../web-app-kern"   }
+cawr-web-app-seed   = { path = "../web-app-seed"   }
+
+[profile.release]
+lto = true
+opt-level = 'z'
+codegen-units= 1

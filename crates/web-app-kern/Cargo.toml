@@ -1,0 +1,12 @@
+[package]
+name = "cawr-web-app-kern"
+authors.workspace = true
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+cawr-json-boundary = "=0.0.0" 
+cawr-web-app-api = "=0.0.0"
+derive_more = "0.99.18"
+gloo-net = { version = "0.5.0", default-features = false }

@@ -1,31 +1,13 @@
 [package]
-name = "web-app"
-version = "0.0.0"
-edition = "2021"
+name = "cawr-web-app-seed"
+authors.workspace = true
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
 publish = false
 
 [dependencies]
 cawr-json-boundary = "=0.0.0"
-cawr-web-app-api = "=0.0.0"
-console_log = { version = "1.0.0", features = ["color"] }
-gloo-net = { version = "0.5", default-features = false }
+cawr-web-app-kern = "=0.0.0"
 log = "0.4"
 seed = "0.10"
-serde = "1.0"
-
-[dependencies.derive_more]
-version = "0.99"
-default-features = false
-features = ["from"]
-
-[patch.crates-io]
-cawr-json-boundary = { path = "../json-boundary" }
-cawr-web-app-api   = { path = "../web-app-api"   }
-
-[profile.release]
-lto = true
-opt-level = 'z'
-codegen-units= 1
-
-[dev-dependencies]
-wasm-bindgen-test = "0.3"

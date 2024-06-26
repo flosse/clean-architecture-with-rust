@@ -1,5 +1,6 @@
-use crate::api;
 use std::fmt;
+
+use crate::api;
 
 pub mod area_of_life;
 pub mod thought;
