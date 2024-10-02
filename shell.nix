@@ -35,6 +35,7 @@ in
 
       # required for the web-app
       dart-sass
+      wasm-pack
 
       # required for the desktop
       freetype

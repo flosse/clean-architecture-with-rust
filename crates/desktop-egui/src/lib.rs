@@ -32,7 +32,7 @@ where
             let mut app = App::new(app_api, rt, ctx);
             let init_cmds = vec![ui::Cmd::ReadAllAreasOfLife, ui::Cmd::ReadAllThoughts];
             handle_commands(init_cmds, &mut app);
-            Box::new(app)
+            Ok(Box::new(app))
         }),
     )
     .map_err(|err| anyhow!("Unable to start dektop application: {err}"))

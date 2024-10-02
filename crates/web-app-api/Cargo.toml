@@ -11,6 +11,6 @@ serde = "1.0"
 thiserror = "1.0"
 
 [dependencies.gloo-net]
-version = "0.5"
+version = "0.6"
 default-features = false
 features = ["http", "json"]
