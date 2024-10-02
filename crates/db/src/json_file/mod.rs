@@ -68,13 +68,14 @@ impl JsonFile {
     {
         let id = match self.ids.get::<u64>(key) {
             Ok(id) => Ok(id),
-            Err(err) => match err.kind() {
-                io::ErrorKind::NotFound => Ok(0),
-                _ => {
+            Err(err) => {
+                if err.kind() == io::ErrorKind::NotFound {
+                    Ok(0)
+                } else {
                     log::warn!("Unable to fetch last ID key: {}", err);
                     Err(NewIdError)
                 }
-            },
+            }
         }?;
         let new_id = id + 1;
         self.ids.save_with_id(&new_id, key).map_err(|err| {

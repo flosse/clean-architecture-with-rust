@@ -32,11 +32,11 @@ impl<E: fmt::Debug> Present<api::Error<E>> for ErrorPresenter {
             },
             api::Error::Api(e) => {
                 if let Some(d) = &e.details {
-                    format!("{:?}", d) // TODO
+                    format!("{d:?}") // TODO
                 } else if let Some(m) = &e.msg {
                     m.to_string()
                 } else {
-                    format!("{:?}", e) // TODO
+                    format!("{e:?}") // TODO
                 }
             }
         }

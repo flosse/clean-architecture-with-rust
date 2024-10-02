@@ -27,7 +27,7 @@ pub fn validate_area_of_life_properties(req: &Request) -> Response {
     Ok(())
 }
 
-fn validate_name(name: &str) -> Result<(), NameInvalidity> {
+const fn validate_name(name: &str) -> Result<(), NameInvalidity> {
     let actual = name.len();
     let min = Name::min_len();
 

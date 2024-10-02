@@ -24,7 +24,7 @@ pub(crate) mod thought {
             res.id.to_u64().into()
         }
 
-        pub fn from_thought_invalidity(from: ThoughtInvalidity) -> Error {
+        pub const fn from_thought_invalidity(from: ThoughtInvalidity) -> Error {
             let ThoughtInvalidity::Title(e) = from;
             use validate::TitleInvalidity as T;
             match e {
@@ -37,7 +37,7 @@ pub(crate) mod thought {
         use crate::model::view::json::thought::update::Error;
         use cawr_application::usecase::thought::validate::{self, ThoughtInvalidity};
 
-        pub fn from_thought_invalidity(from: ThoughtInvalidity) -> Error {
+        pub const fn from_thought_invalidity(from: ThoughtInvalidity) -> Error {
             let ThoughtInvalidity::Title(e) = from;
             use validate::TitleInvalidity as T;
             match e {
@@ -101,7 +101,7 @@ pub(crate) mod area_of_life {
             from.id.to_u64().into()
         }
 
-        pub fn try_from_error(from: uc::Error) -> Result<Error, ()> {
+        pub const fn try_from_error(from: uc::Error) -> Result<Error, ()> {
             match from {
                 uc::Error::Repo | uc::Error::NewId => Err(()),
                 uc::Error::Invalidity(e) => {
@@ -121,7 +121,7 @@ pub(crate) mod area_of_life {
             AreaOfLifeInvalidity, NameInvalidity,
         };
 
-        pub fn from_area_of_life_invalidity(from: AreaOfLifeInvalidity) -> Error {
+        pub const fn from_area_of_life_invalidity(from: AreaOfLifeInvalidity) -> Error {
             let AreaOfLifeInvalidity::Name(e) = from;
             use NameInvalidity as T;
             match e {

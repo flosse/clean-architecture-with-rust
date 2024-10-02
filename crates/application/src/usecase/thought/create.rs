@@ -2,6 +2,11 @@ use std::collections::HashSet;
 
 use thiserror::Error;
 
+use cawr_domain::{
+    area_of_life as aol,
+    thought::{Id, Thought, Title},
+};
+
 use crate::{
     gateway::repository::{
         area_of_life,
@@ -13,16 +18,12 @@ use crate::{
         thought::validate::{self, validate_thought_properties, ThoughtInvalidity},
     },
 };
-use cawr_domain::{
-    area_of_life as aol,
-    thought::{Id, Thought, Title},
-};
 
 #[derive(Debug)]
 pub struct Request {
     /// The title of new thought.
     pub title: String,
-    /// Associated [aol::AreaOfLife]s.
+    /// Associated [`aol::AreaOfLife`]s.
     pub areas_of_life: HashSet<aol::Id>,
 }
 
@@ -39,7 +40,7 @@ pub struct CreateThought<'r, 'g, R, G> {
 }
 
 impl<'r, 'g, R, G> CreateThought<'r, 'g, R, G> {
-    pub fn new(repo: &'r R, id_gen: &'g G) -> Self {
+    pub const fn new(repo: &'r R, id_gen: &'g G) -> Self {
         Self { repo, id_gen }
     }
 }
@@ -175,7 +176,7 @@ mod tests {
         let gen = IdGen {};
         let usecase = CreateThought::new(&repo, &gen);
         let req = Request {
-            title: "".into(),
+            title: String::new(),
             areas_of_life: HashSet::new(),
         };
         let err = usecase.exec(req).err().unwrap();

@@ -1,4 +1,4 @@
-use super::*;
+use super::{models, JsonFile, LAST_AREA_OF_LIFE_ID_KEY, MAP_AREA_OF_LIFE_ID_KEY};
 use cawr_adapter::model::app::area_of_life as app;
 use cawr_application::{
     gateway::repository::{

@@ -38,7 +38,7 @@ pub struct ReadAll<'r, R> {
 }
 
 impl<'r, R> ReadAll<'r, R> {
-    pub fn new(repo: &'r R) -> Self {
+    pub const fn new(repo: &'r R) -> Self {
         Self { repo }
     }
 }

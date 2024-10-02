@@ -22,11 +22,11 @@ where
         Command::Create { title } => {
             let areas_of_life = HashSet::new(); // Areas of life needs to be added later
             let res = app_api.create_thought(title, &areas_of_life);
-            println!("{}", res);
+            println!("{res}");
         }
         Command::Read { id } => {
             let res = app_api.find_thought(&id);
-            println!("{}", res);
+            println!("{res}");
         }
     }
 }

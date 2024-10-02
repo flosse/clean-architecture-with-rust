@@ -27,7 +27,7 @@ pub fn validate_thought_properties(req: &Request) -> Response {
     Ok(())
 }
 
-fn validate_title(title: &str) -> Result<(), TitleInvalidity> {
+const fn validate_title(title: &str) -> Result<(), TitleInvalidity> {
     let actual = title.len();
     let min = Title::min_len();
 

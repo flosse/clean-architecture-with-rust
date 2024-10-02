@@ -18,7 +18,7 @@ pub fn corrupt_db() -> Arc<CorruptTestDb> {
     Arc::new(CorruptTestDb)
 }
 
-pub fn app_api<D>(db: Arc<D>) -> AppApi<D>
+pub const fn app_api<D>(db: Arc<D>) -> AppApi<D>
 where
     D: Db,
 {

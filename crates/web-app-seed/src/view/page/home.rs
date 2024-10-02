@@ -1,6 +1,14 @@
-use crate::{domain::*, view::new_area_of_life_dialog as new_aol_dialog};
-use seed::{prelude::*, *};
 use std::collections::HashMap;
+
+use seed::{
+    a, aside, attrs, button, div, empty, h1, h3, i, id, input, li, main, nav, p, prelude::*,
+    section, span, style, ul, C, IF,
+};
+
+use crate::{
+    domain::{AreaOfLife, AreaOfLifeId, Thought, ThoughtId},
+    view::new_area_of_life_dialog as new_aol_dialog,
+};
 
 const CLEAN_ARCH_BLOG_URL: &str =
     "https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html";
@@ -182,7 +190,7 @@ pub fn update(msg: Msg, mdl: &mut Mdl) -> Option<Cmd> {
         }
         Msg::UpdateThoughtResult(res) => {
             mdl.error = match res {
-                Ok(_) => None,
+                Ok(()) => None,
                 Err(err) => Some(err),
             };
         }
@@ -374,8 +382,7 @@ fn aol_list(mdl: &Mdl) -> Node<Msg> {
                     let name = mdl
                         .areas_of_life_edits
                         .get(&id)
-                        .map(|aol| &aol.name)
-                        .unwrap_or(&aol.name);
+                        .map_or(&aol.name, |aol| &aol.name);
                     li![
                         clz,
                         C!["field", "has-addons"],
@@ -557,10 +564,7 @@ fn thoughts_list(
                     }
                 })
                 .map(|t| {
-                    let wait = wait_for_deletion
-                        .as_ref()
-                        .map(|id| id == &t.id)
-                        .unwrap_or(false);
+                    let wait = wait_for_deletion.as_ref().is_some_and(|id| id == &t.id);
                     li![thought(t, wait)]
                 })]
         }

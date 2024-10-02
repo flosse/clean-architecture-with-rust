@@ -1,4 +1,4 @@
-use super::*;
+use super::{models, JsonFile, LAST_THOUGHT_ID_KEY, MAP_THOUGHT_ID_KEY};
 use cawr_adapter::model::app::{area_of_life as aol, thought as app};
 use cawr_application::{
     gateway::repository::thought::{DeleteError, GetAllError, GetError, Record, Repo, SaveError},

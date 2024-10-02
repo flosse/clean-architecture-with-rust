@@ -21,7 +21,7 @@ pub struct Request {
     pub id: Id,
     /// The title of the thought.
     pub title: String,
-    /// Associated [aol::AreaOfLife]s.
+    /// Associated [`aol::AreaOfLife`]s.
     pub areas_of_life: HashSet<aol::Id>,
 }
 

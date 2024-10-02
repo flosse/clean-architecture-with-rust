@@ -9,7 +9,7 @@ mod to_json;
 pub struct Presenter;
 
 mod thought {
-    use super::*;
+    use super::{to_json, Error, Present, Presenter, Response, Result, StatusCode};
     use crate::model::{
         app::thought as app,
         view::json::{area_of_life::AreaOfLifeId, thought as view},
@@ -58,7 +58,7 @@ mod thought {
     impl Present<app::update::Result> for Presenter {
         type ViewModel = Result<(), view::update::Error>;
         fn present(&self, res: app::update::Result) -> Self::ViewModel {
-            res.map(|_| Response {
+            res.map(|()| Response {
                 data: None,
                 status: StatusCode::OK,
             })
@@ -174,7 +174,7 @@ mod thought {
 }
 
 mod area_of_life {
-    use super::*;
+    use super::{to_json, Error, Present, Presenter, Response, Result, StatusCode};
     use crate::model::{app::area_of_life as app, view::json::area_of_life as view};
 
     // -- Create -- //
@@ -206,7 +206,7 @@ mod area_of_life {
     impl Present<app::update::Result> for Presenter {
         type ViewModel = Result<(), view::update::Error>;
         fn present(&self, res: app::update::Result) -> Self::ViewModel {
-            res.map(|_| Response {
+            res.map(|()| Response {
                 data: None,
                 status: StatusCode::OK,
             })

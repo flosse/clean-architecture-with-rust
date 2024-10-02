@@ -39,7 +39,7 @@ where
         + Present<aol::read_all::Result>
         + Present<aol::update::Result>,
 {
-    pub fn new(db: Arc<D>, presenter: P) -> Self {
+    pub const fn new(db: Arc<D>, presenter: P) -> Self {
         Self { db, presenter }
     }
     fn thought_controller(&self) -> controller::thought::Controller<D, P> {

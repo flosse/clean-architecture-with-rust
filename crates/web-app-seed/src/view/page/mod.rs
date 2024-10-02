@@ -1,4 +1,4 @@
-use crate::domain::*;
+use crate::domain::{AreaOfLife, AreaOfLifeId, Thought, ThoughtId};
 use seed::prelude::*;
 
 pub mod home;

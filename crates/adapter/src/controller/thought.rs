@@ -22,9 +22,10 @@ where
         + Present<app::read_all::Result>
         + Present<app::update::Result>,
 {
-    pub fn new(db: &'d D, presenter: &'p P) -> Self {
+    pub const fn new(db: &'d D, presenter: &'p P) -> Self {
         Self { db, presenter }
     }
+
     pub fn create_thought(
         &self,
         title: impl Into<String>,
@@ -44,6 +45,7 @@ where
             });
         self.presenter.present(res)
     }
+
     pub fn update_thought(
         &self,
         id: &str,
@@ -70,6 +72,7 @@ where
             });
         self.presenter.present(res)
     }
+
     pub fn delete_thought(&self, id: &str) -> <P as Present<app::delete::Result>>::ViewModel {
         log::debug!("Delete thought {}", id);
         let res = id
@@ -83,6 +86,7 @@ where
             });
         self.presenter.present(res)
     }
+
     pub fn find_thought(&self, id: &str) -> <P as Present<app::find_by_id::Result>>::ViewModel {
         log::debug!("Find thought {}", id);
         let res = id

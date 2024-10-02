@@ -4,7 +4,7 @@ mod usecase;
 
 pub mod domain;
 
-use self::domain::*;
+use self::domain::{AreaOfLife, AreaOfLifeId, Thought, ThoughtId};
 
 // ------ ------
 //    Message
@@ -59,7 +59,7 @@ pub async fn find_thought_by_id(id: domain::ThoughtId) -> UsecaseResult {
 
 pub async fn delete_thought(id: domain::ThoughtId) -> UsecaseResult {
     let res = usecase::thought::delete(&id).await;
-    UsecaseResult::DeleteThought(res.map(|_| id))
+    UsecaseResult::DeleteThought(res.map(|()| id))
 }
 
 pub async fn create_area_of_life(name: String) -> UsecaseResult {
@@ -80,5 +80,5 @@ pub async fn fetch_all_areas_of_life() -> UsecaseResult {
 
 pub async fn delete_area_of_life(id: domain::AreaOfLifeId) -> UsecaseResult {
     let res = usecase::area_of_life::delete(&id).await;
-    UsecaseResult::DeleteAreaOfLife(res.map(|_| id))
+    UsecaseResult::DeleteAreaOfLife(res.map(|()| id))
 }

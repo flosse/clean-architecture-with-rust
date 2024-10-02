@@ -17,7 +17,7 @@ pub struct Delete<'r, R> {
 }
 
 impl<'r, R> Delete<'r, R> {
-    pub fn new(repo: &'r R) -> Self {
+    pub const fn new(repo: &'r R) -> Self {
         Self { repo }
     }
 }

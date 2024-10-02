@@ -38,7 +38,7 @@ mod thought {
         areas_of_life: Vec<AreaOfLifeId>,
     ) -> Result<(), update::Error> {
         http::put_json(
-            &format!("/api/thought/{}", id),
+            &format!("/api/thought/{id}"),
             &update::Request {
                 id,
                 title,

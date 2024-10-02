@@ -1,7 +1,10 @@
-use crate::gateway::repository::area_of_life::{DeleteError, Repo};
-use cawr_domain::area_of_life::Id;
 use std::fmt::Debug;
+
 use thiserror::Error;
+
+use cawr_domain::area_of_life::Id;
+
+use crate::gateway::repository::area_of_life::{DeleteError, Repo};
 
 #[derive(Debug)]
 pub struct Request {
@@ -17,7 +20,7 @@ pub struct Delete<'r, R> {
 }
 
 impl<'r, R> Delete<'r, R> {
-    pub fn new(repo: &'r R) -> Self {
+    pub const fn new(repo: &'r R) -> Self {
         Self { repo }
     }
 }

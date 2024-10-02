@@ -9,6 +9,7 @@ use cawr_domain::area_of_life as aol;
 pub struct Id(u64);
 
 impl Id {
+    #[must_use]
     pub const fn to_u64(self) -> u64 {
         self.0
     }

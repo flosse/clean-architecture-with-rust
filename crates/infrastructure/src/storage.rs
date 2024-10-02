@@ -2,6 +2,7 @@ use cawr_db::json_file::JsonFile;
 use directories::UserDirs;
 use std::path::{Path, PathBuf};
 
+#[must_use]
 pub fn data_storage(data_dir: Option<PathBuf>) -> JsonFile {
     let data_dir = data_storage_directory(data_dir);
     log::info!("Use data directory: {data_dir:?}");
@@ -15,6 +16,7 @@ const DEFAULT_STORAGE_DIR_NAME: &str = "clean-architecture-with-rust-data";
 // 2. HOME/DOCUMENTS/clean-architecture-with-rust-data
 // 3. HOME/clean-architecture-with-rust-data
 // 4. Relative to the executable: ./clean-architecture-with-rust-data
+#[must_use]
 pub fn data_storage_directory(data_dir: Option<PathBuf>) -> PathBuf {
     if let Some(data_dir) = data_dir {
         data_dir

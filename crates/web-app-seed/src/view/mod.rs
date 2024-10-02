@@ -1,6 +1,6 @@
 use seed::prelude::*;
 
-use crate::domain::*;
+use crate::domain::{AreaOfLife, AreaOfLifeId, Thought, ThoughtId};
 
 pub mod new_area_of_life_dialog;
 pub mod page;

@@ -23,6 +23,7 @@ pub struct Error<T> {
 }
 
 impl<T> Error<T> {
+    #[must_use]
     pub const fn internal() -> Self {
         Self {
             msg: None, // We really want to hide internal details

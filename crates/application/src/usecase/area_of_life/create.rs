@@ -27,7 +27,7 @@ pub struct CreateAreaOfLife<'r, 'g, R, G> {
 }
 
 impl<'r, 'g, R, G> CreateAreaOfLife<'r, 'g, R, G> {
-    pub fn new(repo: &'r R, id_gen: &'g G) -> Self {
+    pub const fn new(repo: &'r R, id_gen: &'g G) -> Self {
         Self { repo, id_gen }
     }
 }

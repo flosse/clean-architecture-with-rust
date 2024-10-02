@@ -1,4 +1,6 @@
-use seed::{prelude::*, *};
+use seed::{
+    attrs, button, div, empty, footer, header, i, input, p, prelude::*, section, span, C, IF,
+};
 
 // ------ ------
 //     Model

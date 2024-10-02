@@ -62,9 +62,9 @@ where
         let (msg_tx, msg_rx) = mpsc::channel();
         let egui = egui_ctx;
         Self {
+            ui,
             api,
             egui,
-            ui,
             rt,
             msg_tx,
             msg_rx,

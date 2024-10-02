@@ -1,5 +1,5 @@
 //! All value objects and information that
-//! belong to [AreaOfLife]s.
+//! belong to [`AreaOfLife`]s.
 
 use crate::value_object;
 
@@ -14,15 +14,18 @@ pub struct AreaOfLife {
 }
 
 impl AreaOfLife {
+    #[must_use]
     pub fn new(id: Id, name: Name) -> Self {
         // Never construct an area of life with invalid name
         debug_assert!(name.as_ref().len() <= Name::max_len());
         debug_assert!(name.as_ref().len() >= Name::min_len());
         Self { id, name }
     }
+    #[must_use]
     pub const fn id(&self) -> Id {
         self.id
     }
+    #[must_use]
     pub const fn name(&self) -> &Name {
         &self.name
     }

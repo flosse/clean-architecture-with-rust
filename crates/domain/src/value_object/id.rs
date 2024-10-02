@@ -46,7 +46,7 @@ impl<T> Hash for Id<T> {
     where
         H: Hasher,
     {
-        self.id.hash(hasher)
+        self.id.hash(hasher);
     }
 }
 
@@ -69,6 +69,6 @@ mod tests {
     #[test]
     fn format_id() {
         let id: Id<()> = Id::new(33);
-        assert_eq!(format!("{}", id), "33");
+        assert_eq!(format!("{id}"), "33");
     }
 }

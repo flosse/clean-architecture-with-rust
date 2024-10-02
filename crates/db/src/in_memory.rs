@@ -19,7 +19,7 @@ pub struct InMemory {
 impl Db for InMemory {}
 
 mod thought {
-    use super::*;
+    use super::{InMemory, NewId, NewIdError};
     use cawr_application::gateway::repository::thought::{
         DeleteError, GetAllError, GetError, Record, Repo, SaveError,
     };
@@ -71,7 +71,7 @@ mod thought {
 }
 
 mod area_of_life {
-    use super::*;
+    use super::{InMemory, NewId, NewIdError};
     use cawr_application::gateway::repository::area_of_life::{
         DeleteError, GetAllError, GetError, Record, Repo, SaveError,
     };

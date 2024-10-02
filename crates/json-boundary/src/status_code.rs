@@ -33,6 +33,7 @@ impl StatusCode {
             .ok_or_else(InvalidStatusCode::new)
     }
 
+    #[must_use]
     pub fn as_u16(&self) -> u16 {
         u16::from(self.0)
     }

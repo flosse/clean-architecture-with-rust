@@ -20,7 +20,7 @@ where
         + Present<app::read_all::Result>
         + Present<app::update::Result>,
 {
-    pub fn new(db: &'d D, presenter: &'p P) -> Self {
+    pub const fn new(db: &'d D, presenter: &'p P) -> Self {
         Self { db, presenter }
     }
     pub fn create_area_of_life(
